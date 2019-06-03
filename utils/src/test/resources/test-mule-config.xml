@@ -1,0 +1,19 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:utils="http://www.mulesoft.org/schema/mule/utils"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/utils http://www.mulesoft.org/schema/mule/utils/current/mule-utils.xsd">
+
+    <utils:config name="config" configId="configId">
+        <utils:connection requiredParameter="aValue" />
+    </utils:config>
+
+    <flow name="sayHiFlow">
+        <utils:say-hi person="Mariano Gonzalez"/>
+    </flow>
+
+    <flow name="retrieveInfoFlow">
+        <utils:retrieve-info config-ref="config"/>
+    </flow>
+
+</mule>
