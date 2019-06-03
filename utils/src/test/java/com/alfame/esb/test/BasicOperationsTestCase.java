@@ -1,4 +1,4 @@
-package com.alfame.esb.utils;
+package com.alfame.esb.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
