@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" 
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+		
+	<http:request-config name="HTTP_Request_Configuration" basePath="/api">
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+		
+	<munit:config name="api-test-suite.xml" />
+	<munit:test name="api-test-suite-get:\test:api-configTest" description="Test" doc:id="4c7798cf-6314-4ea6-a440-3e3ae2ec7834" >
+	
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="api-main" />
+			<munit:enable-flow-source value="get:\test:api-config" />
+		</munit:enable-flow-sources>
+	
+		<munit:execution>
+			<http:request config-ref="HTTP_Request_Configuration" method="GET" path="/test" />
+		</munit:execution>
+		
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]" message="Invalid HTTP Status Code"/>
+			<munit-tools:assert-that doc:name="Assert that" expression="#[attributes.headers['content-type']]" is="#[MunitTools::equalTo('application/json; charset=UTF-8')]" message="Invalid Content-Type Header" />
+		</munit:validation>
+		
+	</munit:test>
+
+</mule>

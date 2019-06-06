@@ -1,0 +1,11 @@
+{
+	"minMuleVersion":"4.1.1",
+	"classLoaderModelLoaderDescriptor": {
+		"id": "mule",
+		"attributes": {
+			"exportedResources": [
+				"/com/alfame/esb/test-integration/beans.xml"
+			]
+		}
+	}
+}
