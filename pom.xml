@@ -13,6 +13,7 @@
 		<module>flowable</module>
 		<module>parents</module>
 		<module>utils</module>
+		<module>bpm-utils</module>
 	</modules>
 	
 	<build>
