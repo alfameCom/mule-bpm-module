@@ -16,6 +16,9 @@
 		<!-- Mule logger -->        
         <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>  
 
+		<!-- Flowable logger -->
+		<AsyncLogger name="org.flowable" level="ERROR" />
+
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>
         </AsyncRoot>

@@ -1,4 +1,4 @@
-package com.alfame.esb.utils.flowable;
+package com.alfame.esb.bpm.utils.flowable;
 
 public class TenantInfoHolder {
 

@@ -1,4 +1,4 @@
-package com.alfame.esb.utils.flowable;
+package com.alfame.esb.bpm.utils.flowable;
 
 import java.util.zip.ZipInputStream;
 
@@ -20,10 +20,17 @@ public class TenantAwareDefaultAutoDeploymentStrategy extends DefaultAutoDeploym
 		
 		this.tenantInfoHolder = tenantInfoHolder;
 	}
+
+    public static final String DEPLOYMENT_MODE = "tenant-aware-default";
+
+    @Override
+    protected String getDeploymentMode() {
+        return DEPLOYMENT_MODE;
+    }
 	
 	@Override
 	public void deployResources(String deploymentNameHint, Resource[] resources, RepositoryService repositoryService ) {
-		
+		logger.info( "ASD" );
 		try {
             // Create a single deployment for all resources using the name hint as the literal name
             final DeploymentBuilder deploymentBuilder = repositoryService
@@ -34,6 +41,7 @@ public class TenantAwareDefaultAutoDeploymentStrategy extends DefaultAutoDeploym
 
             for (final Resource resource : resources) {
                 final String resourceName = determineResourceName(resource);
+                logger.info( "Deploying resource with name " + resourceName );
                 if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
                     deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
                 } else {

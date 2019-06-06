@@ -18,7 +18,7 @@
 		<property name="password" value="sa"/>
 	</bean>
 	
-	<bean id="tenantInfoHolder" class="com.alfame.esb.utils.flowable.TenantInfoHolder">
+	<bean id="tenantInfoHolder" class="com.alfame.esb.bpm.utils.flowable.TenantInfoHolder">
 		<property name="tenantId" value="com.alfame.esb" />
 	</bean>
 	
@@ -26,14 +26,14 @@
 		<property name="dataSource" ref="processEngineDataSource" />
 	</bean>
 
-	<bean id="processEngineConfiguration" class="com.alfame.esb.utils.flowable.TenantAwareSpringProcessEngineConfiguration">
+	<bean id="processEngineConfiguration" class="com.alfame.esb.bpm.utils.flowable.TenantAwareSpringProcessEngineConfiguration">
 		<property name="dataSource" ref="processEngineDataSource" />
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="databaseSchemaUpdate" value="true" />
 		<property name="asyncExecutorActivate" value="true" />
 		<property name="history" value="audit" />
 		<property name="tenantInfoHolder" ref="tenantInfoHolder" />
-		<property name="deploymentResources" value="classpath*:processes/*.bpmn" />
+		<property name="deploymentResources" value="classpath*:processes/*.bpmn20.xml" />
 	</bean>
 
 	<bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">

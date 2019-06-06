@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="2138b7d4-1d22-438c-ac2f-197518b2c01c" >
+		<vm:queues >
+			<vm:queue queueName="com.alfame.esb.processStarter" />
+			<vm:queue queueName="com.alfame.esb.testMuleTask" />
+		</vm:queues>
+	</vm:config>
+	
+	<flow name="processStarterFlow">
+		<vm:listener queueName="com.alfame.esb.processStarter" doc:name="Listener" config-ref="VM_Config"/>
+		<logger level="INFO" message="#[payload]" />
+		
+		<java:invoke-static method="getInstance" class="com.alfame.esb.test.StartProcess" />
+		
+	</flow>
+	
+	<flow name="testMuleTaskFlow" doc:id="2a25918c-499f-4b80-9181-bd8274377810" >
+		<vm:listener queueName="com.alfame.esb.testMuleTask" doc:name="Listener" doc:id="4e9f5fed-7810-4542-b2a1-c655c1b50648" config-ref="VM_Config"/>
+		<logger level="INFO" message="#[payload]" />
+		
+		<set-payload value="false" />
+		
+	</flow>
+	
+	
+	
+</mule>
