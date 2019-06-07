@@ -26,6 +26,10 @@
 		<property name="dataSource" ref="processEngineDataSource" />
 	</bean>
 
+	<!--  bean id="processDefinitionResources" class="com.alfame.esb.bpm.utils.flowable.ProcessDefinitionResources">
+		<constructor-arg value="classpath*:processes/*.bpmn20.xml" />
+	</bean-->
+	
 	<bean id="processEngineConfiguration" class="com.alfame.esb.bpm.utils.flowable.TenantAwareSpringProcessEngineConfiguration">
 		<property name="dataSource" ref="processEngineDataSource" />
 		<property name="transactionManager" ref="transactionManager" />
@@ -33,7 +37,15 @@
 		<property name="asyncExecutorActivate" value="true" />
 		<property name="history" value="audit" />
 		<property name="tenantInfoHolder" ref="tenantInfoHolder" />
-		<property name="deploymentResources" value="classpath*:processes/*.bpmn20.xml" />
+		<!-- property name="deploymentResources" value="classpath*:processes/*.bpmn20.xml" / -->
+		<property name="deploymentResources">
+			<list value-type="org.springframework.core.io.Resource">
+				<value>classpath:/processes/TestProcess.bpmn20.xml</value>
+			</list>
+		</property>
+		<!--  property name="deploymentResources">
+			<bean factory-bean="processDefinitionResources" factory-method="getResources" />
+		</property -->
 	</bean>
 
 	<bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
