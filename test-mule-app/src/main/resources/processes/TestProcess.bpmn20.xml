@@ -3,7 +3,7 @@
   <process id="testProcess" name="TestProcess" isExecutable="true">
     <startEvent id="sid-EFAA0939-EB43-4D17-BE6A-2145F2E9E544" isInterrupting="false">
       <timerEventDefinition>
-        <timeCycle>PT10M</timeCycle>
+        <timeCycle>0 0/5 * 1/1 * ? *</timeCycle>
       </timerEventDefinition>
     </startEvent>
     <serviceTask id="testMuleTask" name="Test Mule Task" flowable:async="true" flowable:exclusive="false" flowable:type="mule">

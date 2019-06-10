@@ -68,8 +68,12 @@
 							<groupId>org.apache.logging.log4j</groupId>
 							<artifactId>log4j-api</artifactId>
 						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.mule.runtime</groupId>
+							<artifactId>mule-api</artifactId>
+						</sharedLibrary>
 					</sharedLibraries>
-				<classifier>mule-application</classifier>
+					<classifier>mule-application</classifier>
                 </configuration>
 			</plugin>
 			<plugin>
@@ -95,6 +99,11 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-mule4</artifactId>
+			<version>6.4.1</version>
 		</dependency>
 	
 		
@@ -127,6 +136,6 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 
-	</dependencies>
+    </dependencies>
 
 </project>

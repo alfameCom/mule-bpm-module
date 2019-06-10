@@ -56,6 +56,11 @@
 			<artifactId>flowable-spring</artifactId>
 			<version>${flowable.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-groovy-script-static-engine</artifactId>
+			<version>${flowable.version}</version>
+		</dependency>
 
 		<!-- Spring -->
 		<dependency>
@@ -97,6 +102,13 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
 			<version>${spring.security.version}</version>
+		</dependency>
+
+		<!-- Mule Runtime -->
+		<dependency>
+			<groupId>org.mule.runtime</groupId>
+			<artifactId>mule-api</artifactId>
+			<version>1.2.0</version>
 		</dependency>
 
 		<!-- Mule Modules -->

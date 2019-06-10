@@ -5,25 +5,17 @@ import org.apache.commons.logging.LogFactory;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.configurator.AutoDeploymentStrategy;
+import org.springframework.core.io.Resource;
 
 public class TenantAwareSpringProcessEngineConfiguration extends SpringProcessEngineConfiguration {
 
 	private static final Log logger = LogFactory.getLog( TenantAwareSpringProcessEngineConfiguration.class );
 
 	protected String deploymentMode = "tenant-aware-default";
-	private TenantInfoHolder tenantInfoHolder;
-	
-	public TenantInfoHolder getTenantInfoHolder() {
-		return tenantInfoHolder;
-	}
 
-	public void setTenantInfoHolder(TenantInfoHolder tenantInfoHolder) {
-		this.tenantInfoHolder = tenantInfoHolder;
-	}
-
-	public TenantAwareSpringProcessEngineConfiguration() {
+	public TenantAwareSpringProcessEngineConfiguration( TenantInfoHolder tenantInfoHolder ) {
 		super();
-		deploymentStrategies.add( new TenantAwareDefaultAutoDeploymentStrategy( this.tenantInfoHolder ) );
+		deploymentStrategies.add( new TenantAwareDefaultAutoDeploymentStrategy( tenantInfoHolder ) );
 	}
 
 	@Override	
@@ -35,5 +27,5 @@ public class TenantAwareSpringProcessEngineConfiguration extends SpringProcessEn
             strategy.deployResources(deploymentName, deploymentResources, processEngine.getRepositoryService());
         }
     }
-	
+
 }

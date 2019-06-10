@@ -30,7 +30,6 @@ public class TenantAwareDefaultAutoDeploymentStrategy extends DefaultAutoDeploym
 	
 	@Override
 	public void deployResources(String deploymentNameHint, Resource[] resources, RepositoryService repositoryService ) {
-		logger.info( "ASD" );
 		try {
             // Create a single deployment for all resources using the name hint as the literal name
             final DeploymentBuilder deploymentBuilder = repositoryService
