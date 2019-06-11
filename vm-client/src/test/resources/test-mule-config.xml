@@ -1,0 +1,19 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vmclient="http://www.mulesoft.org/schema/mule/vmclient"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/vmclient http://www.mulesoft.org/schema/mule/vmclient/current/mule-vmclient.xsd">
+
+    <vmclient:config name="config" configId="configId">
+        <vmclient:connection requiredParameter="aValue" />
+    </vmclient:config>
+
+    <flow name="sayHiFlow">
+        <vmclient:say-hi person="Mariano Gonzalez"/>
+    </flow>
+
+    <flow name="retrieveInfoFlow">
+        <vmclient:retrieve-info config-ref="config"/>
+    </flow>
+
+</mule>
