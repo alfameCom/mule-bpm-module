@@ -13,8 +13,9 @@
 		<module>parents</module>
 		<module>utils</module>
 		<module>bpm-utils</module>
-    	<module>vm-client</module>
-	</modules>
+		<module>bpm-queue</module>
+		<module>mule-bpm-connector</module>
+  </modules>
 	
 	<build>
 		<plugins>
