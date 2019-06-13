@@ -4,23 +4,17 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
           http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
 
-    <bpm:config name="config" configId="configId">
-        <bpm:connection requiredParameter="aValue" />
-    </bpm:config>
-
-    <flow name="sayHiFlow">
-        <bpm:say-hi person="Mariano Gonzalez"/>
-    </flow>
-
-    <flow name="retrieveInfoFlow">
-        <bpm:retrieve-info config-ref="config"/>
-    </flow>
-
-    <flow name="bpmListenerTestFlow">
-        <bpm:listener queueName="some.test.queue" />
+    <flow name="bpmListenerSuccessTestFlow">
+        <bpm:listener queueName="some.success.test.queue" />
         <logger level="INFO" message="#[payload]" />
         <logger level="INFO" message="#[attributes]" />
         <set-payload value="asd" />
+    </flow>
+
+    <flow name="bpmListenerErrorTestFlow">
+        <bpm:listener queueName="some.error.test.queue" />
+        <set-payload value="BEFORE_ERROR" />
+		<raise-error type="ANY" description="THIS IS SOME TEST ERROR" />
     </flow>
 
 </mule>

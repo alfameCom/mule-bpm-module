@@ -1,9 +1,11 @@
 package com.alfame.esb.connectors.bpm.internal;
 
+import com.alfame.esb.connectors.bpm.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.connectors.bpm.internal.listener.BPMListener;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 
 
@@ -14,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 @Xml(prefix = "bpm")
 @Extension(name = "bpm")
 @Sources( BPMListener.class)
-@Configurations(BasicConfiguration.class)
-public class BasicExtension {
+@ConnectionProviders( BPMConnectionProvider.class )
+public class BPMExtension {
 
 }

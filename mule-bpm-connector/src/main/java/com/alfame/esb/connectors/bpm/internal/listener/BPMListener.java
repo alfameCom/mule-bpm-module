@@ -7,9 +7,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import com.alfame.esb.bpm.activity.queue.api.*;
 import com.alfame.esb.connectors.bpm.internal.BPMQueueDescriptor;
+import com.alfame.esb.connectors.bpm.internal.connection.BPMConnection;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
@@ -24,10 +27,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.*;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
@@ -59,6 +59,9 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 
 	@Inject
 	private ConfigurationComponentLocator componentLocator;
+
+	@Connection
+	private ConnectionProvider< BPMConnection > connectionProvider;
 
 	private Scheduler scheduler;
 
@@ -101,16 +104,18 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 		String payload = (String)messageBuilder.getContent().getValue();
 		BPMActivityResponse response = new BPMActivityResponse( new TypedValue<>( payload, DataType.STRING) );
 
-		//messageBuilder.getResponseCallback().submitResponse( response );
+		BPMConnection connection = ctx.getConnection();
+		connection.getResponseCallback().submitResponse( response );
 
 	}
 
 	@OnError
-	public void onError( Error error, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
+	public void onError( @ParameterGroup( name = "Error Response", showInDsl = true) BPMResponseBuilder messageBuilder, Error error, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
 
 		final ErrorType errorType = error.getErrorType();
 		String msg = errorType.getNamespace() + ":" + errorType.getIdentifier() + ": " + error.getDescription();
-
+		LOGGER.info( (String)messageBuilder.getContent().getValue() );
+		LOGGER.info( "ERROR" );
 
 	}
 
@@ -164,8 +169,11 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 				try {
 
 					semaphore.acquire();
+					final BPMConnection connection = connect( ctx );
 					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( queueDescriptor.getQueueName() );
 					BPMActivity activity = queue.pop();
+
+					connection.setResponseCallback( activity );
 
 					if( activity == null ) {
 						cancel( ctx );
@@ -218,6 +226,13 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 				}
 			}
 			semaphore.release();
+			connectionProvider.disconnect( ctx.getConnection() );
+		}
+
+		private BPMConnection connect( SourceCallbackContext ctx ) throws ConnectionException, TransactionException {
+			BPMConnection connection = connectionProvider.connect();
+			ctx.bindConnection( connection );
+			return connection;
 		}
 
 		private boolean isAlive() {
