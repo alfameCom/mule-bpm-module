@@ -19,7 +19,7 @@
     <flow name="bpmListenerTestFlow">
         <bpm:listener queueName="some.test.queue" />
         <logger level="INFO" message="#[payload]" />
-        <logger level="INFO" message="#[attributes.]" />
+        <logger level="INFO" message="#[attributes]" />
         <set-payload value="asd" />
     </flow>
 

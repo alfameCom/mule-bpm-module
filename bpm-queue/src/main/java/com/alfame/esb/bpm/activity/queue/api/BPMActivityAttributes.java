@@ -1,11 +1,11 @@
-package com.alfame.esb.bpm.queue.api;
+package com.alfame.esb.bpm.activity.queue.api;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import static java.time.LocalDateTime.now;
 
-public class BPMMessageAttributes implements Serializable {
+public class BPMActivityAttributes implements Serializable {
 
 	private final String queueName;
 	private final String correlationId;
@@ -17,7 +17,7 @@ public class BPMMessageAttributes implements Serializable {
 	 * @param queueName			the name of the queue from which the message was taken
 	 * @param correlationId		the message correlation id
 	 */
-	public BPMMessageAttributes( String queueName, String correlationId ) {
+	public BPMActivityAttributes( String queueName, String correlationId ) {
 		this.queueName = queueName;
 		this.correlationId = correlationId;
 	}

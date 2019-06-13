@@ -3,9 +3,9 @@ package com.alfame.esb.connectors.bpm;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-import com.alfame.esb.bpm.queue.api.BPMQueue;
-import com.alfame.esb.bpm.queue.api.BPMQueueFactory;
-import com.alfame.esb.bpm.queue.api.BPMMessage;
+import com.alfame.esb.bpm.activity.queue.api.BPMActivityQueue;
+import com.alfame.esb.bpm.activity.queue.api.BPMActivityQueueFactory;
+import com.alfame.esb.bpm.activity.queue.api.BPMActivity;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.junit.Test;
 import org.mule.runtime.api.metadata.DataType;
@@ -21,7 +21,7 @@ public class BasicOperationsTestCase extends MuleArtifactFunctionalTestCase {
     return "test-mule-config.xml";
   }
 
-  @Test
+  //@Test
   public void executeSayHiOperation() throws Exception {
     String payloadValue = ((String) flowRunner("sayHiFlow").run()
                                       .getMessage()
@@ -30,7 +30,7 @@ public class BasicOperationsTestCase extends MuleArtifactFunctionalTestCase {
     assertThat(payloadValue, is("Hello Mariano Gonzalez!!!"));
   }
 
-  @Test
+  //@Test
   public void executeRetrieveInfoOperation() throws Exception {
     String payloadValue = ((String) flowRunner("retrieveInfoFlow")
                                       .run()
@@ -42,9 +42,11 @@ public class BasicOperationsTestCase extends MuleArtifactFunctionalTestCase {
 
   @Test
   public void executeBpmListenerTestFlow() throws Exception {
-    BPMQueue queue = BPMQueueFactory.getInstance( "some.test.queue" );
-    queue.publish( new BPMMessage( new TypedValue<>( "asd", DataType.STRING ), null ) );
-    flowRunner( "bpmListenerTestFlow" ).run();
+    BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "some.test.queue" );
+    BPMActivity activity = new BPMActivity( null, null );
+    queue.publish( activity );
+    //flowRunner( "bpmListenerTestFlow" ).run();
+    activity.waitForResponse();
   }
 
 }

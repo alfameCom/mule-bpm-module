@@ -26,6 +26,11 @@
 			<artifactId>mule-api</artifactId>
 			<version>1.2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.2</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>

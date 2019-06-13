@@ -5,10 +5,10 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.alfame.esb.bpm.queue.api.BPMMessage;
-import com.alfame.esb.bpm.queue.api.BPMMessageAttributes;
-import com.alfame.esb.bpm.queue.api.BPMQueue;
-import com.alfame.esb.bpm.queue.api.BPMQueueFactory;
+import com.alfame.esb.bpm.activity.queue.api.BPMActivity;
+import com.alfame.esb.bpm.activity.queue.api.BPMActivityAttributes;
+import com.alfame.esb.bpm.activity.queue.api.BPMActivityQueue;
+import com.alfame.esb.bpm.activity.queue.api.BPMActivityQueueFactory;
 import com.alfame.esb.connectors.bpm.internal.BPMQueueDescriptor;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Alias( "listener" )
 @EmitsResponse
 @MediaType( value = ANY, strict = false )
-public class BPMListener extends Source< Serializable, BPMMessageAttributes > {
+public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 
 	private static final Logger LOGGER = getLogger( BPMListener.class );
 
@@ -76,7 +76,7 @@ public class BPMListener extends Source< Serializable, BPMMessageAttributes > {
 	private List< Consumer > consumers;
 
 	@Override
-	public void onStart( SourceCallback< Serializable, BPMMessageAttributes > sourceCallback ) throws MuleException {
+	public void onStart( SourceCallback< Serializable, BPMActivityAttributes > sourceCallback ) throws MuleException {
 
 		startConsumers( sourceCallback );
 
@@ -118,7 +118,7 @@ public class BPMListener extends Source< Serializable, BPMMessageAttributes > {
 
 	}
 
-	private void startConsumers( SourceCallback< Serializable, BPMMessageAttributes > sourceCallback ) {
+	private void startConsumers( SourceCallback< Serializable, BPMActivityAttributes > sourceCallback ) {
 		createScheduler();
 		consumers = new ArrayList<>( numberOfConsumers );
 		semaphore = new Semaphore( getMaxConcurrency(), false );
@@ -145,10 +145,10 @@ public class BPMListener extends Source< Serializable, BPMMessageAttributes > {
 
 	private class Consumer {
 
-		private final SourceCallback< Serializable, BPMMessageAttributes > sourceCallback;
+		private final SourceCallback< Serializable, BPMActivityAttributes > sourceCallback;
 		private final AtomicBoolean stop = new AtomicBoolean( false );
 
-		public Consumer( SourceCallback< Serializable, BPMMessageAttributes > sourceCallback ) {
+		public Consumer( SourceCallback< Serializable, BPMActivityAttributes > sourceCallback ) {
 			this.sourceCallback = sourceCallback;
 		}
 
@@ -161,35 +161,26 @@ public class BPMListener extends Source< Serializable, BPMMessageAttributes > {
 				try {
 
 					semaphore.acquire();
-					final BPMQueue queue = BPMQueueFactory.getInstance( queueDescriptor.getQueueName() );
-					Serializable value = queue.pop();
+					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( queueDescriptor.getQueueName() );
+					BPMActivity value = queue.pop();
 
+					if( value != null ) {
+						LOGGER.info( "test" );
+					}
 					if( value == null ) {
 						cancel( ctx );
 						continue;
 					}
 
 					String correlationId = null;
-					Result.Builder resultBuilder = Result.<Serializable, BPMMessageAttributes>builder();
+					Result.Builder resultBuilder = Result.<Serializable, BPMActivityAttributes >builder();
 
-					if( value instanceof BPMMessage ) {
-						BPMMessage command = (BPMMessage) value;
-						correlationId = command.getCorrelationId().orElse( null );
+					correlationId = value.getCorrelationId().orElse( null );
 
-						value = command.getValue();
-					}
+					resultBuilder.output( value );
+					resultBuilder.attributes( new BPMActivityAttributes( queueDescriptor.getQueueName(), correlationId ) );
 
-					if( value instanceof TypedValue ) {
-						TypedValue typedValue = (TypedValue) value;
-						resultBuilder.output( typedValue.getValue() ).mediaType( typedValue.getDataType().getMediaType() );
-					} else {
-						resultBuilder.output( value );
-					}
-
-					LOGGER.info( (String)((TypedValue)value).getValue() );
-
-					resultBuilder.attributes( new BPMMessageAttributes( queueDescriptor.getQueueName(), correlationId ) );
-					Result< Serializable, BPMMessageAttributes > result = resultBuilder.build();
+					Result< Serializable, BPMActivityAttributes > result = resultBuilder.build();
 
 					ctx.setCorrelationId( correlationId );
 
@@ -219,13 +210,13 @@ public class BPMListener extends Source< Serializable, BPMMessageAttributes > {
 		}
 
 		private void cancel( SourceCallbackContext ctx ) {
-			try {
+			/*try {
 				ctx.getTransactionHandle().rollback();
 			} catch( TransactionException e ) {
 				if( LOGGER.isWarnEnabled() ) {
 					LOGGER.warn( "Failed to rollback transaction: " + e.getMessage(), e );
 				}
-			}
+			}*/
 			semaphore.release();
 		}
 
