@@ -5,7 +5,7 @@ import java.util.concurrent.*;
 
 import static java.util.Optional.ofNullable;
 
-public class BPMActivity {
+public class BPMActivity implements BPMActivityResponseCallback {
 
 	private CompletableFuture< BPMActivityResponse > completableFuture = new CompletableFuture<>();
 

@@ -5,10 +5,7 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.alfame.esb.bpm.activity.queue.api.BPMActivity;
-import com.alfame.esb.bpm.activity.queue.api.BPMActivityAttributes;
-import com.alfame.esb.bpm.activity.queue.api.BPMActivityQueue;
-import com.alfame.esb.bpm.activity.queue.api.BPMActivityQueueFactory;
+import com.alfame.esb.bpm.activity.queue.api.*;
 import com.alfame.esb.connectors.bpm.internal.BPMQueueDescriptor;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -16,6 +13,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
@@ -100,6 +98,11 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 
 		LOGGER.info( (String)messageBuilder.getContent().getValue() );
 
+		String payload = (String)messageBuilder.getContent().getValue();
+		BPMActivityResponse response = new BPMActivityResponse( new TypedValue<>( payload, DataType.STRING) );
+
+		//messageBuilder.getResponseCallback().submitResponse( response );
+
 	}
 
 	@OnError
@@ -162,12 +165,9 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 
 					semaphore.acquire();
 					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( queueDescriptor.getQueueName() );
-					BPMActivity value = queue.pop();
+					BPMActivity activity = queue.pop();
 
-					if( value != null ) {
-						LOGGER.info( "test" );
-					}
-					if( value == null ) {
+					if( activity == null ) {
 						cancel( ctx );
 						continue;
 					}
@@ -175,9 +175,9 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 					String correlationId = null;
 					Result.Builder resultBuilder = Result.<Serializable, BPMActivityAttributes >builder();
 
-					correlationId = value.getCorrelationId().orElse( null );
+					correlationId = activity.getCorrelationId().orElse( null );
 
-					resultBuilder.output( value );
+					resultBuilder.output( "test" );
 					resultBuilder.attributes( new BPMActivityAttributes( queueDescriptor.getQueueName(), correlationId ) );
 
 					Result< Serializable, BPMActivityAttributes > result = resultBuilder.build();
@@ -210,13 +210,13 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 		}
 
 		private void cancel( SourceCallbackContext ctx ) {
-			/*try {
+			try {
 				ctx.getTransactionHandle().rollback();
 			} catch( TransactionException e ) {
 				if( LOGGER.isWarnEnabled() ) {
 					LOGGER.warn( "Failed to rollback transaction: " + e.getMessage(), e );
 				}
-			}*/
+			}
 			semaphore.release();
 		}
 
