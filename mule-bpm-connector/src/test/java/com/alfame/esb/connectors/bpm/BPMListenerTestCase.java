@@ -24,7 +24,7 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 		return "test-mule-config.xml";
 	}
 
-	@Test
+	//@Test
 	public void executeBpmListenerSuccessTestFlow() throws Exception {
 		BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "some.success.test.queue" );
 		BPMActivity activity = new BPMActivity( null, null );
@@ -34,7 +34,7 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 		LOGGER.info( (String)response.getValue().getValue() );
 	}
 
-	@Test
+	//@Test
 	public void executeBpmListenerErrorTestFlow() throws Exception {
 		BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "some.error.test.queue" );
 		BPMActivity activity = new BPMActivity( null, null );
@@ -42,6 +42,11 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 		BPMActivityResponse response = activity.waitForResponse();
 		response.getValue().toString();
 		LOGGER.info( (String)response.getValue().getValue() );
+	}
+
+	@Test
+	public void executeBpmStartProcessTestFlow() throws Exception {
+		flowRunner( "bpmStartProcessTestFlow" ).run();
 	}
 
 }

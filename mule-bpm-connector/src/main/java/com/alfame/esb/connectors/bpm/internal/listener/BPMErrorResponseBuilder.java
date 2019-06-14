@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
-public class BPMResponseBuilder {
+public class BPMErrorResponseBuilder {
 
 	@Parameter
 	@Content

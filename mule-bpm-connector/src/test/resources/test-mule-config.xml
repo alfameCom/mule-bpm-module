@@ -8,13 +8,27 @@
         <bpm:listener queueName="some.success.test.queue" />
         <logger level="INFO" message="#[payload]" />
         <logger level="INFO" message="#[attributes]" />
-        <set-payload value="asd" />
+        <set-payload value="SUCCESS" />
     </flow>
 
     <flow name="bpmListenerErrorTestFlow">
         <bpm:listener queueName="some.error.test.queue" />
         <set-payload value="BEFORE_ERROR" />
-		<raise-error type="ANY" description="THIS IS SOME TEST ERROR" />
+		<raise-error type="ANY" description="SOME_TEST_ERROR" />
+        <error-handler>
+            <on-error-propagate>
+                <set-payload value="#[error.description]" />
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+
+    <flow name="bpmStartProcessTestFlow">
+        <bpm:processfactory>
+            <bpm:properties>
+                <bpm:tenantId value="asd" />
+            </bpm:properties>
+        </bpm:processfactory>
+        <set-payload value="TEST" />
     </flow>
 
 </mule>

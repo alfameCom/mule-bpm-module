@@ -2,11 +2,13 @@ package com.alfame.esb.connectors.bpm.internal;
 
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.connectors.bpm.internal.listener.BPMListener;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.Sources;
+import com.alfame.esb.connectors.bpm.internal.processfactory.ProcessFactoryOperations;
+import org.mule.runtime.api.meta.ExternalLibraryType;
+import org.mule.runtime.extension.api.annotation.*;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+
+import static org.mule.runtime.api.meta.ExternalLibraryType.DEPENDENCY;
 
 
 /**
@@ -14,9 +16,11 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
  * and sources are going to be declared.
  */
 @Xml(prefix = "bpm")
-@Extension(name = "bpm")
-@Sources( BPMListener.class)
+@Extension(name = "BPM")
+@Sources( BPMListener.class )
 @ConnectionProviders( BPMConnectionProvider.class )
+@Operations( { ProcessFactoryOperations.class } )
+@ExternalLib( name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl")
 public class BPMExtension {
 
 }

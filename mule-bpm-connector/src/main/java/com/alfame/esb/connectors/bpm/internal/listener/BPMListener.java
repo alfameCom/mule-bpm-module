@@ -97,11 +97,11 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 	}
 
 	@OnSuccess
-	public void onSuccess( @ParameterGroup( name = "Response", showInDsl = true ) BPMResponseBuilder messageBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
+	public void onSuccess( @ParameterGroup( name = "Response", showInDsl = true ) BPMSuccessResponseBuilder responseBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
 
-		LOGGER.info( (String)messageBuilder.getContent().getValue() );
+		LOGGER.info( (String)responseBuilder.getContent().getValue() );
 
-		String payload = (String)messageBuilder.getContent().getValue();
+		String payload = (String)responseBuilder.getContent().getValue();
 		BPMActivityResponse response = new BPMActivityResponse( new TypedValue<>( payload, DataType.STRING) );
 
 		BPMConnection connection = ctx.getConnection();
@@ -110,12 +110,16 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 	}
 
 	@OnError
-	public void onError( @ParameterGroup( name = "Error Response", showInDsl = true) BPMResponseBuilder messageBuilder, Error error, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
+	public void onError( @ParameterGroup( name = "Error Response", showInDsl = true) BPMErrorResponseBuilder errorResponseBuilder, Error error, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
 
 		final ErrorType errorType = error.getErrorType();
 		String msg = errorType.getNamespace() + ":" + errorType.getIdentifier() + ": " + error.getDescription();
-		LOGGER.info( (String)messageBuilder.getContent().getValue() );
-		LOGGER.info( "ERROR" );
+		LOGGER.error( msg );
+
+		BPMActivityResponse response = new BPMActivityResponse( error.getCause() );
+
+		BPMConnection connection = ctx.getConnection();
+		connection.getResponseCallback().submitResponse( response );
 
 	}
 

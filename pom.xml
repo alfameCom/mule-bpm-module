@@ -11,7 +11,6 @@
 	<modules>
 		<module>flowable</module>
 		<module>parents</module>
-		<module>utils</module>
 		<module>bpm-utils</module>
 		<module>bpm-queue</module>
 		<module>mule-bpm-connector</module>
