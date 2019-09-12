@@ -14,14 +14,14 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<app.runtime>4.1.1</app.runtime>
+		<app.runtime>4.2.1</app.runtime>
 		<mule.maven.plugin.version>3.2.7</mule.maven.plugin.version>
 		<munit.version>2.1.0</munit.version>
 
 		<flowable.version>6.4.1</flowable.version>
 
-		<spring.version>5.0.12.RELEASE</spring.version>
-        <spring.security.version>5.0.11.RELEASE</spring.security.version>
+		<spring.version>5.1.6.RELEASE</spring.version>
+        <spring.security.version>5.1.6.RELEASE</spring.security.version>
 	</properties>
 
 	<dependencies>
