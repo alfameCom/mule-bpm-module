@@ -99,7 +99,7 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 	@OnSuccess
 	public void onSuccess( @ParameterGroup( name = "Response", showInDsl = true ) BPMSuccessResponseBuilder responseBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
 
-		LOGGER.info( (String)responseBuilder.getContent().getValue() );
+		LOGGER.debug( (String)responseBuilder.getContent().getValue() );
 
 		String payload = (String)responseBuilder.getContent().getValue();
 		BPMActivityResponse response = new BPMActivityResponse( new TypedValue<>( payload, DataType.STRING) );
