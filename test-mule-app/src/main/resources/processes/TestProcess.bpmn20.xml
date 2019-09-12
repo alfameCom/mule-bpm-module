@@ -9,7 +9,7 @@
     <serviceTask id="testMuleTask" name="Test Mule Task" flowable:async="true" flowable:exclusive="false" flowable:type="mule">
       <extensionElements>
         <flowable:field name="endpointUrl">
-          <flowable:string><![CDATA[vm://com.alfame.esb.testMuleTask]]></flowable:string>
+          <flowable:string><![CDATA[vm://mighty.queue]]></flowable:string>
         </flowable:field>
         <flowable:field name="language">
           <flowable:string><![CDATA[javascript]]></flowable:string>
