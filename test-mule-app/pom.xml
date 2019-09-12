@@ -72,6 +72,10 @@
 							<groupId>org.mule.runtime</groupId>
 							<artifactId>mule-api</artifactId>
 						</sharedLibrary>
+                        <sharedLibrary>
+                            <groupId>com.h2database</groupId>
+                            <artifactId>h2</artifactId>
+                        </sharedLibrary>
 					</sharedLibraries>
 					<classifier>mule-application</classifier>
                 </configuration>
@@ -140,6 +144,13 @@
 			<version>1.1.15</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
+
+        <!-- h2 driver -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.199</version>
+        </dependency>
 
     </dependencies>
 
