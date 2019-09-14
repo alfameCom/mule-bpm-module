@@ -1,14 +1,14 @@
 #%RAML 1.0
-title: Sample API
+title: Group API
+version: 1.0
+types:
+  testModel: !include model/testModel.json
 
 /test:
   get:
+    description: Get test data
     responses:
       200:
         body:
           application/json:
-            example: |
-              {
-                "key": "SomeKey",
-                "value": "SomeValue
-              }
+            type: testModel
