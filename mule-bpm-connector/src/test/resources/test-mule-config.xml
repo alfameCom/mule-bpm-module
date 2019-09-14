@@ -1,9 +1,13 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+      xmlns:spring="http://www.mulesoft.org/schema/mule/spring"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-          http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
-
+          http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
+          http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd">
+          
+	<!--  spring:config name="springConfig" files="beans.xml" / -->
+	
     <flow name="bpmListenerSuccessTestFlow">
         <bpm:listener queueName="some.success.test.queue" />
         <logger level="INFO" message="#[payload]" />

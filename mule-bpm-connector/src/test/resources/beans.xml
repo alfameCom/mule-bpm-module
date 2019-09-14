@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="processEngineDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+		<property name="minIdle" value="2"/>
+		<property name="maxTotal" value="10"/>
+		<property name="driverClassName" value="org.h2.Driver"/>
+		<property name="url" value="jdbc:h2:mem:flowable;MODE=MYSQL;DB_CLOSE_DELAY=-1;MVCC=TRUE"/>
+		<property name="username" value="sa"/>
+		<property name="password" value="sa"/>
+	</bean>
+	
+	<bean id="tenantInfoHolder" class="com.alfame.esb.bpm.utils.flowable.TenantInfoHolder">
+		<property name="tenantId" value="com.alfame.esb" />
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="processEngineDataSource" />
+	</bean>
+
+	<!-- bean id="processDefinitionResources" class="com.alfame.esb.bpm.utils.flowable.ProcessDefinitionResources">
+		<constructor-arg name="pattern" value="classpath*:/processes/*.bpmn20.xml" />
+	</bean -->
+	
+	<bean id="processEngineConfiguration" class="com.alfame.esb.bpm.utils.flowable.TenantAwareSpringProcessEngineConfiguration">
+		<constructor-arg ref="tenantInfoHolder" />
+		<property name="dataSource" ref="processEngineDataSource" />
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="databaseSchemaUpdate" value="true" />
+		<property name="asyncExecutorActivate" value="true" />
+		<property name="history" value="audit" />
+		<!-- property name="deploymentResources" value="classpath*:processes/*.bpmn20.xml" / -->
+		<property name="deploymentResources">
+			<list value-type="org.springframework.core.io.Resource">
+				<value>classpath:processes/TestProcess.bpmn20.xml</value>
+			</list>
+		</property>
+		<!-- property name="deploymentResources">
+			<bean factory-bean="processDefinitionResources" factory-method="getResources" />
+		</property -->
+	</bean>
+
+	<bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
+		<property name="processEngineConfiguration" ref="processEngineConfiguration" />
+	</bean>
+
+	<bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />
+	<bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />
+	<bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
+	<bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
+	<bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
+
+</beans>
