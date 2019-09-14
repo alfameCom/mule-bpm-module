@@ -27,11 +27,7 @@
     </flow>
 
     <flow name="bpmStartProcessTestFlow">
-        <bpm:processfactory>
-            <bpm:properties>
-                <bpm:tenantId value="asd" />
-            </bpm:properties>
-        </bpm:processfactory>
+        <bpm:processfactory processDefinitionKey="asd" tenantId="asd" />
         <set-payload value="TEST" />
     </flow>
 

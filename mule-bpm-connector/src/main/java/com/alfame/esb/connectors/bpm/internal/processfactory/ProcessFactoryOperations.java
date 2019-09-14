@@ -4,11 +4,15 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
+import com.alfame.esb.connectors.bpm.internal.BPMExtension;
+
+import org.mule.runtime.api.exception.MuleException;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -21,15 +25,16 @@ public class ProcessFactoryOperations {
 
 	@MediaType( value = MediaType.ANY, strict = false )
 	@OutputResolver( output = ProcessFactoryMetadataResolver.class )
-	public ProcessInstance processfactory( @ParameterGroup( name = "Properties", showInDsl = true ) ProcessFactoryProperties properties ) {
+	public ProcessInstance processfactory(
+			@ParameterGroup( name = "properties" ) ProcessFactoryProperties properties,
+			@Config BPMExtension config
+			) {
 
 		ProcessInstance instance = null;
+		
+		LOGGER.debug("Starting process instance with definition key: " + properties.getProcessDefinitionKey());
 
-		/*if( properties.isPayloadAsAttachment() ) {
-
-		} else {
-			instance = startProcessInstance( this.runtimeService, properties );
-		}*/
+		instance = startProcessInstance( this.runtimeService, properties );
 
 		return instance;
 
@@ -37,7 +42,7 @@ public class ProcessFactoryOperations {
 
 	private static ProcessInstance startProcessInstance( RuntimeService runtimeService, ProcessFactoryProperties properties ) {
 
-		/*ProcessInstance instance = null;
+		ProcessInstance instance = null;
 
 		if( properties.getTenantId() != null ) {
 
@@ -53,9 +58,7 @@ public class ProcessFactoryOperations {
 			runtimeService.setProcessInstanceName( instance.getId(), properties.getProcessName() );
 		}
 
-		return instance;*/
-
-		return null;
+		return instance;
 
 	}
 
