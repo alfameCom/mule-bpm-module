@@ -1,5 +1,7 @@
 package com.alfame.esb.connectors.bpm.internal;
 
+import com.alfame.esb.connectors.bpm.api.processengine.config.ProcessEngineProperty;
+import com.alfame.esb.connectors.bpm.api.processengine.config.ProcessEngineTenant;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.connectors.bpm.internal.listener.BPMListener;
 import com.alfame.esb.connectors.bpm.internal.processfactory.ProcessFactoryOperations;
@@ -8,7 +10,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.mule.runtime.extension.api.annotation.*;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExternalLibraryType.DEPENDENCY;
 
 import java.nio.file.FileSystem;
@@ -22,6 +27,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
@@ -44,8 +51,8 @@ import org.mule.runtime.api.lifecycle.Stoppable;
  * This is the main class of an extension, is the entry point from which configurations, connection providers, operations
  * and sources are going to be declared.
  */
-@Xml(prefix = "bpm")
-@Extension(name = "BPM")
+@Xml( prefix = "bpm" )
+@Extension( name = "BPM" )
 @Sources( BPMListener.class )
 @ConnectionProviders( BPMConnectionProvider.class )
 @Operations( { ProcessFactoryOperations.class } )
@@ -61,7 +68,20 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 			this.deploymentBuilder = deploymentBuilder;
 		}
 	}
+	
+	@RefName
+	private String name;
+	
+	@Parameter
+	@Expression( NOT_SUPPORTED )
+	@Alias( "properties" )
+	private List<ProcessEngineProperty> processEngineProperties;
 
+	@Parameter
+	@Expression( NOT_SUPPORTED )
+	@Alias( "tenants" )
+	private List<ProcessEngineTenant> processEngineTenants;
+	
 	private MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration;
 	private ProcessEngine processEngine;
 	private Collection<String> tenantIds = new ArrayList<String>();
@@ -75,12 +95,14 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 		
 		this.processEngineConfiguration.setDisableIdmEngine( true );
 		
-		this.processEngineConfiguration.setEngineName( "Mule" );
+		this.processEngineConfiguration.setEngineName( this.name );
 		
 		this.processEngineConfiguration.setDatabaseType( this.getDatabaseType() );
 		this.processEngineConfiguration.setDatabaseSchemaUpdate( ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE );
 
-		this.addTenant( "com.alfame.esb" );
+		for ( ProcessEngineTenant tenant : processEngineTenants ) {
+			this.addTenant( tenant.tenantId() );
+		}
 		
 		this.asyncExecutor = new ExecutorPerTenantAsyncExecutor( this );
 		this.asyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis( 50 );
@@ -149,6 +171,14 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 	@Override
 	public void setCurrentTenantId(String currentTenantId) {
 		this.currentTenantId = currentTenantId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public List<ProcessEngineProperty> getProcessEngineProperties() {
+		return processEngineProperties;
 	}
 
 	public RuntimeService getRuntimeService() {

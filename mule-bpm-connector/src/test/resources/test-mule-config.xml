@@ -4,15 +4,24 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
           http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
     
+    <bpm:config name="engineConfig">
+    		<bpm:properties>
+    			<bpm:property key="databaseType" value="h2" />
+    		</bpm:properties>
+    		<bpm:tenants>
+    			<bpm:tenant tenantId="com.alfame.esb" />
+    		</bpm:tenants>
+    </bpm:config>
+    
     <flow name="bpmListenerSuccessTestFlow">
-        <bpm:listener queueName="some.success.test.queue" />
+        <bpm:listener config-ref="engineConfig" queueName="some.success.test.queue" />
         <logger level="INFO" message="#[payload]" />
         <logger level="INFO" message="#[attributes]" />
         <set-payload value="SUCCESS" />
     </flow>
 
     <flow name="bpmListenerErrorTestFlow">
-        <bpm:listener queueName="some.error.test.queue" />
+        <bpm:listener config-ref="engineConfig" queueName="some.error.test.queue" />
         <set-payload value="BEFORE_ERROR" />
 		<raise-error type="ANY" description="SOME_TEST_ERROR" />
         <error-handler>
@@ -23,14 +32,14 @@
     </flow>
     
 	<flow name="bpmListenerTestFlow">
-		<bpm:listener queueName="test.queue" />
+		<bpm:listener config-ref="engineConfig" queueName="test.queue" />
 		<logger level="INFO" message="#[payload]" />
 
 		<set-payload value="true" />
 	</flow>
 
     <flow name="bpmStartProcessTestFlow">
-        <bpm:processfactory processDefinitionKey="testProcess" tenantId="com.alfame.esb" />
+        <bpm:processfactory config-ref="engineConfig" processDefinitionKey="testProcess" tenantId="com.alfame.esb" />
         <set-payload value="TEST" />
     </flow>
 
