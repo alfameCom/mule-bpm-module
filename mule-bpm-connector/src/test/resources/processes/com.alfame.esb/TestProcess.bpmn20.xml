@@ -3,13 +3,13 @@
   <process id="testProcess" name="TestProcess" isExecutable="true">
     <startEvent id="sid-EFAA0939-EB43-4D17-BE6A-2145F2E9E544" isInterrupting="false">
       <timerEventDefinition>
-        <timeCycle>0 0/1 * 1/1 * ? *</timeCycle>
+        <timeCycle>* * * * * ? *</timeCycle>
       </timerEventDefinition>
     </startEvent>
     <serviceTask id="testMuleTask" name="Test Mule Task" flowable:async="true" flowable:exclusive="false" flowable:type="mule">
       <extensionElements>
         <flowable:field name="endpointUrl">
-          <flowable:string><![CDATA[vm://mighty.queue]]></flowable:string>
+          <flowable:string><![CDATA[test.queue]]></flowable:string>
         </flowable:field>
         <flowable:field name="language">
           <flowable:string><![CDATA[javascript]]></flowable:string>

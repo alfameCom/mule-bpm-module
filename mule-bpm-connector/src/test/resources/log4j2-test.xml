@@ -14,7 +14,10 @@
         <AsyncLogger name="org.mule.extension.http" level="WARN"/>
     
 		<!-- Mule logger -->        
-        <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>  
+        <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
+        
+        <!--  Flowable logger -->
+        <AsyncLogger name="org.flowable.job.service.impl.asyncexecutor" level="DEBUG"/>
 
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>
