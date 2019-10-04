@@ -2,6 +2,7 @@ package com.alfame.esb.connectors.bpm.internal.processfactory;
 
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -15,6 +16,7 @@ public class ProcessFactoryOperations {
 
 	private static final Logger LOGGER = getLogger( ProcessFactoryOperations.class );
 
+	@Alias( "process-factory" )
 	@MediaType( value = MediaType.ANY, strict = false )
 	@OutputResolver( output = ProcessFactoryMetadataResolver.class )
 	public ProcessInstance processfactory(

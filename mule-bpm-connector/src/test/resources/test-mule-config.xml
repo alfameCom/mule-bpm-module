@@ -48,7 +48,7 @@
 	</flow>
 
     <flow name="bpmStartProcessTestFlow">
-        <bpm:processfactory config-ref="engineConfig" processDefinitionKey="otherTestProcess" tenantId="com.alfame.esb.sub.tenant" />
+        <bpm:process-factory config-ref="engineConfig" processDefinitionKey="otherTestProcess" tenantId="com.alfame.esb.sub.tenant" />
         <set-payload value="TEST" />
     </flow>
 

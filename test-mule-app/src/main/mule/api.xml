@@ -72,6 +72,10 @@ xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft
     </flow>
     <flow name="get:\test:api-config">
 		<set-payload value="#[output application/json --- {  &quot;key&quot;: &quot;SomeKey&quot;,  &quot;value&quot;: &quot;SomeValue&quot; }]" doc:id="4ac050cd-3f71-4887-b39e-61616c29b91b" />
-		<bpm:processfactory processDefinitionKey="asd" doc:name="Processfactory" config-ref="engineConfig" doc:id="ac1cae9b-174a-418e-bc97-cb20d4c9d64b" />
+		<bpm:process-factory processDefinitionKey="testProcess" 
+							config-ref="BPM_Config" 
+							tenantId="com.alfame.esb" 
+							doc:name="Processfactory" 
+							doc:id="ac1cae9b-174a-418e-bc97-cb20d4c9d64b" />
     </flow>
 </mule>
