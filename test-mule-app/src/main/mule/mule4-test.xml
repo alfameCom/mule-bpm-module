@@ -8,9 +8,22 @@
 	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 	http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
 
+	<bpm:config name="BPM_Config" doc:name="BPM Config" doc:id="33199c6b-10fe-412f-82bb-bd509da767a7" defaultTenantId="com.alfame.esb">
+		<bpm:default-data-source type="h2" 
+								driverClassName="org.h2.Driver" 
+								jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1" 
+								username="sa" 
+								password="sa"/>
+		<bpm:definitions>
+			<bpm:definition classPath="processes/TestProcess.bpmn20.xml" />
+		</bpm:definitions>
+	</bpm:config>
+	
 	<flow name="mightMuleTaskFlow">
 		<bpm:listener doc:name="Listener"
-			doc:id="90bb2825-efa0-48e7-8c9a-b0c8ddb71f08" queueName="vm://mighty.queue" />
+			doc:id="90bb2825-efa0-48e7-8c9a-b0c8ddb71f08" 
+			queueName="mighty.queue" 
+			config-ref="BPM_Config"/>
 		<logger level="INFO" message="#[payload]" />
 
 		<set-payload value="true" />

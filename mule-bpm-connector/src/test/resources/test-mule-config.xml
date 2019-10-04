@@ -10,8 +10,15 @@
 								jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1"
 								username="sa"
 								password="sa" />
+		<bpm:definitions>
+			<bpm:definition classPath="processes/TestProcess.bpmn20.xml" />
+		</bpm:definitions>
 		<bpm:tenants>
-			<bpm:tenant tenantId="com.alfame.esb.sub.tenant" />
+			<bpm:tenant tenantId="com.alfame.esb.sub.tenant">
+				<bpm:definitions>
+					<bpm:definition classPath="processes/sub/tenant/OtherTestProcess.bpmn20.xml" />
+				</bpm:definitions>
+			</bpm:tenant>
 		</bpm:tenants>
 	</bpm:config>
     

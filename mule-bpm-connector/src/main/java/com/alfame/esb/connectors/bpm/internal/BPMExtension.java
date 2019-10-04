@@ -1,8 +1,8 @@
 package com.alfame.esb.connectors.bpm.internal;
 
 import com.alfame.esb.connectors.bpm.api.config.BPMAsyncExecutor;
-import com.alfame.esb.connectors.bpm.api.config.BPMDataSource;
 import com.alfame.esb.connectors.bpm.api.config.BPMDefaultDataSource;
+import com.alfame.esb.connectors.bpm.api.config.BPMDefinition;
 import com.alfame.esb.connectors.bpm.api.config.BPMTenant;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.connectors.bpm.internal.listener.BPMListener;
@@ -21,24 +21,17 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExternalLibraryType.DEPENDENCY;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
+import org.slf4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -48,7 +41,6 @@ import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEng
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -67,15 +59,8 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 @ExternalLib( name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl")
 @ExternalLib( name = "Flowable Mule 4", type = DEPENDENCY, coordinates = "org.flowable:flowable-mule4:6.4.1", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 public class BPMExtension implements Initialisable, Startable, Stoppable, TenantInfoHolder {
-	
-	private class ProcessDefinitionVisitor extends SimpleFileVisitor<Path> {
-		
-		protected DeploymentBuilder deploymentBuilder;
-		
-		ProcessDefinitionVisitor( DeploymentBuilder deploymentBuilder ) {
-			this.deploymentBuilder = deploymentBuilder;
-		}
-	}
+
+	private static final Logger LOGGER = getLogger( BPMExtension.class );
 	
 	@RefName
 	private String name;
@@ -105,11 +90,19 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 	@Parameter
 	@Optional
 	@Expression( NOT_SUPPORTED )
-	@Alias( "default-async-executor" )
+	@Alias( "definitions" )
 	@Placement( tab = "General", order = 4 )
+	@DisplayName( "Process definitions" )
+	private List<BPMDefinition> defaultDefinitions;
+
+	@Parameter
+	@Optional
+	@Expression( NOT_SUPPORTED )
+	@Alias( "default-async-executor" )
+	@Placement( tab = "General", order = 5 )
 	@DisplayName( "BPM Async executor" )
 	private BPMAsyncExecutor defaultAsyncExecutor;
-	
+
 	@Parameter
 	@Optional
 	@Expression( NOT_SUPPORTED )
@@ -155,55 +148,21 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 	public void start() throws MuleException {
 		this.processEngine = this.processEngineConfiguration.buildProcessEngine();
 		
-		try {
-			FileSystem fs = FileSystems.getDefault();
-
-			final String processDirectoryRoot = "processes";
-			final String pattern = "*.{bpmn20.xml,bpmn}";
-			
-			for ( String tenantId : this.registeredTenantIds ) {
-				DeploymentBuilder deploymentBuilder = this.processEngine.getRepositoryService().createDeployment();
-
-				final String subTenantId = tenantId.startsWith( this.defaultTenantId ) ? 
-						tenantId.substring( this.defaultTenantId.length() ) : null;
-				final String subDirectory = subTenantId.replaceAll( "\\.", fs.getSeparator() );
-
-				final String processDirectory = ( subDirectory == null || subDirectory.isEmpty() ) ? 
-						processDirectoryRoot : processDirectoryRoot + subDirectory;
-				Path processDirectoryPath = Paths.get( ClassLoader.getSystemResource( processDirectory + fs.getSeparator() ).toURI() );
-				
-				final PathMatcher matcher = fs.getPathMatcher( "glob:" + pattern );
-
-				ProcessDefinitionVisitor matcherVisitor = new ProcessDefinitionVisitor( deploymentBuilder ) {
-				    @Override
-				    public FileVisitResult visitFile( Path file, BasicFileAttributes attribs ) {
-				        Path name = file.getFileName();
-				        if ( matcher.matches( name ) ) {
-				    			Path relativePath = processDirectoryPath.relativize( file );
-				    			String absolutePath = processDirectory + 
-				    					( relativePath.getParent() != null ? relativePath.getParent() : "" ) + 
-				    					fs.getSeparator() + relativePath.getFileName();
-				        		this.deploymentBuilder.addClasspathResource( absolutePath );
-				        }
-				        return FileVisitResult.CONTINUE;
-				    }
-				};
-				Files.walkFileTree( processDirectoryPath, EnumSet.noneOf( FileVisitOption.class ), 1, matcherVisitor );
-
-				final String absoluteTenantId = ( subTenantId == null || subTenantId.isEmpty() ) ? 
-						this.defaultTenantId : this.defaultTenantId + subTenantId;
-				deploymentBuilder.tenantId( absoluteTenantId ).deploy();
+		this.deployDefinitions( this.defaultDefinitions, this.defaultTenantId );
+		if ( this.additionalTenants != null ) {
+			for ( BPMTenant additionalTenant : this.additionalTenants ) {
+				this.deployDefinitions( additionalTenant.getDefinitions(), additionalTenant.getTenantId() );
 			}
-
-		} catch (Exception e) {
-			new MuleRuntimeException( e );
 		}
 		
 		this.asyncExecutor.start();
+		
+		LOGGER.info( this.name + " has been started");
 	}
 
 	@Override
 	public void stop() throws MuleException {
+		LOGGER.info( this.name + " is going to shutdown");
 		this.asyncExecutor.shutdown();
 		this.processEngine.close();
 	}
@@ -266,7 +225,8 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 			dataSource.setUsername( this.defaultDataSource.getUsername() );
 			dataSource.setPassword( this.defaultDataSource.getPassword() );
 		}
-		
+
+		LOGGER.debug( this.name + " is building data source " + dataSource.getJdbcUrl() + " for tenant " + tenantId );
 		return dataSource;
 
 	}
@@ -274,6 +234,26 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 	private void registerTenant( String tenantId ) {
 		this.registeredTenantIds.add( tenantId );
 		this.processEngineConfiguration.registerTenant( tenantId, this.buildDataSource( tenantId ) );
+		LOGGER.info( this.name + " has registered tenant " + tenantId );
+	}
+	
+	private void deployDefinitions( Collection<BPMDefinition> definitions, String tenantId ) {
+		DeploymentBuilder deploymentBuilder = this.processEngine.getRepositoryService().createDeployment();
+
+		if ( definitions != null ) {
+			for ( BPMDefinition definition : definitions ) {
+				LOGGER.debug( this.name + " adding classpath resource " + definition.getClassPath() + " for tenant " + tenantId );
+				try {
+					deploymentBuilder.addClasspathResource( definition.getClassPath() );
+				} catch ( FlowableIllegalArgumentException exception ) {
+    					LOGGER.warn( this.name + " classpath resource " + definition.getClassPath() + " not found for tenant " + tenantId );
+				}
+    				LOGGER.debug( this.name + " added classpath resource " + definition.getClassPath() + " for tenant " + tenantId );
+			}
+		}
+		
+		deploymentBuilder.tenantId( tenantId ).deploy();
+		LOGGER.debug( this.name + " made deployment for tenant " + tenantId );
 	}
 
 }

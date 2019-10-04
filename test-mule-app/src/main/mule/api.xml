@@ -4,14 +4,12 @@ xmlns="http://www.mulesoft.org/schema/mule/core"
 xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" 
 xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
 xmlns:http="http://www.mulesoft.org/schema/mule/http" 
-xmlns:spring="http://www.mulesoft.org/schema/mule/spring" 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:schemaLocation="http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd
-	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 	http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 	http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
 	http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
-    <spring:config name="springConfig" files="beans.xml" />
+
     <http:listener-config name="api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" />
     </http:listener-config>
@@ -74,6 +72,6 @@ xsi:schemaLocation="http://www.mulesoft.org/schema/mule/spring http://www.muleso
     </flow>
     <flow name="get:\test:api-config">
 		<set-payload value="#[output application/json --- {  &quot;key&quot;: &quot;SomeKey&quot;,  &quot;value&quot;: &quot;SomeValue&quot; }]" doc:id="4ac050cd-3f71-4887-b39e-61616c29b91b" />
-		<bpm:processfactory processDefinitionKey="asd" doc:name="Processfactory" doc:id="ac1cae9b-174a-418e-bc97-cb20d4c9d64b" />
+		<bpm:processfactory processDefinitionKey="asd" doc:name="Processfactory" config-ref="engineConfig" doc:id="ac1cae9b-174a-418e-bc97-cb20d4c9d64b" />
     </flow>
 </mule>

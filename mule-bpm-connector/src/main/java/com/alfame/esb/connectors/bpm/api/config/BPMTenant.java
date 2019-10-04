@@ -1,6 +1,9 @@
 package com.alfame.esb.connectors.bpm.api.config;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+
+import java.util.List;
+
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -18,7 +21,13 @@ public class BPMTenant {
 	@Expression( NOT_SUPPORTED )
 	@Alias( "data-source" )
 	private BPMDataSource dataSource;
-
+	
+	@Parameter
+	@Optional
+	@Expression( NOT_SUPPORTED )
+	@Alias( "definitions" )
+	private List<BPMDefinition> definitions;
+	
 	@Parameter
 	@Optional
 	@Expression( NOT_SUPPORTED )
@@ -33,12 +42,12 @@ public class BPMTenant {
 		return this.dataSource;
 	}
 
-	public BPMAsyncExecutor getProcessEngineAsyncExecutor() {
-		return processEngineAsyncExecutor;
+	public List<BPMDefinition> getDefinitions() {
+		return this.definitions;
 	}
 
-	public void setProcessEngineAsyncExecutor(BPMAsyncExecutor processEngineAsyncExecutor) {
-		this.processEngineAsyncExecutor = processEngineAsyncExecutor;
+	public BPMAsyncExecutor getProcessEngineAsyncExecutor() {
+		return this.processEngineAsyncExecutor;
 	}
 
 }
