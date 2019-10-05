@@ -40,7 +40,6 @@ import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Alias( "listener" )
@@ -71,7 +70,6 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 	@Inject
 	private SchedulerService schedulerService;
 
-	private Semaphore semaphore;
 	private ComponentLocation location;
 
 	private List< Consumer > consumers;
@@ -125,15 +123,11 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 
 	@OnTerminate
 	public void onTerminate() {
-
-		semaphore.release();
-
 	}
 
 	private void startConsumers( SourceCallback< Serializable, BPMActivityAttributes > sourceCallback ) {
 		createScheduler();
 		consumers = new ArrayList<>( numberOfConsumers );
-		semaphore = new Semaphore( getMaxConcurrency(), false );
 		for( int i = 0; i < numberOfConsumers; i++ ) {
 			final Consumer consumer = new Consumer( sourceCallback );
 			consumers.add( consumer );
@@ -165,26 +159,25 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 		}
 
 		public void start() {
-			final long timeout = queueDescriptor.getQueueTimeoutInMillis();
 
 			while( isAlive() ) {
 
 				SourceCallbackContext ctx = sourceCallback.createContext();
 				try {
 
-					LOGGER.debug( "Consumer for <bpm:listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
-					semaphore.acquire();
-					LOGGER.debug( "Consumer for <bpm:listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+					LOGGER.trace( "Consumer for <bpm:listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 					final BPMConnection connection = connect( ctx );
 					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( queueDescriptor.getQueueName() );
-					BPMActivity activity = queue.pop();
+					BPMActivity activity = queue.pop( queueDescriptor.getTimeout(), queueDescriptor.getTimeoutUnit() );
 
 					connection.setResponseCallback( activity );
 
 					if( activity == null ) {
-						LOGGER.debug( "Consumer for <bpm:listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+						LOGGER.trace( "Consumer for <bpm:listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						cancel( ctx );
 						continue;
+					} else {
+						LOGGER.debug( "Consumer for <bpm:listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 					}
 
 					String correlationId = null;
@@ -232,7 +225,6 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 					LOGGER.warn( "Failed to rollback transaction: " + e.getMessage(), e );
 				}
 			}
-			semaphore.release();
 			connectionProvider.disconnect( ctx.getConnection() );
 		}
 

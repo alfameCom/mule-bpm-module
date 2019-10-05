@@ -13,8 +13,8 @@ public class BPMQueueDescriptor {
 	private String queueName;
 
 	@Parameter
-	@Optional( defaultValue = "5")
-	private int timeout = 5;
+	@Optional( defaultValue = "3")
+	private int timeout;
 
 	@Parameter
 	@Optional( defaultValue = "SECONDS" )
