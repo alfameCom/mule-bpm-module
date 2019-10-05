@@ -3,26 +3,26 @@ package com.alfame.esb.bpm.activity.queue.api;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
 
 public class BPMActivityQueue {
 
 	private static final Log logger = LogFactory.getLog( BPMActivityQueue.class );
 
 	private String queueName;
-	private Queue< BPMActivity > queueData = new ConcurrentLinkedQueue<>();
+	private BlockingQueue< BPMActivity > activityQueue = new LinkedTransferQueue<>();
 
 	public BPMActivityQueue( String queueName ) {
 		this.queueName = queueName;
 	}
 
 	public boolean publish( BPMActivity message ) throws InterruptedException {
-		return queueData.offer( message );
+		return activityQueue.offer( message );
 	}
 
-	public BPMActivity pop() {
-		return queueData.poll();
+	public BPMActivity pop() throws InterruptedException {
+		return activityQueue.take();
 	}
 
 	public String getQueueName() {

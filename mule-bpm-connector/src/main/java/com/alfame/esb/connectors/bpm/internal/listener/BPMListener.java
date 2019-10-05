@@ -172,7 +172,9 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 				SourceCallbackContext ctx = sourceCallback.createContext();
 				try {
 
+					LOGGER.debug( "Consumer for <bpm:listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 					semaphore.acquire();
+					LOGGER.debug( "Consumer for <bpm:listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 					final BPMConnection connection = connect( ctx );
 					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( queueDescriptor.getQueueName() );
 					BPMActivity activity = queue.pop();
@@ -180,6 +182,7 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 					connection.setResponseCallback( activity );
 
 					if( activity == null ) {
+						LOGGER.debug( "Consumer for <bpm:listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						cancel( ctx );
 						continue;
 					}
