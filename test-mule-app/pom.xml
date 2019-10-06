@@ -11,8 +11,8 @@
 
 	<parent>
 		<groupId>com.alfame.esb.parents</groupId>
-		<artifactId>alfameesb-dependencies</artifactId>
-		<version>2.0.1-SNAPSHOT</version>
+		<artifactId>mule-bpm-app</artifactId>
+		<version>2.0.2</version>
 	</parent>
 
 	<build>
@@ -58,12 +58,6 @@
 		</dependency>
 		
 		<!-- Mule Connectors -->
-		<dependency>
-			<groupId>com.alfame.esb.connectors</groupId>
-			<artifactId>mule-bpm-connector</artifactId>
-			<version>2.0.2-SNAPSHOT</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-http-connector</artifactId>

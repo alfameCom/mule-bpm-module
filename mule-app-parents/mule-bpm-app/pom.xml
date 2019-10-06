@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<name>Alfame ESB - Mule BPM Application</name>
+
+	<artifactId>mule-bpm-app</artifactId>
+	<packaging>pom</packaging>
+
+    <parent>
+        <groupId>com.alfame.esb.parents</groupId>
+        <artifactId>mule-app-parents</artifactId>
+		<version>2.0.2</version>
+    </parent>
+		
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<flowable.version>6.4.1</flowable.version>
+	</properties>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mule.tools.maven</groupId>
+				<artifactId>mule-maven-plugin</artifactId>
+				<version>${mule.maven.plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<sharedLibraries>
+                        <sharedLibrary>
+                            <groupId>org.flowable</groupId>
+                            <artifactId>flowable-engine</artifactId>
+                        </sharedLibrary>
+                        <sharedLibrary>
+                            <groupId>org.flowable</groupId>
+                            <artifactId>flowable-mule4</artifactId>
+                        </sharedLibrary>
+					</sharedLibraries>
+					<classifier>mule-application</classifier>
+                </configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<!-- Mule Connectors -->
+		<dependency>
+			<groupId>com.alfame.esb.connectors</groupId>
+			<artifactId>mule-bpm-connector</artifactId>
+			<version>2.0.2-SNAPSHOT</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+
+		<!-- Flowable -->
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-engine</artifactId>
+			<version>${flowable.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-mule4</artifactId>
+			<version>${flowable.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

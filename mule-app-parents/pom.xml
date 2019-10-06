@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<name>Alfame ESB - Mule Application Parents</name>
+	<groupId>com.alfame.esb.parents</groupId>
+	<artifactId>mule-app-parents</artifactId>
+	<version>2.0.2</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<app.runtime>4.2.1</app.runtime>
+		<mule.maven.plugin.version>3.2.7</mule.maven.plugin.version>
+		<munit.version>2.1.0</munit.version>
+	</properties>
+
+	<modules>
+		<module>mule-bpm-app</module>
+	</modules>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+			<!-- Mule Runtime -->
+			<dependency>
+				<groupId>org.mule.runtime</groupId>
+				<artifactId>mule-api</artifactId>
+				<version>1.2.0</version>
+			</dependency>
+	
+			<!-- Testing -->
+			<dependency>
+				<groupId>com.mulesoft.munit</groupId>
+				<artifactId>munit-runner</artifactId>
+				<version>${munit.version}</version>
+				<classifier>mule-plugin</classifier>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.mulesoft.munit</groupId>
+				<artifactId>munit-tools</artifactId>
+				<version>${munit.version}</version>
+				<classifier>mule-plugin</classifier>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.mulesoft.munit</groupId>
+				<artifactId>munit-assert</artifactId>
+				<version>${munit.version}</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	
+		<repositories>
+			<repository>
+				<id>anypoint-exchange</id>
+				<name>Anypoint Exchange</name>
+				<url>https://maven.anypoint.mulesoft.com/api/v1/maven</url>
+				<layout>default</layout>
+			</repository>
+			<repository>
+				<id>mulesoft-releases</id>
+				<name>MuleSoft Releases Repository</name>
+				<url>https://repository.mulesoft.org/releases/</url>
+				<layout>default</layout>
+			</repository>
+		</repositories>
+		<pluginRepositories>
+			<pluginRepository>
+				<id>mulesoft-releases</id>
+				<name>mulesoft release repository</name>
+				<layout>default</layout>
+				<url>https://repository.mulesoft.org/releases/</url>
+				<snapshots>
+					<enabled>false</enabled>
+				</snapshots>
+			</pluginRepository>
+		</pluginRepositories>
+	
+</project>
+

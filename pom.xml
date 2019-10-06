@@ -2,7 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<name>AlfameESB</name>
+
+	<name>Alfame ESB</name>
+
 	<groupId>com.alfame.esb</groupId>
 	<artifactId>mule-esb</artifactId>
 	<version>2.0.0-SNAPSHOT</version>
@@ -10,10 +12,9 @@
 
 	<modules>
 		<module>flowable</module>
-		<module>parents</module>
-		<module>bpm-utils</module>
 		<module>bpm-queue</module>
 		<module>mule-bpm-connector</module>
+		<module>mule-app-parents</module>
   </modules>
 	
 	<build>
