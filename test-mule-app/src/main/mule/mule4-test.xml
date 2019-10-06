@@ -15,7 +15,7 @@
 								username="sa" 
 								password="sa"/>
 		<bpm:definitions>
-			<bpm:definition classPath="processes/TestProcess.bpmn20.xml" />
+			<bpm:classpath-definition resourceClasspath="processes/TestProcess.bpmn20.xml" />
 		</bpm:definitions>
 	</bpm:config>
 	

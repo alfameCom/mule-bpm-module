@@ -1,8 +1,10 @@
 package com.alfame.esb.connectors.bpm.internal;
 
 import com.alfame.esb.connectors.bpm.api.config.BPMAsyncExecutor;
+import com.alfame.esb.connectors.bpm.api.config.BPMClasspathDefinition;
 import com.alfame.esb.connectors.bpm.api.config.BPMDefaultDataSource;
 import com.alfame.esb.connectors.bpm.api.config.BPMDefinition;
+import com.alfame.esb.connectors.bpm.api.config.BPMStreamDefinition;
 import com.alfame.esb.connectors.bpm.api.config.BPMTenant;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.connectors.bpm.internal.listener.BPMListener;
@@ -56,6 +58,8 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 @Sources( BPMListener.class )
 @ConnectionProviders( BPMConnectionProvider.class )
 @Operations( { ProcessFactoryOperations.class } )
+@SubTypeMapping( baseType = BPMDefinition.class, 
+				subTypes = { BPMClasspathDefinition.class, BPMStreamDefinition.class } )
 @ExternalLib( name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl")
 @ExternalLib( name = "Flowable Mule 4", type = DEPENDENCY, coordinates = "org.flowable:flowable-mule4:6.4.1", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 public class BPMExtension implements Initialisable, Startable, Stoppable, TenantInfoHolder {
@@ -242,13 +246,13 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 
 		if ( definitions != null ) {
 			for ( BPMDefinition definition : definitions ) {
-				LOGGER.debug( this.name + " adding classpath resource " + definition.getClassPath() + " for tenant " + tenantId );
 				try {
-					deploymentBuilder.addClasspathResource( definition.getClassPath() );
+					LOGGER.debug( this.name + " adding " + definition.getType() + " resource " + definition.getResourceName() + " for tenant " + tenantId );
+					definition.addToDeploymentBuilder( deploymentBuilder );
+					LOGGER.debug( this.name + " added " + definition.getType() + " resource " + definition.getResourceName() + " for tenant " + tenantId );
 				} catch ( FlowableIllegalArgumentException exception ) {
-    					LOGGER.warn( this.name + " classpath resource " + definition.getClassPath() + " not found for tenant " + tenantId );
+					LOGGER.warn( this.name + " failed to add " + definition.getType() + " resource " + definition.getResourceName() + " for tenant " + tenantId );
 				}
-    				LOGGER.debug( this.name + " added classpath resource " + definition.getClassPath() + " for tenant " + tenantId );
 			}
 		}
 		

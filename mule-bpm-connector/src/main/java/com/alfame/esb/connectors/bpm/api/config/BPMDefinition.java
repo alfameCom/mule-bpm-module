@@ -1,19 +1,15 @@
 package com.alfame.esb.connectors.bpm.api.config;
 
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.flowable.engine.repository.DeploymentBuilder;
+import org.mule.runtime.extension.api.annotation.Extensible;
 
-@Alias( "definition" )
-public class BPMDefinition {
+@Extensible
+public abstract class BPMDefinition {
+
+	public abstract String getType();
 	
-	@Parameter
-	@Expression( NOT_SUPPORTED )
-	private String classPath;
-
-	public String getClassPath() {
-		return classPath;
-	}
+	public abstract String getResourceName();
+	
+	public abstract void addToDeploymentBuilder( DeploymentBuilder deploymentBuilder );
 
 }
