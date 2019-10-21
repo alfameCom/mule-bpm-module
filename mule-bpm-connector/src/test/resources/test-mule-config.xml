@@ -5,11 +5,13 @@
           http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
     
     <bpm:config name="engineConfig" defaultTenantId="com.alfame.esb">
-		<bpm:default-data-source type="h2" 
-								driverClassName="org.h2.Driver"
-								jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1"
-								username="sa"
-								password="sa" />
+		<bpm:default-data-source >
+			<bpm:generic-data-source driverClassName="org.h2.Driver" 
+									jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1" 
+									username="sa" 
+									password="sa" 
+									type="h2" />
+		</bpm:default-data-source>
 		<bpm:definitions>
 			<bpm:classpath-definition resourceClasspath="processes/TestProcess.bpmn20.xml" />
 		</bpm:definitions>

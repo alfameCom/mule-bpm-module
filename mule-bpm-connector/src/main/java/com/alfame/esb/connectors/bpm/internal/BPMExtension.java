@@ -2,15 +2,15 @@ package com.alfame.esb.connectors.bpm.internal;
 
 import com.alfame.esb.connectors.bpm.api.config.BPMAsyncExecutor;
 import com.alfame.esb.connectors.bpm.api.config.BPMClasspathDefinition;
-import com.alfame.esb.connectors.bpm.api.config.BPMDefaultDataSource;
+import com.alfame.esb.connectors.bpm.api.config.BPMDataSource;
+import com.alfame.esb.connectors.bpm.api.config.BPMDataSourceReference;
 import com.alfame.esb.connectors.bpm.api.config.BPMDefinition;
+import com.alfame.esb.connectors.bpm.api.config.BPMGenericDataSource;
 import com.alfame.esb.connectors.bpm.api.config.BPMStreamDefinition;
 import com.alfame.esb.connectors.bpm.api.config.BPMTenant;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.connectors.bpm.internal.listener.BPMListener;
 import com.alfame.esb.connectors.bpm.internal.processfactory.ProcessFactoryOperations;
-import com.zaxxer.hikari.HikariDataSource;
-
 import org.mule.runtime.extension.api.annotation.*;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
@@ -60,6 +60,8 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 @Operations( { ProcessFactoryOperations.class } )
 @SubTypeMapping( baseType = BPMDefinition.class, 
 				subTypes = { BPMClasspathDefinition.class, BPMStreamDefinition.class } )
+@SubTypeMapping( baseType = BPMDataSource.class, 
+				subTypes = { BPMDataSourceReference.class, BPMGenericDataSource.class } )
 @ExternalLib( name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl")
 @ExternalLib( name = "Flowable Mule 4", type = DEPENDENCY, coordinates = "org.flowable:flowable-mule4:6.4.1", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 public class BPMExtension implements Initialisable, Startable, Stoppable, TenantInfoHolder {
@@ -86,10 +88,10 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 
 	@Parameter
 	@Expression( NOT_SUPPORTED )
-	@Alias( "default-data-source" )
+	@Optional
 	@Placement( tab = "General", order = 3 )
 	@DisplayName( "Default data source" )
-	private BPMDefaultDataSource defaultDataSource;
+	private BPMDataSource defaultDataSource;
 
 	@Parameter
 	@Optional
@@ -199,23 +201,15 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 	}
 	
 	private DataSource buildDataSource( String tenantId ) {
-		HikariDataSource dataSource = null;
+		DataSource dataSource = null;
 		
 		if ( this.defaultTenantId.equals( tenantId )) {
-			dataSource = new HikariDataSource();
-			dataSource.setDriverClassName( this.defaultDataSource.getDriverClassName() );
-			dataSource.setJdbcUrl( this.defaultDataSource.getJdbcUrl() );
-			dataSource.setUsername( this.defaultDataSource.getUsername() );
-			dataSource.setPassword( this.defaultDataSource.getPassword() );
+			dataSource = this.defaultDataSource.getDataSource();
 		} else {
 			for ( BPMTenant tenant : this.additionalTenants ) {
 				if ( this.defaultTenantId.equals( tenant.getTenantId() ) ) {
 					if ( tenant.getDataSource() != null ) {
-						dataSource = new HikariDataSource();
-						dataSource.setDriverClassName( tenant.getDataSource().getDriverClassName() );
-						dataSource.setJdbcUrl( tenant.getDataSource().getJdbcUrl() );
-						dataSource.setUsername( tenant.getDataSource().getUsername() );
-						dataSource.setPassword( tenant.getDataSource().getPassword() );
+						dataSource = this.defaultDataSource.getDataSource();
 					}
 					break;
 				}
@@ -223,14 +217,9 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 		}
 		
 		if ( dataSource == null ) {
-			dataSource = new HikariDataSource();
-			dataSource.setDriverClassName( this.defaultDataSource.getDriverClassName() );
-			dataSource.setJdbcUrl( this.defaultDataSource.getJdbcUrl() );
-			dataSource.setUsername( this.defaultDataSource.getUsername() );
-			dataSource.setPassword( this.defaultDataSource.getPassword() );
+			dataSource = this.defaultDataSource.getDataSource();
 		}
 
-		LOGGER.debug( this.name + " is building data source " + dataSource.getJdbcUrl() + " for tenant " + tenantId );
 		return dataSource;
 
 	}

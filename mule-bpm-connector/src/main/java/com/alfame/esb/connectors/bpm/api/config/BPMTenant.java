@@ -17,9 +17,8 @@ public class BPMTenant {
 	private String tenantId;
 
 	@Parameter
-	@Optional
 	@Expression( NOT_SUPPORTED )
-	@Alias( "data-source" )
+	@Optional
 	private BPMDataSource dataSource;
 	
 	@Parameter

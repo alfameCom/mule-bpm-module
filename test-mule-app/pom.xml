@@ -24,10 +24,34 @@
 				<extensions>true</extensions>
 				<configuration>
 					<sharedLibraries>
-                        <sharedLibrary>
-                            <groupId>com.h2database</groupId>
-                            <artifactId>h2</artifactId>
-                        </sharedLibrary>
+						<sharedLibrary>
+							<groupId>com.h2database</groupId>
+							<artifactId>h2</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>com.zaxxer</groupId>
+							<artifactId>HikariCP</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework</groupId>
+							<artifactId>spring-beans</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework</groupId>
+							<artifactId>spring-core</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework.security</groupId>
+							<artifactId>spring-security-core</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework</groupId>
+							<artifactId>spring-context</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework.security</groupId>
+							<artifactId>spring-security-config</artifactId>
+						</sharedLibrary>
 					</sharedLibraries>
 					<classifier>mule-application</classifier>
                 </configuration>
@@ -57,7 +81,7 @@
 			<version>2.1</version>
 		</dependency>
 		
-		<!-- Mule Connectors -->
+		<!-- Mule HTTP connector -->
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-http-connector</artifactId>
@@ -66,7 +90,7 @@
 		</dependency>
 
 
-		<!-- Mule Modules -->
+		<!-- Mule APIkit -->
 		<dependency>
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-apikit-module</artifactId>
@@ -74,13 +98,50 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 
-        <!-- h2 driver -->
+        <!-- Data source for BPM -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.199</version>
         </dependency>
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>3.3.1</version>
+		</dependency>
 
-    </dependencies>
+		<!-- Mule Spring module -->
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-spring-module</artifactId>
+			<version>1.3.1</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>5.1.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>5.1.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>5.1.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>5.1.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>5.1.0.RELEASE</version>
+		</dependency>
+	</dependencies>
 
 </project>

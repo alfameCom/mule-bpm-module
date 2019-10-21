@@ -5,6 +5,7 @@
 		"id": "mule",
 		"attributes": {
 			"exportedResources": [
+				"beans.xml"
 			],
 			"exportedPackages": [
 				"com.alfame.esb.test"

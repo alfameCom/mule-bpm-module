@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
-	xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns:spring="http://www.mulesoft.org/schema/mule/spring"
+	xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
-	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-	http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
+	http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd">
 
+	<spring:config name="Spring_Config" doc:name="Spring Config" doc:id="15776ef2-5727-438d-ad8b-8c4f09d9097d" files="beans.xml" />
+	
 	<bpm:config name="BPM_Config" doc:name="BPM Config" doc:id="33199c6b-10fe-412f-82bb-bd509da767a7" defaultTenantId="com.alfame.esb">
-		<bpm:default-data-source type="h2" 
-								driverClassName="org.h2.Driver" 
-								jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1" 
-								username="sa" 
-								password="sa"/>
+		<bpm:listener-connection />
+		<bpm:default-data-source >
+			<bpm:data-source-reference type="h2" dataSourceRef="bpmDataSource"  />
+		</bpm:default-data-source>
 		<bpm:definitions>
 			<bpm:classpath-definition resourceClasspath="processes/TestProcess.bpmn20.xml" />
 		</bpm:definitions>
