@@ -27,12 +27,6 @@ public class BPMTenant {
 	@Alias( "definitions" )
 	private List<BPMDefinition> definitions;
 	
-	@Parameter
-	@Optional
-	@Expression( NOT_SUPPORTED )
-	@Alias( "async-executor" )
-	private BPMAsyncExecutor processEngineAsyncExecutor;
-	
 	public String getTenantId() {
 		return tenantId;
 	}
@@ -43,10 +37,6 @@ public class BPMTenant {
 
 	public List<BPMDefinition> getDefinitions() {
 		return this.definitions;
-	}
-
-	public BPMAsyncExecutor getProcessEngineAsyncExecutor() {
-		return this.processEngineAsyncExecutor;
 	}
 
 }

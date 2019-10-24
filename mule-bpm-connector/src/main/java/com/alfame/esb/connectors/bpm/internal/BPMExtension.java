@@ -27,6 +27,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.slf4j.Logger;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +42,11 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutorFactory;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -64,7 +69,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 				subTypes = { BPMDataSourceReference.class, BPMGenericDataSource.class } )
 @ExternalLib( name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl")
 @ExternalLib( name = "Flowable Mule 4", type = DEPENDENCY, coordinates = "org.flowable:flowable-mule4:6.4.1", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
-public class BPMExtension implements Initialisable, Startable, Stoppable, TenantInfoHolder {
+public class BPMExtension implements Initialisable, Startable, Stoppable, TenantInfoHolder, TenantAwareAsyncExecutorFactory {
 
 	private static final Logger LOGGER = getLogger( BPMExtension.class );
 	
@@ -121,7 +126,7 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 	private ProcessEngine processEngine;
 	private Collection<String> registeredTenantIds = new ArrayList<String>();
 	private String currentTenantId;
-	private ExecutorPerTenantAsyncExecutor asyncExecutor;
+	private TenantAwareAsyncExecutor asyncExecutor;
 	
 	@Override
 	public void initialise() throws InitialisationException {
@@ -141,12 +146,26 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 			}
 		}
 		
-		this.asyncExecutor = new ExecutorPerTenantAsyncExecutor( this );
-		this.asyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis( 50 );
-		this.asyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis( 50 );
-		this.asyncExecutor.setMaxAsyncJobsDuePerAcquisition( 10 );
-		this.asyncExecutor.setMaxTimerJobsPerAcquisition( 10 );
-		this.processEngineConfiguration.setAsyncExecutor( this.asyncExecutor );
+		if ( this.defaultAsyncExecutor != null ) {
+			try {
+				Class<?> asyncExecutorClass = Class.forName( this.defaultAsyncExecutor.getClassName() );
+				Constructor<?> asyncExecutorCostructor = null;
+				try {
+					asyncExecutorCostructor = asyncExecutorClass.getConstructor( TenantInfoHolder.class, TenantAwareAsyncExecutorFactory.class );
+					this.asyncExecutor = (TenantAwareAsyncExecutor) asyncExecutorCostructor.newInstance( this, this );
+				} catch ( NoSuchMethodException factoriedException ) {
+					asyncExecutorCostructor = asyncExecutorClass.getConstructor( TenantInfoHolder.class );
+					this.asyncExecutor = (TenantAwareAsyncExecutor) asyncExecutorCostructor.newInstance( this );
+				}
+			} catch( Exception e ) {
+				throw new InitialisationException( e, this );
+			}
+			this.asyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis( this.defaultAsyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis() );
+			this.asyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis( this.defaultAsyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis() );
+			this.asyncExecutor.setMaxAsyncJobsDuePerAcquisition( this.defaultAsyncExecutor.getMaxAsyncJobsDuePerAcquisition() );
+			this.asyncExecutor.setMaxTimerJobsPerAcquisition( this.defaultAsyncExecutor.getMaxTimerJobsPerAcquisition() );
+			this.processEngineConfiguration.setAsyncExecutor( this.asyncExecutor );
+		}
 		this.processEngineConfiguration.setAsyncExecutorActivate( false );
 	}
 
@@ -161,7 +180,9 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 			}
 		}
 		
-		this.asyncExecutor.start();
+		if ( this.asyncExecutor != null ) {
+			this.asyncExecutor.start();
+		}
 		
 		LOGGER.info( this.name + " has been started");
 	}
@@ -190,6 +211,19 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 	@Override
 	public void setCurrentTenantId( String currentTenantId ) {
 		this.currentTenantId = currentTenantId;
+	}
+
+	@Override
+	public AsyncExecutor createAsyncExecutor( String tenantId ) {
+		DefaultAsyncJobExecutor tenantExecutor = null;
+
+		if ( this.defaultAsyncExecutor != null ) {
+			tenantExecutor = new DefaultAsyncJobExecutor();
+            tenantExecutor.setCorePoolSize( this.defaultAsyncExecutor.getMinThreads() );
+            tenantExecutor.setMaxPoolSize( this.defaultAsyncExecutor.getMaxThreads() );
+		}
+		
+		return tenantExecutor;
 	}
 
 	public RuntimeService getRuntimeService() {
