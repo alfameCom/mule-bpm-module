@@ -112,7 +112,7 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 	@Parameter
 	@Optional
 	@Expression( NOT_SUPPORTED )
-	@Alias( "tenants" )
+	@Alias( "additional-tenants" )
 	@Placement( tab = "Additional tenants", order = 1 )
 	@DisplayName( "Additional tenants" )
 	private List<BPMTenant> additionalTenants;

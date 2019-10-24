@@ -15,14 +15,14 @@
 		<bpm:definitions>
 			<bpm:classpath-definition resourceClasspath="processes/TestProcess.bpmn20.xml" />
 		</bpm:definitions>
-		<bpm:tenants>
+		<bpm:additional-tenants>
 			<bpm:tenant tenantId="com.alfame.esb.sub.tenant">
 				<bpm:definitions>
 					<bpm:stream-definition resourceName="OtherTestProcess.bpmn20.xml" 
 										resourceStream="#[readUrl( 'classpath://processes/sub/tenant/OtherTestProcess.bpmn20.xml', 'application/octet-stream' )]" />
 				</bpm:definitions>
 			</bpm:tenant>
-		</bpm:tenants>
+		</bpm:additional-tenants>
 	</bpm:config>
     
     <flow name="bpmListenerSuccessTestFlow">
