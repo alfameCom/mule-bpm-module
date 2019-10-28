@@ -219,8 +219,8 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 
 		if ( this.defaultAsyncExecutor != null ) {
 			tenantExecutor = new DefaultAsyncJobExecutor();
-            tenantExecutor.setCorePoolSize( this.defaultAsyncExecutor.getMinThreads() );
-            tenantExecutor.setMaxPoolSize( this.defaultAsyncExecutor.getMaxThreads() );
+			tenantExecutor.setCorePoolSize( this.defaultAsyncExecutor.getMinThreads() );
+			tenantExecutor.setMaxPoolSize( this.defaultAsyncExecutor.getMaxThreads() );
 		}
 		
 		return tenantExecutor;
