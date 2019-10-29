@@ -17,8 +17,7 @@
 			<bpm:data-source-reference type="h2" dataSourceRef="bpmDataSource"  />
 		</bpm:default-data-source>
 		<bpm:definitions>
-			<bpm:stream-definition resourceName="TestProcess.bpmn20.xml" 
-				resourceStream="#[readUrl( 'classpath://processes/TestProcess.bpmn20.xml', 'application/octet-stream' )]" />
+			<bpm:classpath-definition resourceClasspath="processes/TestProcess.bpmn20.xml" />
 		</bpm:definitions>
 		<bpm:default-async-executor />
 	</bpm:config>

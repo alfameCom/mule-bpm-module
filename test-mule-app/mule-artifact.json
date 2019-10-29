@@ -5,7 +5,8 @@
 		"id": "mule",
 		"attributes": {
 			"exportedResources": [
-				"beans.xml"
+				"beans.xml",
+				"processes/TestProcess.bpmn20.xml"
 			],
 			"exportedPackages": [
 				"com.alfame.esb.test"
