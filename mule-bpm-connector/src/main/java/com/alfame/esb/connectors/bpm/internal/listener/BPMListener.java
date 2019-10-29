@@ -97,7 +97,7 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 	@OnSuccess
 	public void onSuccess( @ParameterGroup( name = "Response", showInDsl = true ) BPMSuccessResponseBuilder responseBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
 
-		LOGGER.debug( (String)responseBuilder.getContent().getValue() );
+		LOGGER.trace( (String)responseBuilder.getContent().getValue() );
 
 		String payload = (String)responseBuilder.getContent().getValue();
 		BPMActivityResponse response = new BPMActivityResponse( new TypedValue<>( payload, DataType.STRING) );
@@ -163,54 +163,68 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 			while( isAlive() ) {
 
 				SourceCallbackContext ctx = sourceCallback.createContext();
+				if ( ctx == null ) {
+					LOGGER.warn( "Consumer for <bpm:listener> on flow '{}' no callback context. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+					stop();
+					continue;
+				}
+				
 				try {
 
 					LOGGER.trace( "Consumer for <bpm:listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 					final BPMConnection connection = connect( ctx );
+					if ( connection == null ) {
+						LOGGER.warn( "Consumer for <bpm:listener> on flow '{}' no connection provider available. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+						stop();
+						cancel( ctx );
+						continue;
+					}
+					
 					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( queueDescriptor.getQueueName() );
 					BPMActivity activity = queue.pop( queueDescriptor.getTimeout(), queueDescriptor.getTimeoutUnit() );
-
-					connection.setResponseCallback( activity );
-
+					
 					if( activity == null ) {
 						LOGGER.trace( "Consumer for <bpm:listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						cancel( ctx );
 						continue;
 					} else {
 						LOGGER.debug( "Consumer for <bpm:listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+						connection.setResponseCallback( activity );
+
+						String correlationId = activity.getCorrelationId().orElse( null );
+
+						Result.Builder resultBuilder = Result.<Serializable, BPMActivityAttributes >builder();
+						resultBuilder.output( activity.getValue() );
+						resultBuilder.attributes( new BPMActivityAttributes( queueDescriptor.getQueueName(), correlationId ) );
+
+						Result< Serializable, BPMActivityAttributes > result = resultBuilder.build();
+
+						ctx.setCorrelationId( correlationId );
+
+						if( isAlive() ) {
+							sourceCallback.handle( result, ctx );
+						} else {
+							cancel( ctx );
+						}
+
 					}
 
-					String correlationId = null;
-					Result.Builder resultBuilder = Result.<Serializable, BPMActivityAttributes >builder();
+				} catch( ConnectionException e ) {
 
-					correlationId = activity.getCorrelationId().orElse( null );
-
-					resultBuilder.output( "test" );
-					resultBuilder.attributes( new BPMActivityAttributes( queueDescriptor.getQueueName(), correlationId ) );
-
-					Result< Serializable, BPMActivityAttributes > result = resultBuilder.build();
-
-					ctx.setCorrelationId( correlationId );
-
-					if( isAlive() ) {
-						sourceCallback.handle( result, ctx );
-					} else {
-						cancel( ctx );
-					}
+					stop();
+					cancel( ctx );
+					LOGGER.warn( "Consumer for <bpm:listener> on flow '{}' is unable to connect. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName(), e );
 
 				} catch( InterruptedException e ) {
 
 					stop();
 					cancel( ctx );
-					LOGGER.info( "Consumer for <bpm:listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+					LOGGER.warn( "Consumer for <bpm:listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName(), e );
 
 				} catch( Exception e ) {
 
 					cancel( ctx );
-					if( LOGGER.isErrorEnabled() ) {
-						LOGGER.error( format( "Consumer for <bpm:listener> on flow '%s' found unexpected exception. Consuming will continue '", location.getRootContainerName() ), e );
-					}
-
+					LOGGER.error( "Consumer for <bpm:listener> on flow '{}' found unexpected exception. Consuming will continue for thread '{}'", location.getRootContainerName(), currentThread().getName(), e );
 				}
 
 			}
@@ -225,7 +239,16 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 					LOGGER.warn( "Failed to rollback transaction: " + e.getMessage(), e );
 				}
 			}
-			connectionProvider.disconnect( ctx.getConnection() );
+			
+			try {
+				connectionProvider.disconnect( ctx.getConnection() );
+			} catch( IllegalStateException e) {
+				// Not connected
+			} catch( Exception e ) {
+				if( LOGGER.isWarnEnabled() ) {
+					LOGGER.warn( "Failed to disconnect connection: " + e.getMessage(), e );
+				}
+			}
 		}
 
 		private BPMConnection connect( SourceCallbackContext ctx ) throws ConnectionException, TransactionException {
