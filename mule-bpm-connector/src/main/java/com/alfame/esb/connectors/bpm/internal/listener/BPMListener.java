@@ -1,13 +1,17 @@
 package com.alfame.esb.connectors.bpm.internal.listener;
 
-import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.alfame.esb.bpm.activity.queue.api.*;
 import com.alfame.esb.connectors.bpm.internal.BPMQueueDescriptor;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnection;
+
+import org.flowable.engine.runtime.Execution;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
@@ -27,6 +31,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.*;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -37,15 +42,15 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Alias( "listener" )
+@MetadataScope( outputResolver = BPMListenerMetadataResolver.class )
 @EmitsResponse
 @MediaType( value = ANY, strict = false )
-public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
+public class BPMListener extends Source< Execution, Void > {
 
 	private static final Logger LOGGER = getLogger( BPMListener.class );
 
@@ -75,7 +80,7 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 	private List< Consumer > consumers;
 
 	@Override
-	public void onStart( SourceCallback< Serializable, BPMActivityAttributes > sourceCallback ) throws MuleException {
+	public void onStart( SourceCallback< Execution, Void > sourceCallback ) throws MuleException {
 
 		startConsumers( sourceCallback );
 
@@ -125,7 +130,7 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 	public void onTerminate() {
 	}
 
-	private void startConsumers( SourceCallback< Serializable, BPMActivityAttributes > sourceCallback ) {
+	private void startConsumers( SourceCallback< Execution, Void > sourceCallback ) {
 		createScheduler();
 		consumers = new ArrayList<>( numberOfConsumers );
 		for( int i = 0; i < numberOfConsumers; i++ ) {
@@ -151,10 +156,10 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 
 	private class Consumer {
 
-		private final SourceCallback< Serializable, BPMActivityAttributes > sourceCallback;
+		private final SourceCallback< Execution, Void > sourceCallback;
 		private final AtomicBoolean stop = new AtomicBoolean( false );
 
-		public Consumer( SourceCallback< Serializable, BPMActivityAttributes > sourceCallback ) {
+		public Consumer( SourceCallback< Execution, Void > sourceCallback ) {
 			this.sourceCallback = sourceCallback;
 		}
 
@@ -193,11 +198,11 @@ public class BPMListener extends Source< Serializable, BPMActivityAttributes > {
 
 						String correlationId = activity.getCorrelationId().orElse( null );
 
-						Result.Builder resultBuilder = Result.<Serializable, BPMActivityAttributes >builder();
+						Result.Builder resultBuilder = Result.< Execution, Void >builder();
 						resultBuilder.output( activity.getValue() );
-						resultBuilder.attributes( new BPMActivityAttributes( queueDescriptor.getQueueName(), correlationId ) );
+						resultBuilder.mediaType( APPLICATION_JAVA );
 
-						Result< Serializable, BPMActivityAttributes > result = resultBuilder.build();
+						Result< Execution, Void > result = resultBuilder.build();
 
 						ctx.setCorrelationId( correlationId );
 

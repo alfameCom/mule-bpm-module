@@ -27,7 +27,7 @@
 			doc:id="90bb2825-efa0-48e7-8c9a-b0c8ddb71f08" 
 			queueName="mighty.queue" 
 			config-ref="BPM_Config"/>
-		<logger level="INFO" message="#[payload]" />
+		<logger level="INFO" message="#[payload.activityId]" />
 
 		<set-payload value="true" />
 	</flow>
