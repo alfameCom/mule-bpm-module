@@ -14,7 +14,7 @@
 			<property name="password" value="sa" />
 			<property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1" />
 			<property name="minimumIdle" value="1" />
-			<property name="maximumPoolSize" value="3" />
+			<property name="maximumPoolSize" value="10" />
 			<property name="connectionTimeout" value="300" />
 		</bean>
 
