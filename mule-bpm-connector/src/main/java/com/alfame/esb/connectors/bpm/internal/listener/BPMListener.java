@@ -224,7 +224,7 @@ public class BPMListener extends Source< Execution, Void > {
 
 					stop();
 					cancel( ctx );
-					LOGGER.warn( "Consumer for <bpm:listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName(), e );
+					LOGGER.info( "Consumer for <bpm:listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 
 				} catch( Exception e ) {
 
