@@ -3,7 +3,7 @@ package com.alfame.esb.connectors.bpm.internal.processfactory;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-public class ProcessFactoryProperties {
+public class BPMProcessFactoryProperties {
 
 	@Parameter
 	private String processDefinitionKey;

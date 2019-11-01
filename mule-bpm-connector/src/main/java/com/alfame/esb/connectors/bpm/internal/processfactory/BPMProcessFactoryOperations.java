@@ -12,15 +12,15 @@ import com.alfame.esb.connectors.bpm.internal.BPMExtension;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class ProcessFactoryOperations {
+public class BPMProcessFactoryOperations {
 
-	private static final Logger LOGGER = getLogger( ProcessFactoryOperations.class );
+	private static final Logger LOGGER = getLogger( BPMProcessFactoryOperations.class );
 
 	@Alias( "process-factory" )
 	@MediaType( value = MediaType.ANY, strict = false )
-	@OutputResolver( output = ProcessFactoryMetadataResolver.class )
+	@OutputResolver( output = BPMProcessFactoryMetadataResolver.class )
 	public ProcessInstance processfactory(
-			@ParameterGroup( name = "properties" ) ProcessFactoryProperties properties,
+			@ParameterGroup( name = "properties" ) BPMProcessFactoryProperties properties,
 			@Config BPMExtension config
 			) {
 
@@ -34,7 +34,7 @@ public class ProcessFactoryOperations {
 
 	}
 
-	private static ProcessInstance startProcessInstance( RuntimeService runtimeService, ProcessFactoryProperties properties ) {
+	private static ProcessInstance startProcessInstance( RuntimeService runtimeService, BPMProcessFactoryProperties properties ) {
 
 		ProcessInstance instance = null;
 

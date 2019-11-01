@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 
 @ArtifactClassLoaderRunnerConfig(
-		applicationSharedRuntimeLibs = { "com.h2database:h2" } )
+		applicationSharedRuntimeLibs = { "com.h2database:h2", "com.alfame.esb:bpm-queue" } )
 public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 
 	private static final Logger LOGGER = getLogger( BPMListenerTestCase.class );

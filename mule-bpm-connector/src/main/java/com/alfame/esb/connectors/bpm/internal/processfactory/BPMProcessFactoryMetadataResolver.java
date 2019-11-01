@@ -5,7 +5,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.metadata.resolving.OutputStaticTypeResolver;
 
-public class ProcessFactoryMetadataResolver extends OutputStaticTypeResolver {
+public class BPMProcessFactoryMetadataResolver extends OutputStaticTypeResolver {
 	
 	private static MetadataType loadMetadataType( Class<?> classType ) {
 		return new JavaTypeLoader( ClassLoader.getSystemClassLoader() ).load( classType );

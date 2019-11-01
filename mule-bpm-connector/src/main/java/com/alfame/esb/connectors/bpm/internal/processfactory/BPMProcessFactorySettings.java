@@ -2,12 +2,12 @@ package com.alfame.esb.connectors.bpm.internal.processfactory;
 
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-public final class ProcessFactorySettings {
+public final class BPMProcessFactorySettings {
 
 	@Parameter
-	private ProcessFactoryProperties properties;
+	private BPMProcessFactoryProperties properties;
 
-	public ProcessFactoryProperties getProperties() {
+	public BPMProcessFactoryProperties getProperties() {
 		return properties;
 	}
 

@@ -9,10 +9,10 @@ import java.io.Serializable;
 
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
-public class BPMErrorResponseBuilder {
+public class BPMTaskListenerSuccessResponseBuilder {
 
 	@Parameter
-	@Content
+	@Content( primary = true )
 	@Optional( defaultValue = PAYLOAD )
 	private TypedValue< Serializable > content;
 

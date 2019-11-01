@@ -8,7 +8,7 @@ import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 
-@Alias( "listener" )
+@Alias( "task-listener" )
 public class BPMConnectionProvider implements ConnectionProvider< BPMConnection >, NoConnectivityTest {
 
 	@Override

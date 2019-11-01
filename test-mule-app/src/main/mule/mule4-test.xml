@@ -12,7 +12,7 @@
 	<spring:config name="Spring_Config" doc:name="Spring Config" doc:id="15776ef2-5727-438d-ad8b-8c4f09d9097d" files="beans.xml" />
 	
 	<bpm:config name="BPM_Config" doc:name="BPM Config" doc:id="33199c6b-10fe-412f-82bb-bd509da767a7" defaultTenantId="com.alfame.esb">
-		<bpm:listener-connection />
+		<bpm:task-listener-connection />
 		<bpm:default-data-source >
 			<bpm:data-source-reference type="h2" dataSourceRef="bpmDataSource"  />
 		</bpm:default-data-source>
@@ -23,7 +23,7 @@
 	</bpm:config>
 	
 	<flow name="mightMuleTaskFlow">
-		<bpm:listener doc:name="Listener"
+		<bpm:task-listener doc:name="Task Listener"
 			doc:id="90bb2825-efa0-48e7-8c9a-b0c8ddb71f08" 
 			queueName="mighty.queue" 
 			config-ref="BPM_Config"/>

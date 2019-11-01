@@ -9,8 +9,8 @@ import com.alfame.esb.connectors.bpm.api.config.BPMGenericDataSource;
 import com.alfame.esb.connectors.bpm.api.config.BPMStreamDefinition;
 import com.alfame.esb.connectors.bpm.api.config.BPMTenant;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnectionProvider;
-import com.alfame.esb.connectors.bpm.internal.listener.BPMListener;
-import com.alfame.esb.connectors.bpm.internal.processfactory.ProcessFactoryOperations;
+import com.alfame.esb.connectors.bpm.internal.listener.BPMTaskListener;
+import com.alfame.esb.connectors.bpm.internal.processfactory.BPMProcessFactoryOperations;
 import org.mule.runtime.extension.api.annotation.*;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
@@ -60,9 +60,9 @@ import org.mule.runtime.api.lifecycle.Stoppable;
  */
 @Xml( prefix = "bpm" )
 @Extension( name = "BPM" )
-@Sources( BPMListener.class )
+@Sources( BPMTaskListener.class )
 @ConnectionProviders( BPMConnectionProvider.class )
-@Operations( { ProcessFactoryOperations.class } )
+@Operations( { BPMProcessFactoryOperations.class } )
 @SubTypeMapping( baseType = BPMDefinition.class, 
 				subTypes = { BPMClasspathDefinition.class, BPMStreamDefinition.class } )
 @SubTypeMapping( baseType = BPMDataSource.class, 

@@ -46,13 +46,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Alias( "listener" )
-@MetadataScope( outputResolver = BPMListenerMetadataResolver.class )
+@Alias( "task-listener" )
+@MetadataScope( outputResolver = BPMTaskListenerMetadataResolver.class )
 @EmitsResponse
 @MediaType( value = ANY, strict = false )
-public class BPMListener extends Source< Execution, Void > {
+public class BPMTaskListener extends Source< Execution, Void > {
 
-	private static final Logger LOGGER = getLogger( BPMListener.class );
+	private static final Logger LOGGER = getLogger( BPMTaskListener.class );
 
 	@ParameterGroup( name = "queue" )
 	private BPMQueueDescriptor queueDescriptor;
@@ -100,7 +100,7 @@ public class BPMListener extends Source< Execution, Void > {
 	}
 
 	@OnSuccess
-	public void onSuccess( @ParameterGroup( name = "Response", showInDsl = true ) BPMSuccessResponseBuilder responseBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
+	public void onSuccess( @ParameterGroup( name = "Response", showInDsl = true ) BPMTaskListenerSuccessResponseBuilder responseBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
 
 		LOGGER.trace( (String)responseBuilder.getContent().getValue() );
 
@@ -113,7 +113,7 @@ public class BPMListener extends Source< Execution, Void > {
 	}
 
 	@OnError
-	public void onError( @ParameterGroup( name = "Error Response", showInDsl = true) BPMErrorResponseBuilder errorResponseBuilder, Error error, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
+	public void onError( @ParameterGroup( name = "Error Response", showInDsl = true) BPMTaskListenerErrorResponseBuilder errorResponseBuilder, Error error, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
 
 		final ErrorType errorType = error.getErrorType();
 		String msg = errorType.getNamespace() + ":" + errorType.getIdentifier() + ": " + error.getDescription();
@@ -169,17 +169,17 @@ public class BPMListener extends Source< Execution, Void > {
 
 				SourceCallbackContext ctx = sourceCallback.createContext();
 				if ( ctx == null ) {
-					LOGGER.warn( "Consumer for <bpm:listener> on flow '{}' no callback context. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+					LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' no callback context. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 					stop();
 					continue;
 				}
 				
 				try {
 
-					LOGGER.trace( "Consumer for <bpm:listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+					LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 					final BPMConnection connection = connect( ctx );
 					if ( connection == null ) {
-						LOGGER.warn( "Consumer for <bpm:listener> on flow '{}' no connection provider available. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+						LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' no connection provider available. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						stop();
 						cancel( ctx );
 						continue;
@@ -189,11 +189,11 @@ public class BPMListener extends Source< Execution, Void > {
 					BPMActivity activity = queue.pop( queueDescriptor.getTimeout(), queueDescriptor.getTimeoutUnit() );
 					
 					if( activity == null ) {
-						LOGGER.trace( "Consumer for <bpm:listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						cancel( ctx );
 						continue;
 					} else {
-						LOGGER.debug( "Consumer for <bpm:listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+						LOGGER.debug( "Consumer for <bpm:task-listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						connection.setResponseCallback( activity );
 
 						String correlationId = activity.getCorrelationId().orElse( null );
@@ -218,18 +218,18 @@ public class BPMListener extends Source< Execution, Void > {
 
 					stop();
 					cancel( ctx );
-					LOGGER.warn( "Consumer for <bpm:listener> on flow '{}' is unable to connect. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName(), e );
+					LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' is unable to connect. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName(), e );
 
 				} catch( InterruptedException e ) {
 
 					stop();
 					cancel( ctx );
-					LOGGER.info( "Consumer for <bpm:listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+					LOGGER.info( "Consumer for <bpm:task-listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 
 				} catch( Exception e ) {
 
 					cancel( ctx );
-					LOGGER.error( "Consumer for <bpm:listener> on flow '{}' found unexpected exception. Consuming will continue for thread '{}'", location.getRootContainerName(), currentThread().getName(), e );
+					LOGGER.error( "Consumer for <bpm:task-listener> on flow '{}' found unexpected exception. Consuming will continue for thread '{}'", location.getRootContainerName(), currentThread().getName(), e );
 				}
 
 			}
