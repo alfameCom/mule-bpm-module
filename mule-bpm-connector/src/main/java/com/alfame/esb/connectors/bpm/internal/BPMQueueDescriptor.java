@@ -10,7 +10,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class BPMQueueDescriptor {
 
 	@Parameter
-	private String queueName;
+	private String endpoint;
 
 	@Parameter
 	@Optional( defaultValue = "3")
@@ -22,12 +22,12 @@ public class BPMQueueDescriptor {
 
 	public BPMQueueDescriptor() {}
 
-	public BPMQueueDescriptor( String queueName ) {
-		this.queueName = queueName;
+	public BPMQueueDescriptor( String endpoint ) {
+		this.endpoint = endpoint;
 	}
 
-	public String getQueueName() {
-		return queueName;
+	public String getEndpoint() {
+		return endpoint;
 	}
 
 	public int getTimeout() {

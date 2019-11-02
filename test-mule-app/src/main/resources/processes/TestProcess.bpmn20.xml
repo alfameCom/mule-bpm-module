@@ -8,7 +8,7 @@
     </startEvent>
     <serviceTask id="testMuleTask" name="Test Mule Task" flowable:async="true" flowable:exclusive="false" flowable:type="mule">
       <extensionElements>
-        <flowable:field name="endpointUrl">
+        <flowable:field name="endpoint">
           <flowable:string><![CDATA[mighty.queue]]></flowable:string>
         </flowable:field>
         <flowable:field name="language">

@@ -26,14 +26,14 @@
 	</bpm:config>
     
     <flow name="bpmListenerSuccessTestFlow">
-        <bpm:task-listener config-ref="engineConfig" queueName="some.success.test.queue" />
+        <bpm:task-listener config-ref="engineConfig" endpoint="some.success.test.queue" />
         <logger level="INFO" message="#[payload]" />
         <logger level="INFO" message="#[attributes]" />
         <set-payload value="SUCCESS" />
     </flow>
 
     <flow name="bpmListenerErrorTestFlow">
-        <bpm:task-listener config-ref="engineConfig" queueName="some.error.test.queue" />
+        <bpm:task-listener config-ref="engineConfig" endpoint="some.error.test.queue" />
         <set-payload value="BEFORE_ERROR" />
 		<raise-error type="ANY" description="SOME_TEST_ERROR" />
         <error-handler>
@@ -44,7 +44,7 @@
     </flow>
     
 	<flow name="bpmListenerTestFlow">
-		<bpm:task-listener config-ref="engineConfig" queueName="test.queue" />
+		<bpm:task-listener config-ref="engineConfig" endpoint="test.queue" />
 		<logger level="INFO" message="#[payload]" />
 
 		<set-payload value="true" />

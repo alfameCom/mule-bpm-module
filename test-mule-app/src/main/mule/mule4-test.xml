@@ -25,7 +25,7 @@
 	<flow name="mightMuleTaskFlow">
 		<bpm:task-listener doc:name="Task Listener"
 			doc:id="90bb2825-efa0-48e7-8c9a-b0c8ddb71f08" 
-			queueName="mighty.queue" 
+			endpoint="test.task" 
 			config-ref="BPM_Config"/>
 		<logger level="INFO" message="#[payload.activityId]" />
 

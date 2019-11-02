@@ -185,7 +185,7 @@ public class BPMTaskListener extends Source< Execution, Void > {
 						continue;
 					}
 					
-					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( queueDescriptor.getQueueName() );
+					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( queueDescriptor.getEndpoint() );
 					BPMActivity activity = queue.pop( queueDescriptor.getTimeout(), queueDescriptor.getTimeoutUnit() );
 					
 					if( activity == null ) {
