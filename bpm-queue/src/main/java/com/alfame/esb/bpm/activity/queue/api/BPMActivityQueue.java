@@ -19,15 +19,18 @@ public class BPMActivityQueue {
 	}
 
 	public boolean publish( BPMActivity message ) throws InterruptedException {
+		logger.debug( "Pushing to queue " + this.queueName );
 		return activityQueue.offer( message );
 	}
 
 	@Deprecated
 	public BPMActivity pop() throws InterruptedException {
+		logger.debug( "Popping from queue " + this.queueName );
 		return activityQueue.take();
 	}
 	
 	public BPMActivity pop( long timeout, TimeUnit unit ) throws InterruptedException {
+		logger.debug( "Popping from queue " + this.queueName );
 		return activityQueue.poll( timeout, unit );
 	}
 

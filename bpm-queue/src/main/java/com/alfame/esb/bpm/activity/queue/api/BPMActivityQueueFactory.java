@@ -26,6 +26,7 @@ public class BPMActivityQueueFactory {
 			logger.info( e );
 		}
 
+		logger.trace( "Returning instance for queueName " + queueName );
 		return instances.get( queueName );
 	}
 
