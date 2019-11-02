@@ -44,7 +44,6 @@ import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEng
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.flowable.job.service.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutorFactory;
 import org.mule.runtime.api.exception.MuleException;
