@@ -58,7 +58,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
  * and sources are going to be declared.
  */
 @Xml( prefix = "bpm" )
-@Extension( name = "BPM" )
+@Extension( name = "BPM", vendor = "Alfame Systems" )
 @Sources( BPMTaskListener.class )
 @ConnectionProviders( BPMConnectionProvider.class )
 @Operations( { BPMProcessFactoryOperations.class } )
