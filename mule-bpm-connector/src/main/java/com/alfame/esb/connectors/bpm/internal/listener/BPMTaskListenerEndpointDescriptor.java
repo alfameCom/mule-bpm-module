@@ -1,4 +1,4 @@
-package com.alfame.esb.connectors.bpm.internal;
+package com.alfame.esb.connectors.bpm.internal.listener;
 
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -7,22 +7,22 @@ import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-public class BPMQueueDescriptor {
+public class BPMTaskListenerEndpointDescriptor {
 
 	@Parameter
 	private String endpoint;
 
 	@Parameter
-	@Optional( defaultValue = "3")
+	@Optional( defaultValue = "5" )
 	private int timeout;
 
 	@Parameter
 	@Optional( defaultValue = "SECONDS" )
 	private TimeUnit timeoutUnit = SECONDS;
 
-	public BPMQueueDescriptor() {}
+	public BPMTaskListenerEndpointDescriptor() {}
 
-	public BPMQueueDescriptor( String endpoint ) {
+	public BPMTaskListenerEndpointDescriptor( String endpoint ) {
 		this.endpoint = endpoint;
 	}
 

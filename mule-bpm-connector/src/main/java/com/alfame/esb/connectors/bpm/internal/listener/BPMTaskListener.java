@@ -6,7 +6,6 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.alfame.esb.bpm.activity.queue.api.*;
-import com.alfame.esb.connectors.bpm.internal.BPMQueueDescriptor;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnection;
 
 import org.flowable.engine.runtime.Execution;
@@ -55,7 +54,7 @@ public class BPMTaskListener extends Source< Execution, Void > {
 	private static final Logger LOGGER = getLogger( BPMTaskListener.class );
 
 	@ParameterGroup( name = "queue" )
-	private BPMQueueDescriptor queueDescriptor;
+	private BPMTaskListenerEndpointDescriptor queueDescriptor;
 
 	@Parameter
 	@Optional( defaultValue = "4" )
