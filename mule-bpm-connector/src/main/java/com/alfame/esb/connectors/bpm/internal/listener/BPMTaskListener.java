@@ -53,8 +53,8 @@ public class BPMTaskListener extends Source< Execution, Void > {
 
 	private static final Logger LOGGER = getLogger( BPMTaskListener.class );
 
-	@ParameterGroup( name = "queue" )
-	private BPMTaskListenerEndpointDescriptor queueDescriptor;
+	@ParameterGroup( name = "endpoint" )
+	private BPMTaskListenerEndpointDescriptor endpointDescriptor;
 
 	@Parameter
 	@Optional( defaultValue = "4" )
@@ -145,7 +145,7 @@ public class BPMTaskListener extends Source< Execution, Void > {
 				.withMaxConcurrentTasks( numberOfConsumers )
 				.withName( "bpm-listener-flow" + location.getRootContainerName() )
 				.withWaitAllowed( true )
-				.withShutdownTimeout( queueDescriptor.getTimeout(), queueDescriptor.getTimeoutUnit() ) );
+				.withShutdownTimeout( endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit() ) );
 	}
 
 	private int getMaxConcurrency() {
@@ -184,8 +184,8 @@ public class BPMTaskListener extends Source< Execution, Void > {
 						continue;
 					}
 					
-					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( queueDescriptor.getEndpoint() );
-					BPMActivity activity = queue.pop( queueDescriptor.getTimeout(), queueDescriptor.getTimeoutUnit() );
+					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( endpointDescriptor.getEndpoint() );
+					BPMActivity activity = queue.pop( endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit() );
 					
 					if( activity == null ) {
 						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );

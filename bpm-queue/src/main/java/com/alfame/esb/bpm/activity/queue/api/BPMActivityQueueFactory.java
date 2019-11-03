@@ -16,18 +16,24 @@ public class BPMActivityQueueFactory {
 	private static Semaphore semaphore = new Semaphore( 1 );
 
 	public static BPMActivityQueue getInstance( String queueName ) {
+		BPMActivityQueue activityQueue = null;
+		
 		try {
 			semaphore.acquire();
+			
 			if( instances.get( queueName ) == null ) {
 				instances.put( queueName, new BPMActivityQueue( queueName ) );
 			}
+			
+			activityQueue = instances.get( queueName );
+			
 			semaphore.release();
 		} catch( InterruptedException e ) {
 			logger.info( e );
 		}
 
 		logger.trace( "Returning instance for queueName " + queueName );
-		return instances.get( queueName );
+		return activityQueue;
 	}
 
 	private BPMActivityQueueFactory() {}

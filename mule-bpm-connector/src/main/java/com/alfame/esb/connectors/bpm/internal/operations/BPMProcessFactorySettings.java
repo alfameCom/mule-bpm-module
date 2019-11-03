@@ -1,4 +1,4 @@
-package com.alfame.esb.connectors.bpm.internal.processfactory;
+package com.alfame.esb.connectors.bpm.internal.operations;
 
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 

@@ -10,7 +10,10 @@ import com.alfame.esb.connectors.bpm.api.config.BPMStreamDefinition;
 import com.alfame.esb.connectors.bpm.api.config.BPMTenant;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.connectors.bpm.internal.listener.BPMTaskListener;
-import com.alfame.esb.connectors.bpm.internal.processfactory.BPMProcessFactoryOperations;
+import com.alfame.esb.connectors.bpm.internal.operations.BPMProcessFactoryOperations;
+import com.alfame.esb.bpm.api.BPMEngine;
+import com.alfame.esb.bpm.api.BPMEnginePool;
+
 import org.mule.runtime.extension.api.annotation.*;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
@@ -38,10 +41,12 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
@@ -68,7 +73,9 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 				subTypes = { BPMDataSourceReference.class, BPMGenericDataSource.class } )
 @ExternalLib( name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl")
 @ExternalLib( name = "Flowable Mule 4", type = DEPENDENCY, coordinates = "org.flowable:flowable-mule4:6.4.1", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
-public class BPMExtension implements Initialisable, Startable, Stoppable, TenantInfoHolder, TenantAwareAsyncExecutorFactory {
+@ExternalLib( name = "BPM Activity Queue", type = DEPENDENCY, coordinates = "com.alfame.esb:bpm-queue:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.activity.queue.api.BPMActivityQueueFactory")
+@ExternalLib( name = "BPM Java API", type = DEPENDENCY, coordinates = "com.alfame.esb:bpm-java-api:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
+public class BPMExtension extends BPMEngine implements Initialisable, Startable, Stoppable, TenantInfoHolder, TenantAwareAsyncExecutorFactory {
 
 	private static final Logger LOGGER = getLogger( BPMExtension.class );
 	
@@ -183,12 +190,17 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 			this.asyncExecutor.start();
 		}
 		
+		BPMEnginePool.register( this.name, this );
+		
 		LOGGER.info( this.name + " has been started");
 	}
 
 	@Override
 	public void stop() throws MuleException {
 		LOGGER.info( this.name + " is going to shutdown");
+		
+		BPMEnginePool.unregister( this.name );
+		
 		this.asyncExecutor.shutdown();
 		this.processEngine.close();
 	}
@@ -224,14 +236,51 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, Tenant
 		
 		return tenantExecutor;
 	}
+	
+	public String getName() {
+		return this.name;
+	}
+
+	public String getDefaultTenantId() {
+		return this.defaultTenantId;
+	}
 
 	public RuntimeService getRuntimeService() {
 		return this.processEngine.getRuntimeService();
 	}
 
-	public RepositoryService getRepositoryService() {
-		return this.processEngine.getRepositoryService();
+	public HistoryService getHistoryService() {
+		return this.processEngine.getHistoryService();
 	}
+
+	public TaskService getTaskService() {
+		return this.processEngine.getTaskService();
+	}
+	
+	public  Object startProcessInstance( String processDefinitionKey, String tenantId, String uniqueBusinessKey, String processName ) {
+
+		ProcessInstance instance = null;
+
+		LOGGER.debug("Starting process instance with definition key: " + processDefinitionKey);
+
+		if( tenantId != null ) {
+
+			instance = this.getRuntimeService().startProcessInstanceByKeyAndTenantId( processDefinitionKey, uniqueBusinessKey, null, tenantId );
+
+		} else {
+
+			instance = this.getRuntimeService().startProcessInstanceByKeyAndTenantId( processDefinitionKey, uniqueBusinessKey, null, this.getDefaultTenantId() );
+
+		}
+
+		if( processName != null ) {
+			this.getRuntimeService().setProcessInstanceName( instance.getId(), processName );
+		}
+
+		return instance;
+
+	}
+
 	
 	private DataSource buildDataSource( String tenantId ) {
 		DataSource dataSource = null;

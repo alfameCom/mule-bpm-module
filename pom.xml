@@ -13,6 +13,7 @@
 	<modules>
 		<module>flowable</module>
 		<module>bpm-queue</module>
+		<module>bpm-java-api</module>
 		<module>mule-bpm-connector</module>
 		<module>mule-app-parents</module>
   </modules>

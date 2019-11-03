@@ -26,6 +26,17 @@
 		<!-- Mule logger -->        
         <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
  
+		<!-- Flowable logger -->
+		<AsyncLogger name="org.flowable" level="INFO" />
+		<AsyncLogger name="org.flowable.mule" level="DEBUG" />
+		<AsyncLogger name="org.flowable.job.service.impl.persistence.entity" level="INFO" />
+ 
+        <!--  BPM extension -->
+        <AsyncLogger name="com.alfame.esb.connectors.bpm" level="INFO" />
+        <AsyncLogger name="com.alfame.esb.connectors.bpm.internal.listener" level="INFO" />
+        <AsyncLogger name="com.alfame.esb.bpm.activity.queue" level="INFO" />
+        <AsyncLogger name="com.alfame.esb.bpm.engine.pool" level="DEBUG" />
+ 
         <AsyncRoot level="INFO">
             <AppenderRef ref="file" />
         </AsyncRoot>

@@ -70,7 +70,17 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
+		<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <compilerArgs>
+                        <args>-parameters</args>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
 	</build>
 
 	<dependencies>
@@ -110,6 +120,13 @@
 			<version>3.3.1</version>
 		</dependency>
 
+		<!-- BPM Java API -->
+		<dependency>
+			<groupId>com.alfame.esb</groupId>
+			<artifactId>bpm-java-api</artifactId>
+			<version>${engine.pool.version}</version>
+		</dependency>
+
 		<!-- Mule Spring module -->
 		<dependency>
 			<groupId>org.mule.modules</groupId>
@@ -142,6 +159,12 @@
 			<artifactId>spring-security-config</artifactId>
 			<version>5.1.0.RELEASE</version>
 		</dependency>
-	</dependencies>
+		<dependency>
+            <groupId>org.mule.module</groupId>
+            <artifactId>mule-java-module</artifactId>
+            <version>1.2.5</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+    </dependencies>
 
 </project>

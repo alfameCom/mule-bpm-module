@@ -6,10 +6,12 @@
 		"attributes": {
 			"exportedResources": [
 				"beans.xml",
-				"processes/TestProcess.bpmn20.xml"
+				"processes/TestProcess.bpmn20.xml",
+				"processes/OtherTestProcess.bpmn20.xml"
 			],
 			"exportedPackages": [
-				"com.alfame.esb.test"
+				"com.alfame.esb.test",
+				"com.alfame.esb.bpm.api"
 			]
 		}
 	}

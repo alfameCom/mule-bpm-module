@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:spring="http://www.mulesoft.org/schema/mule/spring"
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:spring="http://www.mulesoft.org/schema/mule/spring"
 	xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 	http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
-	http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd">
+	http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 
 	<spring:config name="Spring_Config" doc:name="Spring Config" doc:id="15776ef2-5727-438d-ad8b-8c4f09d9097d" files="beans.xml" />
 	
@@ -18,6 +19,7 @@
 		</bpm:default-data-source>
 		<bpm:definitions>
 			<bpm:classpath-definition resourceClasspath="processes/TestProcess.bpmn20.xml" />
+			<bpm:classpath-definition resourceClasspath="processes/OtherTestProcess.bpmn20.xml" />
 		</bpm:definitions>
 		<bpm:default-async-executor />
 	</bpm:config>
@@ -26,6 +28,22 @@
 		<bpm:task-listener doc:name="Task Listener"
 			doc:id="90bb2825-efa0-48e7-8c9a-b0c8ddb71f08" 
 			endpoint="test.task" 
+			config-ref="BPM_Config"/>
+		<logger level="INFO" message="#[payload.activityId]" />
+		
+		<!--  java:invoke doc:name="Invoke" doc:id="b4fc7e7d-536e-4882-9d01-0602232ee736" 
+			class="com.alfame.esb.connectors.bpm.api.config.BPMConfig" instance="BPM_Config" method="getName()"/-->
+		<java:invoke doc:name="Invoke" doc:id="96ac1de6-9f5b-43e6-aeb9-66fe0621c93d" 
+			class="com.alfame.esb.test.TestComponent" instance="testComponent" method="startProcess()"/>
+		<logger level="INFO" message="#[payload.processInstanceId]" />
+
+		<set-payload value="true" />
+	</flow>
+
+	<flow name="mightierMuleTaskFlow">
+		<bpm:task-listener doc:name="Task Listener"
+			doc:id="1f2579ec-ac9e-4fba-81d4-002eb4e849b1" 
+			endpoint="other.test.task" 
 			config-ref="BPM_Config"/>
 		<logger level="INFO" message="#[payload.activityId]" />
 

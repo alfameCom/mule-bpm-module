@@ -19,6 +19,9 @@
 		<!-- Flowable logger -->
 		<AsyncLogger name="org.flowable" level="DEBUG" />
 
+        <!--  BPM extension -->
+        <AsyncLogger name="com.alfame.esb.connectors.bpm" level="DEBUG"/>
+
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>
         </AsyncRoot>

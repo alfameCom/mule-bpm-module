@@ -1,4 +1,4 @@
-package com.alfame.esb.connectors.bpm.internal.processfactory;
+package com.alfame.esb.connectors.bpm.internal.operations;
 
 import org.flowable.engine.runtime.ProcessInstance;
 import org.mule.metadata.api.model.MetadataType;
