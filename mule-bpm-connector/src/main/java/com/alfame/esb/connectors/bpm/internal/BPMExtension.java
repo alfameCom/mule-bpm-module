@@ -13,6 +13,7 @@ import com.alfame.esb.connectors.bpm.internal.listener.BPMTaskListener;
 import com.alfame.esb.connectors.bpm.internal.operations.BPMProcessFactoryOperations;
 import com.alfame.esb.bpm.api.BPMEngine;
 import com.alfame.esb.bpm.api.BPMEnginePool;
+import com.alfame.esb.bpm.api.BPMProcessBuilder;
 
 import org.mule.runtime.extension.api.annotation.*;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
@@ -75,7 +76,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 @ExternalLib( name = "Flowable Mule 4", type = DEPENDENCY, coordinates = "org.flowable:flowable-mule4:6.4.1", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 @ExternalLib( name = "BPM Activity Queue", type = DEPENDENCY, coordinates = "com.alfame.esb:bpm-queue:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.activity.queue.api.BPMActivityQueueFactory")
 @ExternalLib( name = "BPM Java API", type = DEPENDENCY, coordinates = "com.alfame.esb:bpm-java-api:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
-public class BPMExtension extends BPMEngine implements Initialisable, Startable, Stoppable, TenantInfoHolder, TenantAwareAsyncExecutorFactory {
+public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initialisable, Startable, Stoppable, TenantInfoHolder, TenantAwareAsyncExecutorFactory {
 
 	private static final Logger LOGGER = getLogger( BPMExtension.class );
 	
@@ -257,30 +258,9 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 		return this.processEngine.getTaskService();
 	}
 	
-	public  Object startProcessInstance( String processDefinitionKey, String tenantId, String uniqueBusinessKey, String processName ) {
-
-		ProcessInstance instance = null;
-
-		LOGGER.debug("Starting process instance with definition key: " + processDefinitionKey);
-
-		if( tenantId != null ) {
-
-			instance = this.getRuntimeService().startProcessInstanceByKeyAndTenantId( processDefinitionKey, uniqueBusinessKey, null, tenantId );
-
-		} else {
-
-			instance = this.getRuntimeService().startProcessInstanceByKeyAndTenantId( processDefinitionKey, uniqueBusinessKey, null, this.getDefaultTenantId() );
-
-		}
-
-		if( processName != null ) {
-			this.getRuntimeService().setProcessInstanceName( instance.getId(), processName );
-		}
-
-		return instance;
-
+	public BPMProcessBuilder processInstanceBuilder() {
+		return new BPMProcessBuilderImpl( this );
 	}
-
 	
 	private DataSource buildDataSource( String tenantId ) {
 		DataSource dataSource = null;

@@ -17,7 +17,9 @@ public class TestComponent {
 	private BPMEngine bpmEngine;
 	
 	public Object startProcess() {
-		return bpmEngine.startProcessInstance("otherTestProcess", null, null, null);
+		return bpmEngine.processInstanceBuilder()
+				.processDefinitionKey( "otherTestProcess" )
+				.startProcessInstance();
 	}
 	
 	@Override

@@ -6,6 +6,6 @@ public abstract class BPMEngine {
 	
 	public abstract String getDefaultTenantId();
 	
-	public abstract Object startProcessInstance( String processDefinitionKey, String tenantId, String uniqueBusinessKey, String processName );
-
+	public abstract BPMProcessBuilder processInstanceBuilder();
+	
 }

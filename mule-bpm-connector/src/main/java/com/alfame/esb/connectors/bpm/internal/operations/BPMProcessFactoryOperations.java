@@ -9,6 +9,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.slf4j.Logger;
 
 import com.alfame.esb.connectors.bpm.internal.BPMExtension;
+import com.alfame.esb.connectors.bpm.internal.BPMProcessBuilderImpl;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -26,8 +27,15 @@ public class BPMProcessFactoryOperations {
 
 		ProcessInstance instance = null;
 		
-		instance = (ProcessInstance) engine.startProcessInstance( properties.getProcessDefinitionKey(), properties.getTenantId(), properties.getUniqueBusinessKey(), properties.getProcessName() );
-
+		BPMProcessBuilderImpl instanceBuilder = new BPMProcessBuilderImpl( engine );
+		
+		instance = (ProcessInstance) instanceBuilder
+				.processDefinitionKey( properties.getProcessDefinitionKey() )
+				.tenantId( properties.getTenantId() )
+				.uniqueBusinessKey( properties.getUniqueBusinessKey() )
+				.processInstanceName( properties.getProcessName() )
+				.startProcessInstance();
+		
 		return instance;
 
 	}
