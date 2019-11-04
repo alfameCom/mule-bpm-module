@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:java="http://www.mulesoft.org/schema/mule/java"
+<mule xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
 	xmlns:spring="http://www.mulesoft.org/schema/mule/spring"
 	xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 	http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
 	http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd
 http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
@@ -31,8 +31,6 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 			config-ref="BPM_Config"/>
 		<logger level="INFO" message="#[payload.activityId]" />
 		
-		<!--  java:invoke doc:name="Invoke" doc:id="b4fc7e7d-536e-4882-9d01-0602232ee736" 
-			class="com.alfame.esb.connectors.bpm.api.config.BPMConfig" instance="BPM_Config" method="getName()"/-->
 		<java:invoke doc:name="Invoke" doc:id="96ac1de6-9f5b-43e6-aeb9-66fe0621c93d" 
 			class="com.alfame.esb.test.TestComponent" instance="testComponent" method="startProcess()"/>
 		<logger level="INFO" message="#[payload.processInstanceId]" />
@@ -45,8 +43,20 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 			doc:id="1f2579ec-ac9e-4fba-81d4-002eb4e849b1" 
 			endpoint="other.test.task" 
 			config-ref="BPM_Config"/>
-		<logger level="INFO" message="#[payload.activityId]" />
+		<logger level="INFO" message="#[payload.id]" />
 
+		<java:invoke doc:name="Invoke" doc:id="1e0c7968-aa1d-42f2-a67b-95372ddf26e4" 
+			class="com.alfame.esb.bpm.api.BPMEngine" 
+			instance="bpmEngine" 
+			method="getVariables( String, Collection )" 
+			target="bpmVariables">
+			<java:args>#[ {
+				arg0: payload.id,
+				arg1: [ 'correct' ]
+			} ]</java:args>
+		</java:invoke>
+		<logger level="INFO" message="#[vars.bpmVariables]" />
+		
 		<set-payload value="true" />
 	</flow>
 

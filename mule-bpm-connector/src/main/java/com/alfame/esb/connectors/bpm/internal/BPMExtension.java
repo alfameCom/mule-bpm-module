@@ -35,6 +35,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -47,7 +48,6 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentBuilder;
-import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
@@ -260,6 +260,14 @@ public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initial
 	
 	public BPMProcessBuilder processInstanceBuilder() {
 		return new BPMProcessBuilderImpl( this );
+	}
+	
+	public Map<String,Object> getVariables( String executionId, Collection< String > variableNames ) {
+		return this.getRuntimeService().getVariables( executionId, variableNames );
+	}
+
+	public void setVariables( String executionId, Map<String,Object> variables ) {
+		this.getRuntimeService().setVariables( executionId, variables );
 	}
 	
 	private DataSource buildDataSource( String tenantId ) {
