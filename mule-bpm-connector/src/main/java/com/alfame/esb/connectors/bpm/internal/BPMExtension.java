@@ -263,11 +263,11 @@ public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initial
 	}
 	
 	public Map<String,Object> getVariables( String executionId, Collection< String > variableNames ) {
-		return this.getRuntimeService().getVariables( executionId, variableNames );
+		return this.fromBpmVariables( this.getRuntimeService().getVariables( executionId, variableNames ) );
 	}
 
 	public void setVariables( String executionId, Map<String,Object> variables ) {
-		this.getRuntimeService().setVariables( executionId, variables );
+		this.getRuntimeService().setVariables( executionId, this.toBpmVariables( variables ) );
 	}
 	
 	private DataSource buildDataSource( String tenantId ) {
