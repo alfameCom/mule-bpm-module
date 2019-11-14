@@ -27,13 +27,18 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 	<flow name="mightMuleTaskFlow">
 		<bpm:task-listener doc:name="Task Listener"
 			doc:id="90bb2825-efa0-48e7-8c9a-b0c8ddb71f08" 
-			endpoint="test.task" 
-			config-ref="BPM_Config"/>
-		<logger level="INFO" message="#[payload.activityId]" />
+			endpoint="test.task"
+			config-ref="BPM_Config">
+		</bpm:task-listener>
+		
+		<logger level="INFO" message="#[attributes.processInstanceId]" doc:id="13bd9b52-211b-49a8-a5a5-a9a6259d0482"/>
+		<logger level="INFO" message="#[vars.kek]" />
 		
 		<java:invoke doc:name="Invoke" doc:id="96ac1de6-9f5b-43e6-aeb9-66fe0621c93d" 
 			class="com.alfame.esb.test.TestComponent" instance="testComponent" method="startProcess()"/>
 		<logger level="INFO" message="#[payload.processInstanceId]" />
+		
+		<set-variable value="#[payload.processInstanceId]" variableName="kek" />
 
 		<set-payload value="true" />
 	</flow>
@@ -42,8 +47,9 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 		<bpm:task-listener doc:name="Task Listener"
 			doc:id="1f2579ec-ac9e-4fba-81d4-002eb4e849b1" 
 			endpoint="other.test.task" 
-			config-ref="BPM_Config"/>
-		<logger level="INFO" message="#[payload.id]" />
+			config-ref="BPM_Config">
+		</bpm:task-listener>
+		<logger level="INFO" message="#[attributes.id]" />
 
 		<java:invoke doc:name="Invoke" doc:id="1e0c7968-aa1d-42f2-a67b-95372ddf26e4" 
 			class="com.alfame.esb.bpm.api.BPMEngine" 
@@ -51,7 +57,7 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 			method="getVariables( String, Collection )" 
 			target="bpmVariables">
 			<java:args>#[ {
-				arg0: payload.id,
+				arg0: attributes.id,
 				arg1: [ 'correct' ]
 			} ]</java:args>
 		</java:invoke>

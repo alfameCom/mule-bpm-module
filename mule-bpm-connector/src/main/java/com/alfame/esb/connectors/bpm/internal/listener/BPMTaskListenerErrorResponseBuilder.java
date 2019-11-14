@@ -12,12 +12,12 @@ import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 public class BPMTaskListenerErrorResponseBuilder {
 
 	@Parameter
-	@Content
+	@Content( primary = true )
 	@Optional( defaultValue = PAYLOAD )
-	private TypedValue< Serializable > content;
+	private TypedValue< Serializable > value;
 
-	public TypedValue< Serializable > getContent() {
-		return content;
+	public TypedValue< Serializable > getValue() {
+		return value;
 	}
 
 }

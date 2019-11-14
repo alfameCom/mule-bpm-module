@@ -14,10 +14,10 @@ public class BPMTaskListenerSuccessResponseBuilder {
 	@Parameter
 	@Content( primary = true )
 	@Optional( defaultValue = PAYLOAD )
-	private TypedValue< Serializable > content;
+	private TypedValue< Serializable > value;
 
-	public TypedValue< Serializable > getContent() {
-		return content;
+	public TypedValue< Serializable > getValue() {
+		return value;
 	}
 
 }

@@ -9,16 +9,22 @@ public class BPMActivity implements BPMActivityResponseCallback {
 
 	private CompletableFuture< BPMActivityResponse > completableFuture = new CompletableFuture<>();
 
-	private final Object value;
+	private final Object payload;
+	private final Object attributes;
 	private final String correlationId;
 
-	public BPMActivity( Object value, String correlationId ) {
-		this.value = value;
+	public BPMActivity( Object value, Object attributes, String correlationId ) {
+		this.payload = value;
+		this.attributes = attributes;
 		this.correlationId = correlationId;
 	}
 
-	public Object getValue() {
-		return value;
+	public Object getPayload() {
+		return payload;
+	}
+
+	public Object getAttributes() {
+		return attributes;
 	}
 
 	public Optional< String > getCorrelationId() {

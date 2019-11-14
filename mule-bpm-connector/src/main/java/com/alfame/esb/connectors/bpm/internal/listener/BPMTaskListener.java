@@ -9,8 +9,6 @@ import com.alfame.esb.bpm.activity.queue.api.*;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnection;
 
 import org.flowable.engine.runtime.Execution;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
@@ -19,8 +17,6 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -46,14 +42,14 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Alias( "task-listener" )
-@MetadataScope( outputResolver = BPMTaskListenerMetadataResolver.class )
+@MetadataScope( outputResolver = BPMTaskListenerPayloadMetadataResolver.class, attributesResolver = BPMTaskListenerAttributesMetadataResolver.class )
 @EmitsResponse
 @MediaType( value = ANY, strict = false )
-public class BPMTaskListener extends Source< Execution, Void > {
+public class BPMTaskListener extends Source< Object, Execution > {
 
 	private static final Logger LOGGER = getLogger( BPMTaskListener.class );
 
-	@ParameterGroup( name = "endpoint" )
+	@ParameterGroup( name = "Endpoint" )
 	private BPMTaskListenerEndpointDescriptor endpointDescriptor;
 
 	@Parameter
@@ -79,7 +75,7 @@ public class BPMTaskListener extends Source< Execution, Void > {
 	private List< Consumer > consumers;
 
 	@Override
-	public void onStart( SourceCallback< Execution, Void > sourceCallback ) throws MuleException {
+	public void onStart( SourceCallback< Object, Execution > sourceCallback ) throws MuleException {
 
 		startConsumers( sourceCallback );
 
@@ -101,10 +97,10 @@ public class BPMTaskListener extends Source< Execution, Void > {
 	@OnSuccess
 	public void onSuccess( @ParameterGroup( name = "Response", showInDsl = true ) BPMTaskListenerSuccessResponseBuilder responseBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
 
-		LOGGER.trace( (String)responseBuilder.getContent().getValue() );
-
-		String payload = (String)responseBuilder.getContent().getValue();
-		BPMActivityResponse response = new BPMActivityResponse( new TypedValue<>( payload, DataType.STRING) );
+		LOGGER.debug( responseBuilder.getValue() != null ? 
+				responseBuilder.getValue().getValue() != null ? 
+						responseBuilder.getValue().getValue().toString() : null : null );
+		BPMActivityResponse response = new BPMActivityResponse( responseBuilder.getValue() );
 
 		BPMConnection connection = ctx.getConnection();
 		connection.getResponseCallback().submitResponse( response );
@@ -115,10 +111,13 @@ public class BPMTaskListener extends Source< Execution, Void > {
 	public void onError( @ParameterGroup( name = "Error Response", showInDsl = true) BPMTaskListenerErrorResponseBuilder errorResponseBuilder, Error error, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
 
 		final ErrorType errorType = error.getErrorType();
-		String msg = errorType.getNamespace() + ":" + errorType.getIdentifier() + ": " + error.getDescription();
+		String msg = "" + errorType.getNamespace() + ":" + errorType.getIdentifier() + ": " + error.getDescription();
 		LOGGER.error( msg );
 
-		BPMActivityResponse response = new BPMActivityResponse( error.getCause() );
+		LOGGER.debug( errorResponseBuilder.getValue() != null ? 
+				errorResponseBuilder.getValue().getValue() != null ? 
+						errorResponseBuilder.getValue().getValue().toString() : null : null );
+		BPMActivityResponse response = new BPMActivityResponse( errorResponseBuilder.getValue(), error.getCause() );
 
 		BPMConnection connection = ctx.getConnection();
 		connection.getResponseCallback().submitResponse( response );
@@ -129,7 +128,7 @@ public class BPMTaskListener extends Source< Execution, Void > {
 	public void onTerminate() {
 	}
 
-	private void startConsumers( SourceCallback< Execution, Void > sourceCallback ) {
+	private void startConsumers( SourceCallback< Object, Execution > sourceCallback ) {
 		createScheduler();
 		consumers = new ArrayList<>( numberOfConsumers );
 		for( int i = 0; i < numberOfConsumers; i++ ) {
@@ -155,10 +154,10 @@ public class BPMTaskListener extends Source< Execution, Void > {
 
 	private class Consumer {
 
-		private final SourceCallback< Execution, Void > sourceCallback;
+		private final SourceCallback< Object, Execution > sourceCallback;
 		private final AtomicBoolean stop = new AtomicBoolean( false );
 
-		public Consumer( SourceCallback< Execution, Void > sourceCallback ) {
+		public Consumer( SourceCallback< Object, Execution > sourceCallback ) {
 			this.sourceCallback = sourceCallback;
 		}
 
@@ -194,14 +193,16 @@ public class BPMTaskListener extends Source< Execution, Void > {
 					} else {
 						LOGGER.debug( "Consumer for <bpm:task-listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						connection.setResponseCallback( activity );
-
+						
 						String correlationId = activity.getCorrelationId().orElse( null );
 
-						Result.Builder resultBuilder = Result.< Execution, Void >builder();
-						resultBuilder.output( activity.getValue() );
+						Result.Builder< Object, Execution > resultBuilder = Result.< Object, Execution >builder();
+						resultBuilder.output( activity.getPayload() );
+						resultBuilder.mediaType( APPLICATION_JAVA );
+						resultBuilder.attributes( (Execution) activity.getAttributes() );
 						resultBuilder.mediaType( APPLICATION_JAVA );
 
-						Result< Execution, Void > result = resultBuilder.build();
+						Result< Object, Execution > result = resultBuilder.build();
 
 						ctx.setCorrelationId( correlationId );
 

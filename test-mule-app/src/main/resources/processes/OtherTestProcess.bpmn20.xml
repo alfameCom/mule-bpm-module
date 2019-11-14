@@ -8,12 +8,6 @@
         <flowable:field name="endpoint">
           <flowable:string><![CDATA[other.test.task]]></flowable:string>
         </flowable:field>
-        <flowable:field name="language">
-          <flowable:string><![CDATA[javascript]]></flowable:string>
-        </flowable:field>
-        <flowable:field name="payloadExpression">
-          <flowable:string><![CDATA[execution]]></flowable:string>
-        </flowable:field>
         <flowable:field name="resultVariable">
           <flowable:string><![CDATA[result]]></flowable:string>
         </flowable:field>

@@ -30,7 +30,7 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 	@Test
 	public void executeBpmListenerSuccessTestFlow() throws Exception {
 		BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "some.success.test.queue" );
-		BPMActivity activity = new BPMActivity( null, null );
+		BPMActivity activity = new BPMActivity( null, null, null );
 		queue.publish( activity );
 		BPMActivityResponse response = activity.waitForResponse();
 		LOGGER.info( (String)response.getValue().getValue() );
@@ -39,7 +39,7 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 	@Test
 	public void executeBpmListenerErrorTestFlow() throws Exception {
 		BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "some.error.test.queue" );
-		BPMActivity activity = new BPMActivity( null, null );
+		BPMActivity activity = new BPMActivity( null, null, null );
 		queue.publish( activity );
 		BPMActivityResponse response = activity.waitForResponse();
 		LOGGER.info( response.getThrowable().getMessage() );
