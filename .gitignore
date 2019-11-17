@@ -2,6 +2,7 @@
 .classpath
 .DS_Store
 
+*.prefs
 *.iml
 **/*.swp
 
