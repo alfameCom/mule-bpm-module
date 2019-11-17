@@ -7,13 +7,11 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.io.Serializable;
 
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-
 public class BPMTaskListenerSuccessResponseBuilder {
 
 	@Parameter
 	@Content( primary = true )
-	@Optional( defaultValue = PAYLOAD )
+	@Optional( defaultValue = "true" )
 	private TypedValue< Serializable > value;
 
 	public TypedValue< Serializable > getValue() {
