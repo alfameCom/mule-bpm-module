@@ -1,8 +1,6 @@
 #%RAML 1.0
 title: Group API
 version: 1.0
-types:
-  testModel: !include model/testModel.json
 
 /test:
   get:
@@ -11,4 +9,8 @@ types:
       200:
         body:
           application/json:
-            type: testModel
+            example: |
+              {
+                "key": "SomeKey",
+                "value": "someValue"
+              }
