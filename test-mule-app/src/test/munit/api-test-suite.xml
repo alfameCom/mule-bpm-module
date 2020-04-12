@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule 
-	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
 	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" 
@@ -13,8 +12,7 @@
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
-		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
-http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
 		
 	<http:request-config name="HTTP_Request_Configuration" basePath="/api">
 		<http:request-connection host="localhost" port="8081" />
@@ -35,22 +33,6 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 		<munit:validation>
 			<munit-tools:assert-that doc:name="Assert that" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]" message="Invalid HTTP Status Code"/>
 			<munit-tools:assert-that doc:name="Assert that" expression="#[attributes.headers['content-type']]" is="#[MunitTools::equalTo('application/json; charset=UTF-8')]" message="Invalid Content-Type Header" />
-		</munit:validation>
-		
-	</munit:test>
-	<munit:test name="api-test-suiteTest" description="MUnit Test" doc:id="01649a7f-3eb6-434a-876b-75b890ab940c">
-		<munit:enable-flow-sources>
-			<munit:enable-flow-source value="processStarterFlow" />
-			<munit:enable-flow-source value="testMuleTaskFlow" />
-		</munit:enable-flow-sources>
-		
-		<munit:execution>
-			<set-payload value="This is a test" />
-			<vm:publish queueName="com.alfame.esb.testMuleTask" doc:name="Publish" doc:id="624ea127-22a9-4388-98d9-afc2905385ca" config-ref="VM_Config"/>
-		</munit:execution>
-		
-		<munit:validation>
-			<munit-tools:run-custom assertion="com.alfame.esb.test.FlowableAssertion" expression="#[payload]" />
 		</munit:validation>
 		
 	</munit:test>
