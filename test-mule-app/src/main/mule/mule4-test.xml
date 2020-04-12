@@ -29,6 +29,12 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 			doc:id="90bb2825-efa0-48e7-8c9a-b0c8ddb71f08" 
 			endpoint="test.task"
 			config-ref="BPM_Config">
+			<bpm:response >
+				<bpm:value ><![CDATA[#[vars.result]]]></bpm:value>
+			</bpm:response>
+			<bpm:error-response >
+				<bpm:value ><![CDATA[#[false]]]></bpm:value>
+			</bpm:error-response>
 		</bpm:task-listener>
 		
 		<logger level="INFO" message="#[attributes.processInstanceId]" doc:id="13bd9b52-211b-49a8-a5a5-a9a6259d0482"/>
@@ -40,7 +46,7 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 		
 		<set-variable value="#[payload.processInstanceId]" variableName="kek" />
 
-		<set-payload value="true" />
+		<set-variable value="true" variableName="result" />
 	</flow>
 
 	<flow name="mightierMuleTaskFlow">
