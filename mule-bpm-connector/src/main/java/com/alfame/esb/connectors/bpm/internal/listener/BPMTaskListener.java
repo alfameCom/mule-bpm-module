@@ -180,13 +180,13 @@ public class BPMTaskListener extends Source< Object, Execution > {
 						cancel( ctx );
 						continue;
 					} else {
-						String correlationId = activity.getCorrelationId().orElse(null);
+						String correlationId = activity.getCorrelationId().orElse( null );
 						if ( correlationId == null || correlationId.isEmpty() ) {
 							LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' no correlation id available. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 							cancel( ctx );
 							continue;
 						} else {
-							LOGGER.info( "Consumer for <bpm:task-listener> on flow '{}' found correlation id '{}'. Consuming for thread '{}'", location.getRootContainerName(), correlationId, currentThread().getName() );
+							LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' found correlation id '{}'. Consuming for thread '{}'", location.getRootContainerName(), correlationId, currentThread().getName() );
 							ctx.setCorrelationId( correlationId );
 						}
 
@@ -225,7 +225,7 @@ public class BPMTaskListener extends Source< Object, Execution > {
 					cancel( ctx );
 				} catch( InterruptedException e ) {
 					
-					LOGGER.info( "Consumer for <bpm:task-listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+					LOGGER.debug( "Consumer for <bpm:task-listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 					stop();
 					cancel( ctx );
 					
