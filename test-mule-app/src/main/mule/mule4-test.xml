@@ -28,7 +28,9 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 		<bpm:task-listener doc:name="Task Listener"
 			doc:id="90bb2825-efa0-48e7-8c9a-b0c8ddb71f08" 
 			endpoint="test.task"
-			config-ref="BPM_Config">
+			config-ref="BPM_Config"
+			transactionType="LOCAL"
+			transactionalAction="ALWAYS_BEGIN">
 			<bpm:response >
 				<bpm:value ><![CDATA[#[vars.result]]]></bpm:value>
 			</bpm:response>
@@ -38,13 +40,14 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 		</bpm:task-listener>
 		
 		<logger level="INFO" message="#[attributes.processInstanceId]" doc:id="13bd9b52-211b-49a8-a5a5-a9a6259d0482"/>
-		<logger level="INFO" message="#[vars.kek]" />
 		
 		<java:invoke doc:name="Invoke" doc:id="96ac1de6-9f5b-43e6-aeb9-66fe0621c93d" 
 			class="com.alfame.esb.test.TestComponent" instance="testComponent" method="startProcess()"/>
 		<logger level="INFO" message="#[payload.processInstanceId]" />
 		
-		<set-variable value="#[payload.processInstanceId]" variableName="kek" />
+		<bpm:set-variable variableName="test" config-ref="BPM_Config" transactionalAction="ALWAYS_JOIN">
+			<bpm:content>test content</bpm:content>
+		</bpm:set-variable>
 
 		<set-variable value="true" variableName="result" />
 	</flow>
@@ -53,21 +56,28 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 		<bpm:task-listener doc:name="Task Listener"
 			doc:id="1f2579ec-ac9e-4fba-81d4-002eb4e849b1" 
 			endpoint="other.test.task" 
-			config-ref="BPM_Config">
+			config-ref="BPM_Config"
+			transactionType="LOCAL"
+			transactionalAction="ALWAYS_BEGIN">
 		</bpm:task-listener>
 		<logger level="INFO" message="#[attributes.id]" />
 
 		<java:invoke doc:name="Invoke" doc:id="1e0c7968-aa1d-42f2-a67b-95372ddf26e4" 
 			class="com.alfame.esb.bpm.api.BPMEngine" 
 			instance="bpmEngine" 
-			method="getVariables( String, Collection )" 
-			target="bpmVariables">
+			method="getVariableInstance( String, String )" 
+			target="bpmVariableInstance">
 			<java:args>#[ {
 				arg0: attributes.id,
-				arg1: [ 'correct' ]
+				arg1: 'test'
 			} ]</java:args>
 		</java:invoke>
-		<logger level="INFO" message="#[vars.bpmVariables]" />
+		<logger level="INFO" message="#[vars.bpmVariableInstance]" />
+		
+		<bpm:get-variable variableName="test" config-ref="BPM_Config" transactionalAction="ALWAYS_JOIN" />
+		<logger level="INFO" message="#[payload]" />
+		
+		<bpm:remove-variable variableName="test" config-ref="BPM_Config" transactionalAction="ALWAYS_JOIN" />
 		
 		<set-payload value="true" />
 	</flow>

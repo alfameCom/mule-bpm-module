@@ -8,12 +8,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 import com.alfame.esb.bpm.activity.queue.api.*;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnection;
 
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.Execution;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
-import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
@@ -21,7 +20,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
@@ -34,6 +32,7 @@ import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -56,12 +55,12 @@ public class BPMTaskListener extends Source< Object, Execution > {
 	@Optional( defaultValue = "4" )
 	private int numberOfConsumers;
 
-	@Inject
-	private ConfigurationComponentLocator componentLocator;
-
 	@Connection
 	private ConnectionProvider< BPMConnection > connectionProvider;
-
+	
+	@Parameter
+	private SourceTransactionalAction action;
+	
 	private Scheduler scheduler;
 
 	@Inject
@@ -103,6 +102,10 @@ public class BPMTaskListener extends Source< Object, Execution > {
 		BPMActivityResponse response = new BPMActivityResponse( responseBuilder.getValue() );
 
 		BPMConnection connection = ctx.getConnection();
+		
+		response.setVariablesToUpdate( connection.getVariablesToUpdate() );
+		response.setVariablesToRemove( connection.getVariablesToRemove() );
+		
 		connection.getResponseCallback().submitResponse( response );
 
 	}
@@ -147,11 +150,6 @@ public class BPMTaskListener extends Source< Object, Execution > {
 				.withShutdownTimeout( endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit() ) );
 	}
 
-	private int getMaxConcurrency() {
-		Flow flow = (Flow) componentLocator.find( Location.builder().globalName( location.getRootContainerName() ).build() ).get();
-		return flow.getMaxConcurrency();
-	}
-
 	private class Consumer {
 
 		private final SourceCallback< Object, Execution > sourceCallback;
@@ -165,7 +163,7 @@ public class BPMTaskListener extends Source< Object, Execution > {
 
 			while( isAlive() ) {
 
-				SourceCallbackContext ctx = sourceCallback.createContext();
+				final SourceCallbackContext ctx = sourceCallback.createContext();
 				if ( ctx == null ) {
 					LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' no callback context. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 					stop();
@@ -174,15 +172,6 @@ public class BPMTaskListener extends Source< Object, Execution > {
 				
 				try {
 
-					LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
-					final BPMConnection connection = connect( ctx );
-					if ( connection == null ) {
-						LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' no connection provider available. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
-						stop();
-						cancel( ctx );
-						continue;
-					}
-					
 					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( endpointDescriptor.getEndpoint() );
 					BPMActivity activity = queue.pop( endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit() );
 					
@@ -191,11 +180,28 @@ public class BPMTaskListener extends Source< Object, Execution > {
 						cancel( ctx );
 						continue;
 					} else {
+						String correlationId = activity.getCorrelationId().orElse(null);
+						if ( correlationId == null || correlationId.isEmpty() ) {
+							LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' no correlation id available. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+							cancel( ctx );
+							continue;
+						} else {
+							LOGGER.info( "Consumer for <bpm:task-listener> on flow '{}' found correlation id '{}'. Consuming for thread '{}'", location.getRootContainerName(), correlationId, currentThread().getName() );
+							ctx.setCorrelationId( correlationId );
+						}
+
+						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+						final BPMConnection connection = connect( ctx, (DelegateExecution) activity.getAttributes() );
+						if ( connection == null ) {
+							LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' no connection provider available. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+							stop();
+							cancel( ctx );
+							continue;
+						}
+						
 						LOGGER.debug( "Consumer for <bpm:task-listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						connection.setResponseCallback( activity );
 						
-						String correlationId = activity.getCorrelationId().orElse( null );
-
 						Result.Builder< Object, Execution > resultBuilder = Result.< Object, Execution >builder();
 						resultBuilder.output( activity.getPayload() );
 						resultBuilder.mediaType( APPLICATION_JAVA );
@@ -203,8 +209,6 @@ public class BPMTaskListener extends Source< Object, Execution > {
 						resultBuilder.mediaType( APPLICATION_JAVA );
 
 						Result< Object, Execution > result = resultBuilder.build();
-
-						ctx.setCorrelationId( correlationId );
 
 						if( isAlive() ) {
 							sourceCallback.handle( result, ctx );
@@ -216,20 +220,19 @@ public class BPMTaskListener extends Source< Object, Execution > {
 
 				} catch( ConnectionException e ) {
 
-					stop();
-					cancel( ctx );
 					LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' is unable to connect. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName(), e );
-
-				} catch( InterruptedException e ) {
-
 					stop();
 					cancel( ctx );
+				} catch( InterruptedException e ) {
+					
 					LOGGER.info( "Consumer for <bpm:task-listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
-
+					stop();
+					cancel( ctx );
+					
 				} catch( Exception e ) {
 
-					cancel( ctx );
 					LOGGER.error( "Consumer for <bpm:task-listener> on flow '{}' found unexpected exception. Consuming will continue for thread '{}'", location.getRootContainerName(), currentThread().getName(), e );
+					cancel( ctx );
 				}
 
 			}
@@ -238,26 +241,29 @@ public class BPMTaskListener extends Source< Object, Execution > {
 
 		private void cancel( SourceCallbackContext ctx ) {
 			try {
-				ctx.getTransactionHandle().rollback();
-			} catch( TransactionException e ) {
-				if( LOGGER.isWarnEnabled() ) {
-					LOGGER.warn( "Failed to rollback transaction: " + e.getMessage(), e );
-				}
-			}
-			
-			try {
 				connectionProvider.disconnect( ctx.getConnection() );
 			} catch( IllegalStateException e) {
+				// Not connected
+			} catch ( IllegalArgumentException e ) {
 				// Not connected
 			} catch( Exception e ) {
 				if( LOGGER.isWarnEnabled() ) {
 					LOGGER.warn( "Failed to disconnect connection: " + e.getMessage(), e );
 				}
 			}
+			
+			try {
+				ctx.getTransactionHandle().rollback();
+			} catch( TransactionException e ) {
+				if( LOGGER.isWarnEnabled() ) {
+					LOGGER.warn( "Failed to rollback transaction: " + e.getMessage(), e );
+				}
+			}
 		}
 
-		private BPMConnection connect( SourceCallbackContext ctx ) throws ConnectionException, TransactionException {
+		private BPMConnection connect( SourceCallbackContext ctx, DelegateExecution execution ) throws ConnectionException, TransactionException {
 			BPMConnection connection = connectionProvider.connect();
+			connection.setExecution( execution );
 			ctx.bindConnection( connection );
 			return connection;
 		}

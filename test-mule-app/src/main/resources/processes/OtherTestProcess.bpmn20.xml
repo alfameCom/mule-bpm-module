@@ -35,7 +35,7 @@
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tryAgain != true}]]></conditionExpression>
     </sequenceFlow>
     <scriptTask id="sid-E92270A7-9E42-4C5D-AD1E-F3B2DE5DD1C2" name="Test Script Task" flowable:async="true" flowable:exclusive="false" scriptFormat="javascript" flowable:autoStoreVariables="false">
-      <script><![CDATA[var test = "test";]]></script>
+      <script><![CDATA[execution.setVariable( 'test', 'correct content' );]]></script>
     </scriptTask>
     <sequenceFlow id="sid-E090BF66-6B15-4E5B-987C-B074EE3F4026" sourceRef="sid-EFAA0939-EB43-4D17-BE6A-2145F2E9E544" targetRef="sid-E92270A7-9E42-4C5D-AD1E-F3B2DE5DD1C2"></sequenceFlow>
     <sequenceFlow id="sid-765CA1C7-29DA-4E7F-AE28-05D58D415F57" sourceRef="sid-E92270A7-9E42-4C5D-AD1E-F3B2DE5DD1C2" targetRef="testMuleTask"></sequenceFlow>

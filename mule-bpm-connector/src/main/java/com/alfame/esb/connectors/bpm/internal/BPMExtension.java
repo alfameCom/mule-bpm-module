@@ -11,6 +11,7 @@ import com.alfame.esb.connectors.bpm.api.config.BPMTenant;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.connectors.bpm.internal.listener.BPMTaskListener;
 import com.alfame.esb.connectors.bpm.internal.operations.BPMProcessFactoryOperations;
+import com.alfame.esb.connectors.bpm.internal.operations.BPMProcessVariableOperations;
 import com.alfame.esb.bpm.api.BPMEngine;
 import com.alfame.esb.bpm.api.BPMEnginePool;
 import com.alfame.esb.bpm.api.BPMProcessBuilder;
@@ -35,8 +36,6 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-
 import javax.sql.DataSource;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -66,16 +65,17 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 @Xml( prefix = "bpm" )
 @Extension( name = "BPM", vendor = "Alfame Systems" )
 @Sources( BPMTaskListener.class )
+@Export( classes = { org.flowable.engine.runtime.Execution.class } )
 @ConnectionProviders( BPMConnectionProvider.class )
-@Operations( { BPMProcessFactoryOperations.class } )
+@Operations( { BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class } )
 @SubTypeMapping( baseType = BPMDefinition.class, 
 				subTypes = { BPMClasspathDefinition.class, BPMStreamDefinition.class } )
 @SubTypeMapping( baseType = BPMDataSource.class, 
 				subTypes = { BPMDataSourceReference.class, BPMGenericDataSource.class } )
-@ExternalLib( name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl")
-@ExternalLib( name = "Flowable Mule 4", type = DEPENDENCY, coordinates = "org.flowable:flowable-mule4:6.4.1", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
-@ExternalLib( name = "BPM Activity Queue", type = DEPENDENCY, coordinates = "com.alfame.esb:bpm-queue:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.activity.queue.api.BPMActivityQueueFactory")
-@ExternalLib( name = "BPM Java API", type = DEPENDENCY, coordinates = "com.alfame.esb:bpm-java-api:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
+@ExternalLib( name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl" )
+@ExternalLib( name = "Flowable Mule 4", type = DEPENDENCY, coordinates = "org.flowable:flowable-mule4:6.4.1", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior" )
+@ExternalLib( name = "BPM Activity Queue", type = DEPENDENCY, coordinates = "com.alfame.esb:bpm-queue:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.activity.queue.api.BPMActivityQueueFactory" )
+@ExternalLib( name = "BPM Java API", type = DEPENDENCY, coordinates = "com.alfame.esb:bpm-java-api:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool" )
 public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initialisable, Startable, Stoppable, TenantInfoHolder, TenantAwareAsyncExecutorFactory {
 
 	private static final Logger LOGGER = getLogger( BPMExtension.class );
@@ -261,13 +261,13 @@ public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initial
 	public BPMProcessBuilder processInstanceBuilder() {
 		return new BPMProcessBuilderImpl( this );
 	}
-	
-	public Map<String,Object> getVariables( String executionId, Collection< String > variableNames ) {
-		return this.fromBpmVariables( this.getRuntimeService().getVariables( executionId, variableNames ) );
+
+	public Object getVariableInstance( String executionId, String variableName ) {
+		return this.getRuntimeService().getVariableInstance( executionId, variableName );
 	}
 
-	public void setVariables( String executionId, Map<String,Object> variables ) {
-		this.getRuntimeService().setVariables( executionId, this.toBpmVariables( variables ) );
+	public void setVariable( String executionId, String variableName, Object content ) {
+		this.getRuntimeService().setVariable( executionId, variableName, content );
 	}
 	
 	private DataSource buildDataSource( String tenantId ) {
