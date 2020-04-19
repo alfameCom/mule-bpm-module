@@ -15,7 +15,7 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 	<bpm:config name="BPM_Config" doc:name="BPM Config" doc:id="33199c6b-10fe-412f-82bb-bd509da767a7" defaultTenantId="com.alfame.esb">
 		<bpm:task-listener-connection />
 		<bpm:default-data-source >
-			<bpm:data-source-reference type="h2" dataSourceRef="bpmDataSource"  />
+			<bpm:data-source-reference type="postgres" dataSourceRef="bpmDataSource"  />
 		</bpm:default-data-source>
 		<bpm:definitions>
 			<bpm:classpath-definition resourceClasspath="processes/TestProcess.bpmn20.xml" />

@@ -15,7 +15,7 @@
 			<property name="driverClassName" value="org.h2.Driver" />
 			<property name="username" value="sa" />
 			<property name="password" value="sa" />
-			<property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1;TRACE_LEVEL_SYSTEM_OUT=1" />
+			<property name="jdbcUrl" value="jdbc:h2:mem:flowable;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;TRACE_LEVEL_SYSTEM_OUT=1" />
 			<property name="minimumIdle" value="1" />
 			<property name="maximumPoolSize" value="10" />
 			<property name="connectionTimeout" value="300" />
