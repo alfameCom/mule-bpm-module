@@ -12,6 +12,7 @@ public class BPMActivity implements BPMActivityResponseCallback {
 	private final Object payload;
 	private final Object attributes;
 	private final String correlationId;
+	private long requestTimeoutMillis = 300000;
 
 	public BPMActivity( Object value, Object attributes, String correlationId ) {
 		this.payload = value;
@@ -30,9 +31,18 @@ public class BPMActivity implements BPMActivityResponseCallback {
 	public Optional< String > getCorrelationId() {
 		return ofNullable( correlationId );
 	}
+	
+	public long requestTimeoutMillis() {
+		return requestTimeoutMillis;
+	}
 
 	public BPMActivityResponse waitForResponse() throws InterruptedException, ExecutionException, TimeoutException {
-		return completableFuture.get( 5L, TimeUnit.MINUTES );
+		return completableFuture.get( requestTimeoutMillis, TimeUnit.MILLISECONDS );
+	}
+
+	public BPMActivityResponse waitForResponse( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
+		this.requestTimeoutMillis = TimeUnit.MILLISECONDS.convert( timeout, unit );
+		return completableFuture.get( this.requestTimeoutMillis, TimeUnit.MILLISECONDS );
 	}
 
 	public void submitResponse( BPMActivityResponse response ) {

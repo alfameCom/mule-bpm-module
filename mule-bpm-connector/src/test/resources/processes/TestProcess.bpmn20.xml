@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
   <process id="testProcess" name="TestProcess" isExecutable="true">
-    <startEvent id="sid-EFAA0939-EB43-4D17-BE6A-2145F2E9E544" isInterrupting="false">
+    <startEvent id="sid-EFAA0939-EB43-4D17-BE6A-2145F2E9E544" isInterrupting="true">
       <timerEventDefinition>
         <timeCycle>* * * * * ? *</timeCycle>
       </timerEventDefinition>
     </startEvent>
     <serviceTask id="testMuleTask" name="Test Mule Task" flowable:async="true" flowable:exclusive="false" flowable:type="mule">
       <extensionElements>
-        <flowable:field name="endpoint">
-          <flowable:string><![CDATA[test.task]]></flowable:string>
+        <flowable:field name="endpointUrl">
+          <flowable:string><![CDATA[bpm://test.task]]></flowable:string>
         </flowable:field>
         <flowable:field name="language">
           <flowable:string><![CDATA[javascript]]></flowable:string>
@@ -25,7 +25,7 @@
     <exclusiveGateway id="sid-5F3336E4-86A6-4D22-9206-6E1C5D4218DD"></exclusiveGateway>
     <sequenceFlow id="sid-C925D4D9-DC3F-4436-A6A4-A55F3E57645A" sourceRef="testMuleTask" targetRef="sid-5F3336E4-86A6-4D22-9206-6E1C5D4218DD"></sequenceFlow>
     <endEvent id="sid-E1C54E11-A6D7-489F-B80C-9136FDB4092D"></endEvent>
-    <userTask id="testUserTask" name="Test User Task">
+    <userTask id="testUserTask" name="Test User Task" flowable:formFieldValidation="true">
       <extensionElements>
         <flowable:formProperty id="tryAgain" name="Try Again?" type="enum" variable="tryAgain" required="true">
           <flowable:value id="true" name="Yes"></flowable:value>
@@ -82,32 +82,32 @@
         <omgdc:Bounds height="80.0" width="100.0" x="225.0" y="290.5"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="sid-4A5F67C9-8E67-46B8-AF81-01FD0BC02FFE" id="BPMNEdge_sid-4A5F67C9-8E67-46B8-AF81-01FD0BC02FFE">
-        <omgdi:waypoint x="446.4009900990099" y="170.4009900990099"></omgdi:waypoint>
-        <omgdi:waypoint x="446.0687183510287" y="102.94956248608568"></omgdi:waypoint>
+        <omgdi:waypoint x="446.0" y="170.0"></omgdi:waypoint>
+        <omgdi:waypoint x="446.0" y="102.9499347853055"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-E090BF66-6B15-4E5B-987C-B074EE3F4026" id="BPMNEdge_sid-E090BF66-6B15-4E5B-987C-B074EE3F4026">
-        <omgdi:waypoint x="136.94982296630178" y="330.9238103694696"></omgdi:waypoint>
-        <omgdi:waypoint x="225.0" y="330.5045238095238"></omgdi:waypoint>
+        <omgdi:waypoint x="135.94999920866638" y="330.5"></omgdi:waypoint>
+        <omgdi:waypoint x="225.0" y="330.5"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-92898C19-E4DC-4212-9A19-D892E636349A" id="BPMNEdge_sid-92898C19-E4DC-4212-9A19-D892E636349A">
-        <omgdi:waypoint x="524.0" y="190.1958823529412"></omgdi:waypoint>
-        <omgdi:waypoint x="465.4816981875486" y="190.4251968503937"></omgdi:waypoint>
+        <omgdi:waypoint x="524.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="465.90775996871787" y="190.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-C925D4D9-DC3F-4436-A6A4-A55F3E57645A" id="BPMNEdge_sid-C925D4D9-DC3F-4436-A6A4-A55F3E57645A">
-        <omgdi:waypoint x="495.9499999999987" y="330.6943579766537"></omgdi:waypoint>
-        <omgdi:waypoint x="554.421875" y="330.921875"></omgdi:waypoint>
+        <omgdi:waypoint x="495.94999999984776" y="330.5"></omgdi:waypoint>
+        <omgdi:waypoint x="554.0" y="330.5"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-1F63AC6E-CFC5-4B48-A37D-73087BEAFF9D" id="BPMNEdge_sid-1F63AC6E-CFC5-4B48-A37D-73087BEAFF9D">
-        <omgdi:waypoint x="446.43189964157705" y="209.51108524355303"></omgdi:waypoint>
-        <omgdi:waypoint x="446.1426785714286" y="290.5"></omgdi:waypoint>
+        <omgdi:waypoint x="446.0" y="209.94290540540538"></omgdi:waypoint>
+        <omgdi:waypoint x="446.0" y="290.5"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-BA295BD1-4259-422F-AB3F-2660D44F3382" id="BPMNEdge_sid-BA295BD1-4259-422F-AB3F-2660D44F3382">
-        <omgdi:waypoint x="593.5369266055046" y="330.9030612244897"></omgdi:waypoint>
-        <omgdi:waypoint x="659.0001739538702" y="330.57081148673626"></omgdi:waypoint>
+        <omgdi:waypoint x="593.9399344096871" y="330.5"></omgdi:waypoint>
+        <omgdi:waypoint x="659.0" y="330.5"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-D579DC9E-879F-43E4-A4F6-7CA8B1F5384F" id="BPMNEdge_sid-D579DC9E-879F-43E4-A4F6-7CA8B1F5384F">
-        <omgdi:waypoint x="574.4288256227758" y="310.9288256227758"></omgdi:waypoint>
-        <omgdi:waypoint x="574.1416666666667" y="229.95000000000002"></omgdi:waypoint>
+        <omgdi:waypoint x="574.0" y="310.5"></omgdi:waypoint>
+        <omgdi:waypoint x="574.0" y="229.95000000000002"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-765CA1C7-29DA-4E7F-AE28-05D58D415F57" id="BPMNEdge_sid-765CA1C7-29DA-4E7F-AE28-05D58D415F57">
         <omgdi:waypoint x="324.94999999981377" y="330.5"></omgdi:waypoint>

@@ -6,6 +6,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.alfame.esb.bpm.activity.queue.api.*;
+import com.alfame.esb.connectors.bpm.internal.BPMExtension;
 import com.alfame.esb.connectors.bpm.internal.connection.BPMConnection;
 
 import org.flowable.engine.delegate.DelegateExecution;
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Alias( "task-listener" )
@@ -54,6 +56,9 @@ public class BPMTaskListener extends Source< Object, Execution > {
 	@Parameter
 	@Optional( defaultValue = "4" )
 	private int numberOfConsumers;
+	
+	@Config
+	private BPMExtension config;
 
 	@Connection
 	private ConnectionProvider< BPMConnection > connectionProvider;
@@ -113,14 +118,17 @@ public class BPMTaskListener extends Source< Object, Execution > {
 	@OnError
 	public void onError( @ParameterGroup( name = "Error Response", showInDsl = true) BPMTaskListenerErrorResponseBuilder errorResponseBuilder, Error error, CorrelationInfo correlationInfo, SourceCallbackContext ctx ) {
 
-		final ErrorType errorType = error.getErrorType();
-		String msg = "" + errorType.getNamespace() + ":" + errorType.getIdentifier() + ": " + error.getDescription();
+		final ErrorType errorType = error != null ? error.getErrorType() : null;
+		final String namespace = errorType != null ? ( errorType.getNamespace() != null ? errorType.getNamespace() : "null" ) : "null";
+		final String identifier = errorType != null ? ( errorType.getIdentifier() != null ? errorType.getIdentifier() : "null" ) : "null";
+		final String description = error != null ? ( error.getDescription() != null ? error.getDescription() : "null" ) : "null";
+		String msg = "" + namespace + ": " + identifier + ": " + description;
 		LOGGER.error( msg );
 
 		LOGGER.debug( errorResponseBuilder.getValue() != null ? 
 				errorResponseBuilder.getValue().getValue() != null ? 
 						errorResponseBuilder.getValue().getValue().toString() : null : null );
-		BPMActivityResponse response = new BPMActivityResponse( errorResponseBuilder.getValue(), error.getCause() );
+		BPMActivityResponse response = new BPMActivityResponse( errorResponseBuilder.getValue(), error != null ? error.getCause() : null );
 
 		BPMConnection connection = ctx.getConnection();
 		connection.getResponseCallback().submitResponse( response );
@@ -135,7 +143,7 @@ public class BPMTaskListener extends Source< Object, Execution > {
 		createScheduler();
 		consumers = new ArrayList<>( numberOfConsumers );
 		for( int i = 0; i < numberOfConsumers; i++ ) {
-			final Consumer consumer = new Consumer( sourceCallback );
+			final Consumer consumer = new Consumer( config, endpointDescriptor, sourceCallback );
 			consumers.add( consumer );
 			scheduler.submit( consumer::start );
 		}
@@ -151,15 +159,20 @@ public class BPMTaskListener extends Source< Object, Execution > {
 	}
 
 	private class Consumer {
-
+		
+		private final BPMExtension config;
+		private final BPMTaskListenerEndpointDescriptor endpointDescription;
 		private final SourceCallback< Object, Execution > sourceCallback;
 		private final AtomicBoolean stop = new AtomicBoolean( false );
 
-		public Consumer( SourceCallback< Object, Execution > sourceCallback ) {
+		public Consumer( BPMExtension config, BPMTaskListenerEndpointDescriptor endpointDescription, SourceCallback< Object, Execution > sourceCallback ) {
+			this.config = config;
+			this.endpointDescription = endpointDescription;
 			this.sourceCallback = sourceCallback;
 		}
 
 		public void start() {
+			LOGGER.debug( "Consumer for <bpm:task-listener> on flow '{}' acquiring activities for endpoint {}. Consuming for thread '{}'", location.getRootContainerName(), endpointDescriptor.getEndpointUrl(), currentThread().getName() );
 
 			while( isAlive() ) {
 
@@ -172,7 +185,7 @@ public class BPMTaskListener extends Source< Object, Execution > {
 				
 				try {
 
-					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( endpointDescriptor.getEndpoint() );
+					final BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( endpointDescriptor.getEndpointUrl() );
 					BPMActivity activity = queue.pop( endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit() );
 					
 					if( activity == null ) {
@@ -180,9 +193,25 @@ public class BPMTaskListener extends Source< Object, Execution > {
 						cancel( ctx );
 						continue;
 					} else {
+						DelegateExecution delegateExecution = (DelegateExecution) activity.getAttributes();
+						
+						long activityTimeoutMillis = activity.requestTimeoutMillis();
+						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' uses activity timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), activityTimeoutMillis, currentThread().getName() );
+						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' uses async executor timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), config.getAsyncExecutor( delegateExecution != null ? delegateExecution.getTenantId() : null ).getAsyncJobLockTimeInMillis(), currentThread().getName() );
+						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' uses endpoint timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), TimeUnit.MILLISECONDS.convert( endpointDescription.getTimeout(), endpointDescription.getTimeoutUnit() ), currentThread().getName() );
+						if ( activityTimeoutMillis > config.getAsyncExecutor( delegateExecution != null ? delegateExecution.getTenantId() : null ).getAsyncJobLockTimeInMillis() ) {
+							LOGGER.error( "Consumer for <bpm:task-listener> on flow '{}' uses longer timeout than async executor supports. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+							cancel( ctx );
+							continue;
+						} else if ( activityTimeoutMillis > TimeUnit.MILLISECONDS.convert( endpointDescription.getTimeout(), endpointDescription.getTimeoutUnit() ) ) {
+							LOGGER.error( "Consumer for <bpm:task-listener> on flow '{}' uses longer timeout than endpoint supports. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+							cancel( ctx );
+							continue;
+						}
+						
 						String correlationId = activity.getCorrelationId().orElse( null );
 						if ( correlationId == null || correlationId.isEmpty() ) {
-							LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' no correlation id available. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+							LOGGER.error( "Consumer for <bpm:task-listener> on flow '{}' no correlation id available. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 							cancel( ctx );
 							continue;
 						} else {
@@ -191,7 +220,7 @@ public class BPMTaskListener extends Source< Object, Execution > {
 						}
 
 						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
-						final BPMConnection connection = connect( ctx, (DelegateExecution) activity.getAttributes() );
+						final BPMConnection connection = connect( ctx, delegateExecution );
 						if ( connection == null ) {
 							LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' no connection provider available. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 							stop();
@@ -199,13 +228,13 @@ public class BPMTaskListener extends Source< Object, Execution > {
 							continue;
 						}
 						
-						LOGGER.debug( "Consumer for <bpm:task-listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
+						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						connection.setResponseCallback( activity );
 						
 						Result.Builder< Object, Execution > resultBuilder = Result.< Object, Execution >builder();
 						resultBuilder.output( activity.getPayload() );
 						resultBuilder.mediaType( APPLICATION_JAVA );
-						resultBuilder.attributes( (Execution) activity.getAttributes() );
+						resultBuilder.attributes( (Execution) delegateExecution );
 						resultBuilder.mediaType( APPLICATION_JAVA );
 
 						Result< Object, Execution > result = resultBuilder.build();

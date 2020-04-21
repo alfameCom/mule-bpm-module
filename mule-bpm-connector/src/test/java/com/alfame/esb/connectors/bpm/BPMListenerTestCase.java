@@ -4,10 +4,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+
 import com.alfame.esb.bpm.activity.queue.api.BPMActivityQueue;
 import com.alfame.esb.bpm.activity.queue.api.BPMActivityQueueFactory;
 import com.alfame.esb.bpm.activity.queue.api.BPMActivity;
 import com.alfame.esb.bpm.activity.queue.api.BPMActivityResponse;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.junit.Test;
@@ -29,8 +41,8 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 
 	@Test
 	public void executeBpmListenerSuccessTestFlow() throws Exception {
-		BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "some.success.test.queue" );
-		BPMActivity activity = new BPMActivity( null, null, null );
+		BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "bpm://some.success.test.queue" );
+		BPMActivity activity = new BPMActivity( null, null, "123" );
 		queue.publish( activity );
 		BPMActivityResponse response = activity.waitForResponse();
 		LOGGER.info( (String)response.getValue().getValue() );
@@ -38,8 +50,8 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 
 	@Test
 	public void executeBpmListenerErrorTestFlow() throws Exception {
-		BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "some.error.test.queue" );
-		BPMActivity activity = new BPMActivity( null, null, null );
+		BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "bpm://some.error.test.queue" );
+		BPMActivity activity = new BPMActivity( null, null, "456" );
 		queue.publish( activity );
 		BPMActivityResponse response = activity.waitForResponse();
 		LOGGER.info( response.getThrowable().getMessage() );
@@ -51,5 +63,6 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 		
 		Thread.sleep( 1000 * 5 );
 	}
+	
 
 }

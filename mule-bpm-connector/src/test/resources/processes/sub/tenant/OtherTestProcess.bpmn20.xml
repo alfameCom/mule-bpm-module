@@ -8,8 +8,8 @@
     </startEvent>
     <serviceTask id="testMuleTask" name="Test Mule Task" flowable:async="true" flowable:exclusive="false" flowable:type="mule">
       <extensionElements>
-        <flowable:field name="endpoint">
-          <flowable:string><![CDATA[other.test.task]]></flowable:string>
+        <flowable:field name="endpointUrl">
+          <flowable:string><![CDATA[bpm://other.test.task]]></flowable:string>
         </flowable:field>
         <flowable:field name="language">
           <flowable:string><![CDATA[javascript]]></flowable:string>
@@ -19,6 +19,9 @@
         </flowable:field>
         <flowable:field name="resultVariable">
           <flowable:string><![CDATA[result]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestTimeout">
+          <flowable:string><![CDATA[10000]]></flowable:string>
         </flowable:field>
       </extensionElements>
     </serviceTask>

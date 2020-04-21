@@ -27,7 +27,7 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 	<flow name="mightMuleTaskFlow">
 		<bpm:task-listener doc:name="Task Listener"
 			doc:id="90bb2825-efa0-48e7-8c9a-b0c8ddb71f08" 
-			endpoint="test.task"
+			endpointUrl="bpm://test.task"
 			config-ref="BPM_Config"
 			transactionType="LOCAL"
 			transactionalAction="ALWAYS_BEGIN">
@@ -55,7 +55,7 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 	<flow name="mightierMuleTaskFlow">
 		<bpm:task-listener doc:name="Task Listener"
 			doc:id="1f2579ec-ac9e-4fba-81d4-002eb4e849b1" 
-			endpoint="other.test.task" 
+			endpointUrl="bpm://other.test.task" 
 			config-ref="BPM_Config"
 			transactionType="LOCAL"
 			transactionalAction="ALWAYS_BEGIN">

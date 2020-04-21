@@ -238,6 +238,10 @@ public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initial
 		return tenantExecutor;
 	}
 	
+	public AsyncExecutor getAsyncExecutor( String tenantId ) {
+		return this.processEngineConfiguration.getAsyncExecutor();
+	}
+	
 	public String getName() {
 		return this.name;
 	}

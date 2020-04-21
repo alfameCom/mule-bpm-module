@@ -5,29 +5,29 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class BPMTaskListenerEndpointDescriptor {
 
 	@Parameter
-	private String endpoint;
+	private String endpointUrl;
 
 	@Parameter
 	@Optional( defaultValue = "5" )
 	private int timeout;
 
 	@Parameter
-	@Optional( defaultValue = "SECONDS" )
-	private TimeUnit timeoutUnit = SECONDS;
+	@Optional( defaultValue = "MINUTES" )
+	private TimeUnit timeoutUnit = MINUTES;
 
 	public BPMTaskListenerEndpointDescriptor() {}
 
-	public BPMTaskListenerEndpointDescriptor( String endpoint ) {
-		this.endpoint = endpoint;
+	public BPMTaskListenerEndpointDescriptor( String endpointUrl ) {
+		this.endpointUrl = endpointUrl;
 	}
 
-	public String getEndpoint() {
-		return endpoint;
+	public String getEndpointUrl() {
+		return endpointUrl;
 	}
 
 	public int getTimeout() {
