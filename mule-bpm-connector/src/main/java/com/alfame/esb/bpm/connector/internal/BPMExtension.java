@@ -74,8 +74,8 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 				subTypes = { BPMDataSourceReference.class, BPMGenericDataSource.class } )
 @ExternalLib( name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl" )
 @ExternalLib( name = "Flowable Mule 4", type = DEPENDENCY, coordinates = "org.flowable:flowable-mule4:6.4.1", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior" )
-@ExternalLib( name = "BPM Activity Queue", type = DEPENDENCY, coordinates = "com.alfame.esb:bpm-queue:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.activity.queue.api.BPMActivityQueueFactory" )
-@ExternalLib( name = "BPM Java API", type = DEPENDENCY, coordinates = "com.alfame.esb:bpm-java-api:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool" )
+@ExternalLib( name = "BPM Queue", type = DEPENDENCY, coordinates = "com.alfame.esb:mule-bpm-queue:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.queue.BPMTaskQueueFactory" )
+@ExternalLib( name = "BPM API", type = DEPENDENCY, coordinates = "com.alfame.esb:mule-bpm-api:2.0.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool" )
 public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initialisable, Startable, Stoppable, TenantInfoHolder, TenantAwareAsyncExecutorFactory {
 
 	private static final Logger LOGGER = getLogger( BPMExtension.class );
