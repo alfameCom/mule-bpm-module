@@ -14,15 +14,14 @@
         <AsyncLogger name="org.mule.extension.http" level="WARN"/>
     
 		<!-- Mule logger -->        
-        <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
-        
-        <!--  Flowable logger -->
-        <AsyncLogger name="org.flowable.job.service.impl.asyncexecutor" level="DEBUG"/>
+        <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>  
+
+		<!-- Flowable logger -->
+		<AsyncLogger name="org.flowable" level="INFO" />
+		<AsyncLogger name="org.flowable.mule" level="DEBUG" />
 
         <!--  BPM extension -->
-        <AsyncLogger name="com.alfame.esb.bpm.connector" level="DEBUG"/>
-        
-        <AsyncLogger name="org.flowable.mule" level="DEBUG"/>
+        <AsyncLogger name="com.alfame.esb.bpm.connector" level="INFO"/>
 
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>
