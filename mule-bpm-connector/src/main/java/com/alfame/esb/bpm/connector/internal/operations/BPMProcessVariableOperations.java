@@ -39,15 +39,15 @@ public class BPMProcessVariableOperations {
 		Builder< Object, VariableInstance > resultBuilder = Result.builder();
 		
 		VariableInstance variableInstance = (VariableInstance) config.getVariableInstance( 
-				connection.getExecution().getProcessInstanceId(), variableName );
+				connection.getTask().getProcessInstanceId(), variableName );
 		
 		if ( variableInstance != null ) {
-			LOGGER.debug( "Variable " + variableName + " found for process " + connection.getExecution().getProcessInstanceId() );
+			LOGGER.debug( "Variable " + variableName + " found for process " + connection.getTask().getProcessInstanceId() );
 			
 			resultBuilder.output( variableInstance.getValue() );
 			resultBuilder.attributes( variableInstance );
 		} else {
-			LOGGER.debug( "Variable " + variableName + " not found for process " + connection.getExecution().getProcessInstanceId() );
+			LOGGER.debug( "Variable " + variableName + " not found for process " + connection.getTask().getProcessInstanceId() );
 		}
 		
 		
@@ -64,7 +64,7 @@ public class BPMProcessVariableOperations {
 		
 		connection.getVariablesToUpdate().put( variableName, content );
 		
-		LOGGER.debug( "Variable " + variableName + " set to be updated for process " + connection.getExecution().getProcessInstanceId() );
+		LOGGER.debug( "Variable " + variableName + " set to be updated for process " + connection.getTask().getProcessInstanceId() );
 	}
 
 	@Alias( "remove-variable" )
@@ -77,7 +77,7 @@ public class BPMProcessVariableOperations {
 		
 		connection.getVariablesToRemove().add( variableName );
 		
-		LOGGER.debug( "Variable " + variableName + " set to be removed for process " + connection.getExecution().getProcessInstanceId() );
+		LOGGER.debug( "Variable " + variableName + " set to be removed for process " + connection.getTask().getProcessInstanceId() );
 	}
 	
 }

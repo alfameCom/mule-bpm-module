@@ -65,7 +65,6 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 @Xml( prefix = "bpm" )
 @Extension( name = "BPM", vendor = "Alfame Systems" )
 @Sources( BPMTaskListener.class )
-@Export( classes = { org.flowable.engine.runtime.Execution.class } )
 @ConnectionProviders( BPMConnectionProvider.class )
 @Operations( { BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class } )
 @SubTypeMapping( baseType = BPMDefinition.class, 

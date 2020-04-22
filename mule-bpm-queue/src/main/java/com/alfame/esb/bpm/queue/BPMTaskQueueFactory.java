@@ -16,7 +16,7 @@ public class BPMTaskQueueFactory {
 	private static Semaphore semaphore = new Semaphore( 1 );
 
 	public static BPMTaskQueue getInstance( String queueName ) {
-		BPMTaskQueue activityQueue = null;
+		BPMTaskQueue taskQueue = null;
 		
 		try {
 			semaphore.acquire();
@@ -25,7 +25,7 @@ public class BPMTaskQueueFactory {
 				instances.put( queueName, new BPMTaskQueue( queueName ) );
 			}
 			
-			activityQueue = instances.get( queueName );
+			taskQueue = instances.get( queueName );
 			
 			semaphore.release();
 		} catch( InterruptedException e ) {
@@ -33,7 +33,7 @@ public class BPMTaskQueueFactory {
 		}
 
 		logger.trace( "Returning instance for queueName " + queueName );
-		return activityQueue;
+		return taskQueue;
 	}
 
 	private BPMTaskQueueFactory() {}

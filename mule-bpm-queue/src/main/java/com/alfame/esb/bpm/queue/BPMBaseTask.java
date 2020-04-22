@@ -3,41 +3,28 @@ package com.alfame.esb.bpm.queue;
 import java.util.Optional;
 import java.util.concurrent.*;
 
-import static java.util.Optional.ofNullable;
+import com.alfame.esb.bpm.api.BPMTask;
 
-public class BPMTask implements BPMTaskResponseCallback {
+public abstract class BPMBaseTask implements BPMTask, BPMTaskResponseCallback {
 
 	private CompletableFuture< BPMTaskResponse > completableFuture = new CompletableFuture<>();
 
-	private final Object payload;
-	private final Object attributes;
-	private final String correlationId;
 	private long requestTimeoutMillis = 300000;
 
-	public BPMTask( Object value, Object attributes, String correlationId ) {
-		this.payload = value;
-		this.attributes = attributes;
-		this.correlationId = correlationId;
+	abstract public Object getPayload();
+
+	abstract public Optional< String > getCorrelationId();
+
+	public long getRequestTimeoutMillis() {
+		return this.requestTimeoutMillis;
 	}
 
-	public Object getPayload() {
-		return payload;
-	}
-
-	public Object getAttributes() {
-		return attributes;
-	}
-
-	public Optional< String > getCorrelationId() {
-		return ofNullable( correlationId );
-	}
-	
-	public long requestTimeoutMillis() {
-		return requestTimeoutMillis;
+	public void setRequestTimeoutMillis( long requestTimeoutMillis ) {
+		this.requestTimeoutMillis = requestTimeoutMillis;
 	}
 
 	public BPMTaskResponse waitForResponse() throws InterruptedException, ExecutionException, TimeoutException {
-		return completableFuture.get( requestTimeoutMillis, TimeUnit.MILLISECONDS );
+		return completableFuture.get( this.requestTimeoutMillis, TimeUnit.MILLISECONDS );
 	}
 
 	public BPMTaskResponse waitForResponse( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {

@@ -1,12 +1,15 @@
 package com.alfame.esb.bpm.connector;
 
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.Optional;
+
 import com.alfame.esb.bpm.queue.BPMTaskQueue;
 import com.alfame.esb.bpm.queue.BPMTaskQueueFactory;
-import com.alfame.esb.bpm.queue.BPMTask;
+import com.alfame.esb.bpm.queue.BPMBaseTask;
 import com.alfame.esb.bpm.queue.BPMTaskResponse;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
@@ -31,7 +34,7 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 	@Test
 	public void executeBpmListenerSuccessTestFlow() throws Exception {
 		BPMTaskQueue queue = BPMTaskQueueFactory.getInstance( "bpm://some.success.test.queue" );
-		BPMTask task = new BPMTask( null, null, "123" );
+		BPMBaseTask task = new DummyMuleTask( null, "123" );
 		queue.publish( task );
 		BPMTaskResponse response = task.waitForResponse();
 		LOGGER.info( (String)response.getValue().getValue() );
@@ -40,7 +43,7 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 	@Test
 	public void executeBpmListenerErrorTestFlow() throws Exception {
 		BPMTaskQueue queue = BPMTaskQueueFactory.getInstance( "bpm://some.error.test.queue" );
-		BPMTask task = new BPMTask( null, null, "456" );
+		BPMBaseTask task = new DummyMuleTask( null, "456" );
 		queue.publish( task );
 		BPMTaskResponse response = task.waitForResponse();
 		LOGGER.info( response.getThrowable().getMessage() );
@@ -53,5 +56,62 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 		Thread.sleep( 1000 * 5 );
 	}
 	
+	protected class DummyMuleTask extends BPMBaseTask {
+		
+		private final Object payload;
+		private final String correlationId;
+
+		DummyMuleTask( Object payload, String correlationId ) {
+			this.payload = payload;
+			this.correlationId = correlationId;
+		}
+		
+		@Override
+		public String getActivityId() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Optional<String> getCorrelationId() {
+			return ofNullable( correlationId );
+		}
+
+		@Override
+		public String getId() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getParentId() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Object getPayload() {
+			return payload;
+		}
+
+		@Override
+		public String getProcessInstanceId() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getSuperExecutionId() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getTenantId() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+	}
 
 }

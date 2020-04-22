@@ -8,9 +8,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
 import com.alfame.esb.bpm.connector.internal.connection.BPMConnection;
 import com.alfame.esb.bpm.queue.*;
+import com.alfame.esb.bpm.api.*;
 
-import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.runtime.Execution;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -46,7 +45,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @MetadataScope( outputResolver = BPMTaskListenerPayloadMetadataResolver.class, attributesResolver = BPMTaskListenerAttributesMetadataResolver.class )
 @EmitsResponse
 @MediaType( value = ANY, strict = false )
-public class BPMTaskListener extends Source< Object, Execution > {
+public class BPMTaskListener extends Source< Object, BPMTask > {
 
 	private static final Logger LOGGER = getLogger( BPMTaskListener.class );
 
@@ -79,7 +78,7 @@ public class BPMTaskListener extends Source< Object, Execution > {
 	private List< Consumer > consumers;
 
 	@Override
-	public void onStart( SourceCallback< Object, Execution > sourceCallback ) throws MuleException {
+	public void onStart( SourceCallback< Object, BPMTask > sourceCallback ) throws MuleException {
 
 		startConsumers( sourceCallback );
 
@@ -139,7 +138,7 @@ public class BPMTaskListener extends Source< Object, Execution > {
 	public void onTerminate() {
 	}
 
-	private void startConsumers( SourceCallback< Object, Execution > sourceCallback ) {
+	private void startConsumers( SourceCallback< Object, BPMTask > sourceCallback ) {
 		createScheduler();
 		consumers = new ArrayList<>( numberOfConsumers );
 		for( int i = 0; i < numberOfConsumers; i++ ) {
@@ -162,10 +161,10 @@ public class BPMTaskListener extends Source< Object, Execution > {
 		
 		private final BPMExtension config;
 		private final BPMTaskListenerEndpointDescriptor endpointDescription;
-		private final SourceCallback< Object, Execution > sourceCallback;
+		private final SourceCallback< Object, BPMTask > sourceCallback;
 		private final AtomicBoolean stop = new AtomicBoolean( false );
 
-		public Consumer( BPMExtension config, BPMTaskListenerEndpointDescriptor endpointDescription, SourceCallback< Object, Execution > sourceCallback ) {
+		public Consumer( BPMExtension config, BPMTaskListenerEndpointDescriptor endpointDescription, SourceCallback< Object, BPMTask > sourceCallback ) {
 			this.config = config;
 			this.endpointDescription = endpointDescription;
 			this.sourceCallback = sourceCallback;
@@ -186,20 +185,19 @@ public class BPMTaskListener extends Source< Object, Execution > {
 				try {
 
 					final BPMTaskQueue queue = BPMTaskQueueFactory.getInstance( endpointDescriptor.getEndpointUrl() );
-					BPMTask task = queue.pop( endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit() );
+					BPMBaseTask task = queue.pop( endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit() );
 					
 					if( task == null ) {
 						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						cancel( ctx );
 						continue;
 					} else {
-						DelegateExecution delegateExecution = (DelegateExecution) task.getAttributes();
 						
-						long taskTimeoutMillis = task.requestTimeoutMillis();
+						long taskTimeoutMillis = task.getRequestTimeoutMillis();
 						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' uses activity timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), taskTimeoutMillis, currentThread().getName() );
-						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' uses async executor timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), config.getAsyncExecutor( delegateExecution != null ? delegateExecution.getTenantId() : null ).getAsyncJobLockTimeInMillis(), currentThread().getName() );
+						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' uses async executor timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), config.getAsyncExecutor( task.getTenantId() ).getAsyncJobLockTimeInMillis(), currentThread().getName() );
 						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' uses endpoint timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), TimeUnit.MILLISECONDS.convert( endpointDescription.getTimeout(), endpointDescription.getTimeoutUnit() ), currentThread().getName() );
-						if ( taskTimeoutMillis > config.getAsyncExecutor( delegateExecution != null ? delegateExecution.getTenantId() : null ).getAsyncJobLockTimeInMillis() ) {
+						if ( taskTimeoutMillis > config.getAsyncExecutor( task.getTenantId() ).getAsyncJobLockTimeInMillis() ) {
 							LOGGER.error( "Consumer for <bpm:task-listener> on flow '{}' uses longer timeout than async executor supports. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 							cancel( ctx );
 							continue;
@@ -220,7 +218,7 @@ public class BPMTaskListener extends Source< Object, Execution > {
 						}
 
 						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
-						final BPMConnection connection = connect( ctx, delegateExecution );
+						final BPMConnection connection = connect( ctx, task );
 						if ( connection == null ) {
 							LOGGER.warn( "Consumer for <bpm:task-listener> on flow '{}' no connection provider available. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 							stop();
@@ -231,13 +229,13 @@ public class BPMTaskListener extends Source< Object, Execution > {
 						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						connection.setResponseCallback( task );
 						
-						Result.Builder< Object, Execution > resultBuilder = Result.< Object, Execution >builder();
+						Result.Builder< Object, BPMTask > resultBuilder = Result.< Object, BPMTask >builder();
 						resultBuilder.output( task.getPayload() );
 						resultBuilder.mediaType( APPLICATION_JAVA );
-						resultBuilder.attributes( (Execution) delegateExecution );
+						resultBuilder.attributes( task );
 						resultBuilder.mediaType( APPLICATION_JAVA );
 
-						Result< Object, Execution > result = resultBuilder.build();
+						Result< Object, BPMTask > result = resultBuilder.build();
 
 						if( isAlive() ) {
 							sourceCallback.handle( result, ctx );
@@ -290,9 +288,9 @@ public class BPMTaskListener extends Source< Object, Execution > {
 			}
 		}
 
-		private BPMConnection connect( SourceCallbackContext ctx, DelegateExecution execution ) throws ConnectionException, TransactionException {
+		private BPMConnection connect( SourceCallbackContext ctx, BPMBaseTask task ) throws ConnectionException, TransactionException {
 			BPMConnection connection = connectionProvider.connect();
-			connection.setExecution( execution );
+			connection.setTask( task );
 			ctx.bindConnection( connection );
 			return connection;
 		}

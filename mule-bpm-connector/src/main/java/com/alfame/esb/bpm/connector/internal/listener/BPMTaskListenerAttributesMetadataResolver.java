@@ -1,9 +1,10 @@
 package com.alfame.esb.bpm.connector.internal.listener;
 
-import org.flowable.engine.runtime.Execution;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.metadata.resolving.AttributesStaticTypeResolver;
+
+import com.alfame.esb.bpm.api.BPMTask;
 
 public class BPMTaskListenerAttributesMetadataResolver extends AttributesStaticTypeResolver {
 
@@ -18,7 +19,7 @@ public class BPMTaskListenerAttributesMetadataResolver extends AttributesStaticT
 
 	@Override
 	public MetadataType getStaticMetadata() {
-		return loadMetadataType( Execution.class );
+		return loadMetadataType( BPMTask.class );
 	}
 
 }

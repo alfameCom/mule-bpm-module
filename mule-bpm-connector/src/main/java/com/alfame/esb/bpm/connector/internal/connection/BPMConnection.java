@@ -1,5 +1,6 @@
 package com.alfame.esb.bpm.connector.internal.connection;
 
+import com.alfame.esb.bpm.queue.BPMBaseTask;
 import com.alfame.esb.bpm.queue.BPMTaskResponseCallback;
 import org.slf4j.Logger;
 
@@ -11,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.delegate.DelegateExecution;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
@@ -26,7 +26,7 @@ public class BPMConnection implements TransactionalConnection {
 	
 	private List< String > variablesToRemove = new ArrayList< String >();
 
-	private DelegateExecution execution;
+	private BPMBaseTask task;
 
 	public BPMConnection() {}
 
@@ -54,27 +54,27 @@ public class BPMConnection implements TransactionalConnection {
 		this.variablesToRemove = variablesToRemove;
 	}
 
-	public DelegateExecution getExecution() {
-		return execution;
+	public BPMBaseTask getTask() {
+		return task;
 	}
 
-	public void setExecution( DelegateExecution execution ) {
-		this.execution = execution;
+	public void setTask( BPMBaseTask task ) {
+		this.task = task;
 	}
 	
 	@Override
 	public void begin() throws TransactionException {
-		LOGGER.debug( "BPMConnection transaction of activity {} beginning for instance {}", execution.getCurrentActivityId(), execution.getProcessInstanceId() );
+		LOGGER.debug( "BPMConnection transaction of activity {} beginning for instance {}", task.getActivityId(), task.getProcessInstanceId() );
 	}
 
 	@Override
 	public void commit() throws TransactionException {
-		LOGGER.debug( "BPMConnection transaction of activity {} committing for instance {}", execution.getCurrentActivityId(), execution.getProcessInstanceId() );
+		LOGGER.debug( "BPMConnection transaction of activity {} committing for instance {}", task.getActivityId(), task.getProcessInstanceId() );
 	}
 
 	@Override
 	public void rollback() throws TransactionException {
-		LOGGER.debug( "BPMConnection transaction of activity {} rolling back for instance {}", execution.getCurrentActivityId(), execution.getProcessInstanceId() );
+		LOGGER.debug( "BPMConnection transaction of activity {} rolling back for instance {}", task.getActivityId(), task.getProcessInstanceId() );
 	}
 	
 }

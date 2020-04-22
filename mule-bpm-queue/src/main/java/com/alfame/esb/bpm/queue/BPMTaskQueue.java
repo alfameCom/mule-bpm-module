@@ -12,26 +12,26 @@ public class BPMTaskQueue {
 	private static final Log logger = LogFactory.getLog( BPMTaskQueue.class );
 
 	private String queueName;
-	private BlockingQueue< BPMTask > activityQueue = new LinkedTransferQueue<>();
+	private BlockingQueue< BPMBaseTask > taskQueue = new LinkedTransferQueue<>();
 
 	public BPMTaskQueue( String queueName ) {
 		this.queueName = queueName;
 	}
 
-	public boolean publish( BPMTask message ) throws InterruptedException {
+	public boolean publish( BPMBaseTask task ) throws InterruptedException {
 		logger.debug( "Pushing to queue " + this.queueName );
-		return activityQueue.offer( message );
+		return taskQueue.offer( task );
 	}
 
 	@Deprecated
-	public BPMTask pop() throws InterruptedException {
+	public BPMBaseTask pop() throws InterruptedException {
 		logger.debug( "Popping from queue " + this.queueName );
-		return activityQueue.take();
+		return taskQueue.take();
 	}
 	
-	public BPMTask pop( long timeout, TimeUnit unit ) throws InterruptedException {
+	public BPMBaseTask pop( long timeout, TimeUnit unit ) throws InterruptedException {
 		logger.debug( "Popping from queue " + this.queueName );
-		return activityQueue.poll( timeout, unit );
+		return taskQueue.poll( timeout, unit );
 	}
 
 	public String getQueueName() {
