@@ -4,21 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.FlowableListener;
-import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.runtime.Execution;
-import org.flowable.variable.api.persistence.entity.VariableInstance;
-
-import com.alfame.esb.bpm.queue.BPMActivityQueue;
-import com.alfame.esb.bpm.queue.BPMActivityQueueFactory;
-import com.alfame.esb.bpm.queue.BPMActivity;
-import com.alfame.esb.bpm.queue.BPMActivityResponse;
+import com.alfame.esb.bpm.queue.BPMTaskQueue;
+import com.alfame.esb.bpm.queue.BPMTaskQueueFactory;
+import com.alfame.esb.bpm.queue.BPMTask;
+import com.alfame.esb.bpm.queue.BPMTaskResponse;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
@@ -41,19 +30,19 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 
 	@Test
 	public void executeBpmListenerSuccessTestFlow() throws Exception {
-		BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "bpm://some.success.test.queue" );
-		BPMActivity activity = new BPMActivity( null, null, "123" );
-		queue.publish( activity );
-		BPMActivityResponse response = activity.waitForResponse();
+		BPMTaskQueue queue = BPMTaskQueueFactory.getInstance( "bpm://some.success.test.queue" );
+		BPMTask task = new BPMTask( null, null, "123" );
+		queue.publish( task );
+		BPMTaskResponse response = task.waitForResponse();
 		LOGGER.info( (String)response.getValue().getValue() );
 	}
 
 	@Test
 	public void executeBpmListenerErrorTestFlow() throws Exception {
-		BPMActivityQueue queue = BPMActivityQueueFactory.getInstance( "bpm://some.error.test.queue" );
-		BPMActivity activity = new BPMActivity( null, null, "456" );
-		queue.publish( activity );
-		BPMActivityResponse response = activity.waitForResponse();
+		BPMTaskQueue queue = BPMTaskQueueFactory.getInstance( "bpm://some.error.test.queue" );
+		BPMTask task = new BPMTask( null, null, "456" );
+		queue.publish( task );
+		BPMTaskResponse response = task.waitForResponse();
 		LOGGER.info( response.getThrowable().getMessage() );
 	}
 

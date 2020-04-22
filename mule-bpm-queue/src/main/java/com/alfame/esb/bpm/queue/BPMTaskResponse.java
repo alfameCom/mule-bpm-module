@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BPMActivityResponse {
+public class BPMTaskResponse {
 
 	private Throwable throwable;
 
@@ -18,15 +18,15 @@ public class BPMActivityResponse {
 	
 	private List< String > variablesToRemove = new ArrayList< String >();
 
-	public BPMActivityResponse( TypedValue< Serializable > value ) {
+	public BPMTaskResponse( TypedValue< Serializable > value ) {
 		this.value = value;
 	}
 
-	public BPMActivityResponse( Throwable throwable ) {
+	public BPMTaskResponse( Throwable throwable ) {
 		this.throwable = throwable;
 	}
 
-	public BPMActivityResponse( TypedValue< Serializable > value, Throwable throwable ) {
+	public BPMTaskResponse( TypedValue< Serializable > value, Throwable throwable ) {
 		this.value = value;
 		this.throwable = throwable;
 	}

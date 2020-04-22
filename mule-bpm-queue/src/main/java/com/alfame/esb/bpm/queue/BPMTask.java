@@ -5,16 +5,16 @@ import java.util.concurrent.*;
 
 import static java.util.Optional.ofNullable;
 
-public class BPMActivity implements BPMActivityResponseCallback {
+public class BPMTask implements BPMTaskResponseCallback {
 
-	private CompletableFuture< BPMActivityResponse > completableFuture = new CompletableFuture<>();
+	private CompletableFuture< BPMTaskResponse > completableFuture = new CompletableFuture<>();
 
 	private final Object payload;
 	private final Object attributes;
 	private final String correlationId;
 	private long requestTimeoutMillis = 300000;
 
-	public BPMActivity( Object value, Object attributes, String correlationId ) {
+	public BPMTask( Object value, Object attributes, String correlationId ) {
 		this.payload = value;
 		this.attributes = attributes;
 		this.correlationId = correlationId;
@@ -36,16 +36,16 @@ public class BPMActivity implements BPMActivityResponseCallback {
 		return requestTimeoutMillis;
 	}
 
-	public BPMActivityResponse waitForResponse() throws InterruptedException, ExecutionException, TimeoutException {
+	public BPMTaskResponse waitForResponse() throws InterruptedException, ExecutionException, TimeoutException {
 		return completableFuture.get( requestTimeoutMillis, TimeUnit.MILLISECONDS );
 	}
 
-	public BPMActivityResponse waitForResponse( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
+	public BPMTaskResponse waitForResponse( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
 		this.requestTimeoutMillis = TimeUnit.MILLISECONDS.convert( timeout, unit );
 		return completableFuture.get( this.requestTimeoutMillis, TimeUnit.MILLISECONDS );
 	}
 
-	public void submitResponse( BPMActivityResponse response ) {
+	public void submitResponse( BPMTaskResponse response ) {
 		completableFuture.complete( response );
 	}
 

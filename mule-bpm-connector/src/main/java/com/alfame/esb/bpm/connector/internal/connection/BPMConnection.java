@@ -1,6 +1,6 @@
 package com.alfame.esb.bpm.connector.internal.connection;
 
-import com.alfame.esb.bpm.queue.BPMActivityResponseCallback;
+import com.alfame.esb.bpm.queue.BPMTaskResponseCallback;
 import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -20,7 +20,7 @@ public class BPMConnection implements TransactionalConnection {
 
 	private static final Logger LOGGER = getLogger( BPMConnection.class );
 
-	private BPMActivityResponseCallback responseCallback;
+	private BPMTaskResponseCallback responseCallback;
 
 	private Map< String, TypedValue< Serializable > > variablesToUpdate = new HashMap< String, TypedValue< Serializable > >();
 	
@@ -30,11 +30,11 @@ public class BPMConnection implements TransactionalConnection {
 
 	public BPMConnection() {}
 
-	public BPMActivityResponseCallback getResponseCallback() {
+	public BPMTaskResponseCallback getResponseCallback() {
 		return responseCallback;
 	}
 
-	public void setResponseCallback( BPMActivityResponseCallback responseCallback ) {
+	public void setResponseCallback( BPMTaskResponseCallback responseCallback ) {
 		this.responseCallback = responseCallback;
 	}
 

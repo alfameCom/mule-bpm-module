@@ -7,22 +7,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
-public class BPMActivityQueueFactory {
+public class BPMTaskQueueFactory {
 
-	private static final Log logger = LogFactory.getLog( BPMActivityQueueFactory.class );
+	private static final Log logger = LogFactory.getLog( BPMTaskQueueFactory.class );
 
-	private static Map< String, BPMActivityQueue > instances = new ConcurrentHashMap<>();
+	private static Map< String, BPMTaskQueue > instances = new ConcurrentHashMap<>();
 
 	private static Semaphore semaphore = new Semaphore( 1 );
 
-	public static BPMActivityQueue getInstance( String queueName ) {
-		BPMActivityQueue activityQueue = null;
+	public static BPMTaskQueue getInstance( String queueName ) {
+		BPMTaskQueue activityQueue = null;
 		
 		try {
 			semaphore.acquire();
 			
 			if( instances.get( queueName ) == null ) {
-				instances.put( queueName, new BPMActivityQueue( queueName ) );
+				instances.put( queueName, new BPMTaskQueue( queueName ) );
 			}
 			
 			activityQueue = instances.get( queueName );
@@ -36,6 +36,6 @@ public class BPMActivityQueueFactory {
 		return activityQueue;
 	}
 
-	private BPMActivityQueueFactory() {}
+	private BPMTaskQueueFactory() {}
 
 }

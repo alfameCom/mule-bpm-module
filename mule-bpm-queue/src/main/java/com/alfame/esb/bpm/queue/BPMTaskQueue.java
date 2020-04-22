@@ -7,29 +7,29 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
 
-public class BPMActivityQueue {
+public class BPMTaskQueue {
 
-	private static final Log logger = LogFactory.getLog( BPMActivityQueue.class );
+	private static final Log logger = LogFactory.getLog( BPMTaskQueue.class );
 
 	private String queueName;
-	private BlockingQueue< BPMActivity > activityQueue = new LinkedTransferQueue<>();
+	private BlockingQueue< BPMTask > activityQueue = new LinkedTransferQueue<>();
 
-	public BPMActivityQueue( String queueName ) {
+	public BPMTaskQueue( String queueName ) {
 		this.queueName = queueName;
 	}
 
-	public boolean publish( BPMActivity message ) throws InterruptedException {
+	public boolean publish( BPMTask message ) throws InterruptedException {
 		logger.debug( "Pushing to queue " + this.queueName );
 		return activityQueue.offer( message );
 	}
 
 	@Deprecated
-	public BPMActivity pop() throws InterruptedException {
+	public BPMTask pop() throws InterruptedException {
 		logger.debug( "Popping from queue " + this.queueName );
 		return activityQueue.take();
 	}
 	
-	public BPMActivity pop( long timeout, TimeUnit unit ) throws InterruptedException {
+	public BPMTask pop( long timeout, TimeUnit unit ) throws InterruptedException {
 		logger.debug( "Popping from queue " + this.queueName );
 		return activityQueue.poll( timeout, unit );
 	}
