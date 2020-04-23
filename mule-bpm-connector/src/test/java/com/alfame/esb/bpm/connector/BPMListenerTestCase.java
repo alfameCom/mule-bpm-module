@@ -1,8 +1,8 @@
 package com.alfame.esb.bpm.connector;
 
 import static java.util.Optional.ofNullable;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.Optional;
@@ -34,19 +34,36 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
 	@Test
 	public void executeBpmListenerSuccessTestFlow() throws Exception {
 		BPMTaskQueue queue = BPMTaskQueueFactory.getInstance( "bpm://some.success.test.queue" );
+		
 		BPMBaseTask task = new DummyMuleTask( null, "123" );
 		queue.publish( task );
+		
 		BPMTaskResponse response = task.waitForResponse();
-		LOGGER.info( (String)response.getValue().getValue() );
+		
+		assertThat( response, is( notNullValue() ) );
+		assertThat( response.getValue(), is( notNullValue() ) );
+		assertThat( response.getValue().getValue(), is( notNullValue() ) );
+		LOGGER.info( (String) response.getValue().getValue() );
+		assertThat( response.getValue().getValue(), is( "true" ) );
+		assertThat( response.getThrowable(), is( nullValue() ) );
+		
 	}
 
 	@Test
 	public void executeBpmListenerErrorTestFlow() throws Exception {
 		BPMTaskQueue queue = BPMTaskQueueFactory.getInstance( "bpm://some.error.test.queue" );
+		
 		BPMBaseTask task = new DummyMuleTask( null, "456" );
 		queue.publish( task );
+		
 		BPMTaskResponse response = task.waitForResponse();
-		LOGGER.info( response.getThrowable().getMessage() );
+
+		assertThat( response, is( notNullValue() ) );
+		assertThat( response.getValue(), is( notNullValue() ) );
+		assertThat( response.getValue().getValue(), is( notNullValue() ) );
+		LOGGER.info( (String) response.getValue().getValue() );
+		assertThat( response.getValue().getValue(), is( "false" ) );
+		assertThat( response.getThrowable(), is( notNullValue() ) );
 	}
 
 	@Test

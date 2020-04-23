@@ -31,7 +31,7 @@ public class BPMProcessVariableOperations {
 
 	@Alias( "get-variable" )
 	@MediaType( value = ANY, strict = false )
-	@OutputResolver(output = BPMProcessVariableMetadataResolver.class)
+	@OutputResolver( output = BPMProcessVariableOutputMetadataResolver.class, attributes = BPMProcessVariableAttributesMetadataResolver.class )
 	public Result< Object, BPMVariableInstance > getVariable(
 			@Config BPMExtension config,
 			@Connection BPMConnection connection,

@@ -6,7 +6,7 @@
 	<name>Alfame ESB - Mule Application Parents</name>
 	<groupId>com.alfame.esb.parents</groupId>
 	<artifactId>mule-app-parents</artifactId>
-	<version>2.0.2</version>
+	<version>2.0.3</version>
 	<packaging>pom</packaging>
 
 	<properties>

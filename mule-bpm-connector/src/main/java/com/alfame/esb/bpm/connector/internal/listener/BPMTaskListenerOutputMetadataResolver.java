@@ -6,7 +6,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.metadata.resolving.OutputStaticTypeResolver;
 
-public class BPMTaskListenerPayloadMetadataResolver extends OutputStaticTypeResolver {
+public class BPMTaskListenerOutputMetadataResolver extends OutputStaticTypeResolver {
 	
 	private static Optional<MetadataType> loadMetadataType( String className ) {
 		return new JavaTypeLoader( ClassLoader.getSystemClassLoader() ).load( className );

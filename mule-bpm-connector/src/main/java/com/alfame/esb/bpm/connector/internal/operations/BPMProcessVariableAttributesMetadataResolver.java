@@ -2,17 +2,16 @@ package com.alfame.esb.bpm.connector.internal.operations;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
-import org.mule.runtime.api.metadata.resolving.OutputStaticTypeResolver;
+import org.mule.runtime.api.metadata.resolving.AttributesStaticTypeResolver;
+import com.alfame.esb.bpm.api.BPMVariableInstance;
 
-import com.alfame.esb.bpm.api.BPMProcessInstance;
-
-public class BPMProcessFactoryMetadataResolver extends OutputStaticTypeResolver {
+public class BPMProcessVariableAttributesMetadataResolver extends AttributesStaticTypeResolver {
 	
 	private static MetadataType loadMetadataType( Class<?> classType ) {
 		return new JavaTypeLoader( ClassLoader.getSystemClassLoader() ).load( classType );
 	}
 	
-	private static final MetadataType METADATA_TYPE = loadMetadataType( BPMProcessInstance.class );
+	private static final MetadataType METADATA_TYPE = loadMetadataType( BPMVariableInstance.class );
 
 	@Override
 	public String getCategoryName() {

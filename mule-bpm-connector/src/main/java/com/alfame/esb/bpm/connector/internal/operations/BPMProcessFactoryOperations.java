@@ -20,7 +20,7 @@ public class BPMProcessFactoryOperations {
 
 	@Alias( "process-factory" )
 	@MediaType( value = MediaType.ANY, strict = false )
-	@OutputResolver( output = BPMProcessFactoryMetadataResolver.class )
+	@OutputResolver( output = BPMProcessFactoryOutputMetadataResolver.class )
 	public BPMProcessInstance processFactory(
 			@ParameterGroup( name = "properties" ) BPMProcessFactoryProperties properties,
 			@Config BPMExtension engine

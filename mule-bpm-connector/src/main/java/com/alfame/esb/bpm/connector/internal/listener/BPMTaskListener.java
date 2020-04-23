@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Alias( "task-listener" )
-@MetadataScope( outputResolver = BPMTaskListenerPayloadMetadataResolver.class, attributesResolver = BPMTaskListenerAttributesMetadataResolver.class )
+@MetadataScope( outputResolver = BPMTaskListenerOutputMetadataResolver.class, attributesResolver = BPMTaskListenerAttributesMetadataResolver.class )
 @EmitsResponse
 @MediaType( value = ANY, strict = false )
 public class BPMTaskListener extends Source< Object, BPMTaskInstance > {

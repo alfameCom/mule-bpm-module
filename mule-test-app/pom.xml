@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>com.alfame.esb.parents</groupId>
 		<artifactId>mule-bpm-app</artifactId>
-		<version>2.0.2</version>
+		<version>2.0.3</version>
 	</parent>
 
 	<build>
@@ -101,7 +101,6 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 
-
 		<!-- Mule APIkit -->
 		<dependency>
 			<groupId>org.mule.modules</groupId>
@@ -169,4 +168,7 @@
         </dependency>
     </dependencies>
 
+<properties>
+        <app.runtime>4.2.1-hf3</app.runtime>
+    </properties>
 </project>
