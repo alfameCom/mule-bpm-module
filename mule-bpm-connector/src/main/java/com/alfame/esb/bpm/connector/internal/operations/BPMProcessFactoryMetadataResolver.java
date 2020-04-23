@@ -1,9 +1,10 @@
 package com.alfame.esb.bpm.connector.internal.operations;
 
-import org.flowable.engine.runtime.ProcessInstance;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.metadata.resolving.OutputStaticTypeResolver;
+
+import com.alfame.esb.bpm.api.BPMProcessInstance;
 
 public class BPMProcessFactoryMetadataResolver extends OutputStaticTypeResolver {
 	
@@ -11,7 +12,7 @@ public class BPMProcessFactoryMetadataResolver extends OutputStaticTypeResolver 
 		return new JavaTypeLoader( ClassLoader.getSystemClassLoader() ).load( classType );
 	}
 	
-	private static final MetadataType METADATA_TYPE = loadMetadataType( ProcessInstance.class );
+	private static final MetadataType METADATA_TYPE = loadMetadataType( BPMProcessInstance.class );
 
 	@Override
 	public String getCategoryName() {

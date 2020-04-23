@@ -8,6 +8,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.slf4j.Logger;
 
+import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
 import com.alfame.esb.bpm.connector.internal.BPMProcessBuilderImpl;
 
@@ -20,7 +21,7 @@ public class BPMProcessFactoryOperations {
 	@Alias( "process-factory" )
 	@MediaType( value = MediaType.ANY, strict = false )
 	@OutputResolver( output = BPMProcessFactoryMetadataResolver.class )
-	public ProcessInstance processFactory(
+	public BPMProcessInstance processFactory(
 			@ParameterGroup( name = "properties" ) BPMProcessFactoryProperties properties,
 			@Config BPMExtension engine
 			) {
@@ -36,9 +37,11 @@ public class BPMProcessFactoryOperations {
 				.processInstanceName( properties.getProcessName() )
 				.startProcessInstance();
 		
-		LOGGER.debug( "Started process instance " + instance.getProcessInstanceId() );
+		BPMProcessFactoryProcessInstanceProxy instanceProxy = new BPMProcessFactoryProcessInstanceProxy( instance );
 		
-		return instance;
+		LOGGER.debug( "Started process instance " + instanceProxy.getProcessInstanceId() );
+		
+		return instanceProxy;
 
 	}
 
