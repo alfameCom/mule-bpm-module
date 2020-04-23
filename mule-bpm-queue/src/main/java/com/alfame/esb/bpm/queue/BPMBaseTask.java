@@ -3,9 +3,9 @@ package com.alfame.esb.bpm.queue;
 import java.util.Optional;
 import java.util.concurrent.*;
 
-import com.alfame.esb.bpm.api.BPMTask;
+import com.alfame.esb.bpm.api.BPMTaskInstance;
 
-public abstract class BPMBaseTask implements BPMTask, BPMTaskResponseCallback {
+public abstract class BPMBaseTask implements BPMTaskInstance, BPMTaskResponseCallback {
 
 	private CompletableFuture< BPMTaskResponse > completableFuture = new CompletableFuture<>();
 

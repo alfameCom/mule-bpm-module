@@ -1,6 +1,6 @@
 package com.alfame.esb.bpm.api;
 
-public interface BPMTask {
+public interface BPMTaskInstance {
 
 	/**
 	 * The unique identifier of the execution.

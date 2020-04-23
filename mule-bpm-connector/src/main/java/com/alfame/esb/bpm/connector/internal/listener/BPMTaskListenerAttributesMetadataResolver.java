@@ -4,7 +4,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.metadata.resolving.AttributesStaticTypeResolver;
 
-import com.alfame.esb.bpm.api.BPMTask;
+import com.alfame.esb.bpm.api.BPMTaskInstance;
 
 public class BPMTaskListenerAttributesMetadataResolver extends AttributesStaticTypeResolver {
 
@@ -19,7 +19,7 @@ public class BPMTaskListenerAttributesMetadataResolver extends AttributesStaticT
 
 	@Override
 	public MetadataType getStaticMetadata() {
-		return loadMetadataType( BPMTask.class );
+		return loadMetadataType( BPMTaskInstance.class );
 	}
 
 }

@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @MetadataScope( outputResolver = BPMTaskListenerPayloadMetadataResolver.class, attributesResolver = BPMTaskListenerAttributesMetadataResolver.class )
 @EmitsResponse
 @MediaType( value = ANY, strict = false )
-public class BPMTaskListener extends Source< Object, BPMTask > {
+public class BPMTaskListener extends Source< Object, BPMTaskInstance > {
 
 	private static final Logger LOGGER = getLogger( BPMTaskListener.class );
 
@@ -78,7 +78,7 @@ public class BPMTaskListener extends Source< Object, BPMTask > {
 	private List< Consumer > consumers;
 
 	@Override
-	public void onStart( SourceCallback< Object, BPMTask > sourceCallback ) throws MuleException {
+	public void onStart( SourceCallback< Object, BPMTaskInstance > sourceCallback ) throws MuleException {
 
 		startConsumers( sourceCallback );
 
@@ -138,7 +138,7 @@ public class BPMTaskListener extends Source< Object, BPMTask > {
 	public void onTerminate() {
 	}
 
-	private void startConsumers( SourceCallback< Object, BPMTask > sourceCallback ) {
+	private void startConsumers( SourceCallback< Object, BPMTaskInstance > sourceCallback ) {
 		createScheduler();
 		consumers = new ArrayList<>( numberOfConsumers );
 		for( int i = 0; i < numberOfConsumers; i++ ) {
@@ -161,10 +161,10 @@ public class BPMTaskListener extends Source< Object, BPMTask > {
 		
 		private final BPMExtension config;
 		private final BPMTaskListenerEndpointDescriptor endpointDescription;
-		private final SourceCallback< Object, BPMTask > sourceCallback;
+		private final SourceCallback< Object, BPMTaskInstance > sourceCallback;
 		private final AtomicBoolean stop = new AtomicBoolean( false );
 
-		public Consumer( BPMExtension config, BPMTaskListenerEndpointDescriptor endpointDescription, SourceCallback< Object, BPMTask > sourceCallback ) {
+		public Consumer( BPMExtension config, BPMTaskListenerEndpointDescriptor endpointDescription, SourceCallback< Object, BPMTaskInstance > sourceCallback ) {
 			this.config = config;
 			this.endpointDescription = endpointDescription;
 			this.sourceCallback = sourceCallback;
@@ -229,13 +229,13 @@ public class BPMTaskListener extends Source< Object, BPMTask > {
 						LOGGER.trace( "Consumer for <bpm:task-listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName() );
 						connection.setResponseCallback( task );
 						
-						Result.Builder< Object, BPMTask > resultBuilder = Result.< Object, BPMTask >builder();
+						Result.Builder< Object, BPMTaskInstance > resultBuilder = Result.< Object, BPMTaskInstance >builder();
 						resultBuilder.output( task.getPayload() );
 						resultBuilder.mediaType( APPLICATION_JAVA );
 						resultBuilder.attributes( task );
 						resultBuilder.mediaType( APPLICATION_JAVA );
 
-						Result< Object, BPMTask > result = resultBuilder.build();
+						Result< Object, BPMTaskInstance > result = resultBuilder.build();
 
 						if( isAlive() ) {
 							sourceCallback.handle( result, ctx );
