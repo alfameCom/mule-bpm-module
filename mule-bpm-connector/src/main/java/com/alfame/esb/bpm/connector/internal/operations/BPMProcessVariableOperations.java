@@ -16,6 +16,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.operation.Result.Builder;
 import org.slf4j.Logger;
 
+import com.alfame.esb.bpm.api.BPMVariableInstance;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
 import com.alfame.esb.bpm.connector.internal.connection.BPMConnection;
 
@@ -31,12 +32,12 @@ public class BPMProcessVariableOperations {
 	@Alias( "get-variable" )
 	@MediaType( value = ANY, strict = false )
 	@OutputResolver(output = BPMProcessVariableMetadataResolver.class)
-	public Result< Object, VariableInstance > getVariable(
+	public Result< Object, BPMVariableInstance > getVariable(
 			@Config BPMExtension config,
 			@Connection BPMConnection connection,
 			@DisplayName( "Variable name" ) String variableName
 		) {
-		Builder< Object, VariableInstance > resultBuilder = Result.builder();
+		Builder< Object, BPMVariableInstance > resultBuilder = Result.builder();
 		
 		VariableInstance variableInstance = (VariableInstance) config.getVariableInstance( 
 				connection.getTask().getProcessInstanceId(), variableName );
@@ -45,13 +46,12 @@ public class BPMProcessVariableOperations {
 			LOGGER.debug( "Variable " + variableName + " found for process " + connection.getTask().getProcessInstanceId() );
 			
 			resultBuilder.output( variableInstance.getValue() );
-			resultBuilder.attributes( variableInstance );
+			resultBuilder.attributes( new BPMProcessVariableInstanceProxy( variableInstance ) );
 		} else {
 			LOGGER.debug( "Variable " + variableName + " not found for process " + connection.getTask().getProcessInstanceId() );
 		}
 		
-		
-		return resultBuilder.build();		
+		return resultBuilder.build();
 	}
 	
 	@Alias( "set-variable" )
