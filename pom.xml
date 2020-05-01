@@ -11,7 +11,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>flowable</module>
+		<module>flowable-mule4</module>
 		<module>mule-bpm-queue</module>
 		<module>mule-bpm-api</module>
 		<module>mule-bpm-connector</module>
