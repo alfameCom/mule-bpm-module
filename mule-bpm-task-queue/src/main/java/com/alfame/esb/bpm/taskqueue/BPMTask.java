@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public abstract class BPMBaseTask implements BPMTaskInstance, BPMTaskResponseCallback {
+public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallback {
 
     private CompletableFuture<BPMTaskResponse> completableFuture = new CompletableFuture<>();
 

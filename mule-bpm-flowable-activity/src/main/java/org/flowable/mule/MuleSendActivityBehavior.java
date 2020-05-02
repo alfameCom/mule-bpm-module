@@ -108,7 +108,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
             BPMTaskQueue queue = BPMTaskQueueFactory.getInstance(endpointUrlValue);
             if (queue != null) {
                 try {
-                    MuleTask task = new MuleTask(payload, execution.getId(), execution);
+                    MuleSendActivityTask task = new MuleSendActivityTask(payload, execution.getId(), execution);
                     logger.trace(">>>>> " + execution.getProcessDefinitionId() + " / " + execution.getCurrentActivityId() + ": " + execution.getProcessInstanceId() + ": " + endpointUrlValue);
                     queue.publish(task);
                     BPMTaskResponse response = task.waitForResponse(requestTimeoutValue, TimeUnit.MILLISECONDS);

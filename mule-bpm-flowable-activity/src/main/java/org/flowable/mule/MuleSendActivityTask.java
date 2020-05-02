@@ -1,19 +1,19 @@
 package org.flowable.mule;
 
-import com.alfame.esb.bpm.taskqueue.BPMBaseTask;
+import com.alfame.esb.bpm.taskqueue.BPMTask;
 import org.flowable.engine.delegate.DelegateExecution;
 
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
-public class MuleTask extends BPMBaseTask {
+public class MuleSendActivityTask extends BPMTask {
 
     private final Object payload;
     private final String correlationId;
     private final DelegateExecution execution;
 
-    public MuleTask(Object payload, String correlationId, DelegateExecution execution) {
+    public MuleSendActivityTask(Object payload, String correlationId, DelegateExecution execution) {
         this.payload = payload;
         this.correlationId = correlationId;
         this.execution = execution;

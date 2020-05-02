@@ -3,7 +3,7 @@ package com.alfame.esb.bpm.connector.internal.listener;
 import com.alfame.esb.bpm.api.BPMTaskInstance;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
 import com.alfame.esb.bpm.connector.internal.connection.BPMConnection;
-import com.alfame.esb.bpm.taskqueue.BPMBaseTask;
+import com.alfame.esb.bpm.taskqueue.BPMTask;
 import com.alfame.esb.bpm.taskqueue.BPMTaskQueue;
 import com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory;
 import com.alfame.esb.bpm.taskqueue.BPMTaskResponse;
@@ -190,7 +190,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                 try {
 
                     final BPMTaskQueue queue = BPMTaskQueueFactory.getInstance(endpointDescriptor.getEndpointUrl());
-                    BPMBaseTask task = queue.pop(endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit());
+                    BPMTask task = queue.pop(endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit());
 
                     if (task == null) {
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
@@ -293,7 +293,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
             }
         }
 
-        private BPMConnection connect(SourceCallbackContext ctx, BPMBaseTask task) throws ConnectionException, TransactionException {
+        private BPMConnection connect(SourceCallbackContext ctx, BPMTask task) throws ConnectionException, TransactionException {
             BPMConnection connection = connectionProvider.connect();
             connection.setTask(task);
             ctx.bindConnection(connection);

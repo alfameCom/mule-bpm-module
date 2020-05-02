@@ -1,6 +1,6 @@
 package com.alfame.esb.bpm.connector;
 
-import com.alfame.esb.bpm.taskqueue.BPMBaseTask;
+import com.alfame.esb.bpm.taskqueue.BPMTask;
 import com.alfame.esb.bpm.taskqueue.BPMTaskQueue;
 import com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory;
 import com.alfame.esb.bpm.taskqueue.BPMTaskResponse;
@@ -34,7 +34,7 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
     public void executeBpmListenerSuccessTestFlow() throws Exception {
         BPMTaskQueue queue = BPMTaskQueueFactory.getInstance("bpm://some.success.test.queue");
 
-        BPMBaseTask task = new DummyMuleTask(null, "123");
+        BPMTask task = new DummyMuleTask(null, "123");
         queue.publish(task);
 
         BPMTaskResponse response = task.waitForResponse();
@@ -51,7 +51,7 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
     public void executeBpmListenerErrorTestFlow() throws Exception {
         BPMTaskQueue queue = BPMTaskQueueFactory.getInstance("bpm://some.error.test.queue");
 
-        BPMBaseTask task = new DummyMuleTask(null, "456");
+        BPMTask task = new DummyMuleTask(null, "456");
         queue.publish(task);
 
         BPMTaskResponse response = task.waitForResponse();
@@ -70,7 +70,7 @@ public class BPMListenerTestCase extends MuleArtifactFunctionalTestCase {
         Thread.sleep(1000 * 5);
     }
 
-    protected class DummyMuleTask extends BPMBaseTask {
+    protected class DummyMuleTask extends BPMTask {
 
         private final Object payload;
         private final String correlationId;

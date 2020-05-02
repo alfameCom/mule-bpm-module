@@ -1,6 +1,6 @@
 package com.alfame.esb.bpm.connector.internal.connection;
 
-import com.alfame.esb.bpm.taskqueue.BPMBaseTask;
+import com.alfame.esb.bpm.taskqueue.BPMTask;
 import com.alfame.esb.bpm.taskqueue.BPMTaskResponseCallback;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
@@ -20,7 +20,7 @@ public class BPMConnection implements TransactionalConnection {
     private BPMTaskResponseCallback responseCallback;
     private Map<String, Object> variablesToUpdate = new HashMap<>();
     private List<String> variablesToRemove = new ArrayList<>();
-    private BPMBaseTask task;
+    private BPMTask task;
 
     public BPMTaskResponseCallback getResponseCallback() {
         return responseCallback;
@@ -46,11 +46,11 @@ public class BPMConnection implements TransactionalConnection {
     	this.variablesToRemove = variablesToRemove;
     }
 
-    public BPMBaseTask getTask() {
+    public BPMTask getTask() {
     	return task;
     }
 
-    public void setTask(BPMBaseTask task) {
+    public void setTask(BPMTask task) {
     	this.task = task;
     }
 
