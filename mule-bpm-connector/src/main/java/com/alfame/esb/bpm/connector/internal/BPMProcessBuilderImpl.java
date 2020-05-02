@@ -1,48 +1,47 @@
 package com.alfame.esb.bpm.connector.internal;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
+import com.alfame.esb.bpm.api.BPMProcessBuilder;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.slf4j.Logger;
 
-import com.alfame.esb.bpm.api.BPMProcessBuilder;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class BPMProcessBuilderImpl extends BPMProcessBuilder {
 
-	private static final Logger LOGGER = getLogger( BPMProcessBuilderImpl.class );
-	
-	private BPMEngineDetails engineDetails;
-	
-	public BPMProcessBuilderImpl( BPMEngineDetails engineDetails ) {
-		this.engineDetails = engineDetails;
-	}
+    private static final Logger LOGGER = getLogger(BPMProcessBuilderImpl.class);
 
-	@Override
-	public Object startProcessInstance() {
-		ProcessInstanceBuilder instanceBuilder = this.engineDetails.getRuntimeService().createProcessInstanceBuilder();
+    private BPMEngineDetails engineDetails;
 
-		LOGGER.debug( "Starting process instance with definition key: " + this.processDefinitionKey );
-		instanceBuilder = instanceBuilder.processDefinitionKey( this.processDefinitionKey );
-		
-		if( this.tenantId != null ) {
-			instanceBuilder = instanceBuilder.tenantId( this.tenantId );
-		} else {
-			instanceBuilder = instanceBuilder.tenantId( this.engineDetails.getDefaultTenantId() );
-		}
-		
-		if( this.uniqueBusinessKey != null ) {
-			instanceBuilder = instanceBuilder.businessKey( this.tenantId );
-		}
+    public BPMProcessBuilderImpl(BPMEngineDetails engineDetails) {
+        this.engineDetails = engineDetails;
+    }
 
-		if( this.processInstanceName != null ) {
-			instanceBuilder = instanceBuilder.name( this.processInstanceName );
-		}
+    @Override
+    public Object startProcessInstance() {
+        ProcessInstanceBuilder instanceBuilder = this.engineDetails.getRuntimeService().createProcessInstanceBuilder();
 
-		if( this.variables != null ) {
-			instanceBuilder = instanceBuilder.variables( this.variables );
-		}
-		
-		return instanceBuilder.start();
-	}
-	
+        LOGGER.debug("Starting process instance with definition key: " + this.processDefinitionKey);
+        instanceBuilder = instanceBuilder.processDefinitionKey(this.processDefinitionKey);
+
+        if (this.tenantId != null) {
+            instanceBuilder = instanceBuilder.tenantId(this.tenantId);
+        } else {
+            instanceBuilder = instanceBuilder.tenantId(this.engineDetails.getDefaultTenantId());
+        }
+
+        if (this.uniqueBusinessKey != null) {
+            instanceBuilder = instanceBuilder.businessKey(this.tenantId);
+        }
+
+        if (this.processInstanceName != null) {
+            instanceBuilder = instanceBuilder.name(this.processInstanceName);
+        }
+
+        if (this.variables != null) {
+            instanceBuilder = instanceBuilder.variables(this.variables);
+        }
+
+        return instanceBuilder.start();
+    }
+
 }

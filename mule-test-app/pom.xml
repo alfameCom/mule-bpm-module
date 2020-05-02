@@ -12,8 +12,16 @@
 	<parent>
 		<groupId>com.alfame.esb.parents</groupId>
 		<artifactId>mule-bpm-app</artifactId>
-		<version>2.1.0</version>
+		<version>2.1.0-SNAPSHOT</version>
 	</parent>
+
+	<properties>
+		<revision>${mule.bpm.version}</revision>
+		<mule.bpm.version>2.1.0-SNAPSHOT</mule.bpm.version>
+		<app.runtime>4.2.1</app.runtime>
+		<mule.maven.plugin.version>3.3.5</mule.maven.plugin.version>
+		<munit.version>2.2.1</munit.version>
+	</properties>
 
 	<build>
 		<plugins>
@@ -70,7 +78,7 @@
 					</execution>
 				</executions>
 			</plugin>
-		<plugin>
+			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
@@ -121,11 +129,11 @@
 			<version>3.3.1</version>
 		</dependency>
 
-		<!-- BPM Java API -->
+		<!-- Mule BPM Java API -->
 		<dependency>
-			<groupId>com.alfame.esb</groupId>
+			<groupId>com.alfame.esb.bpm</groupId>
 			<artifactId>mule-bpm-api</artifactId>
-			<version>${engine.pool.version}</version>
+			<version>${mule.bpm.version}</version>
 		</dependency>
 
 		<!-- Mule Spring module -->
@@ -168,7 +176,7 @@
             <version>1.2.6</version>
             <classifier>mule-plugin</classifier>
         </dependency>
-		
+
     </dependencies>
 
 </project>

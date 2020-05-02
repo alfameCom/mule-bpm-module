@@ -8,22 +8,22 @@ import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 
-@Alias( "task-listener" )
-public class BPMConnectionProvider implements ConnectionProvider< BPMConnection >, NoConnectivityTest {
+@Alias("task-listener")
+public class BPMConnectionProvider implements ConnectionProvider<BPMConnection>, NoConnectivityTest {
 
-	@Override
-	public BPMConnection connect() throws ConnectionException {
-		return new BPMConnection();
-	}
+    @Override
+    public BPMConnection connect() throws ConnectionException {
+        return new BPMConnection();
+    }
 
-	@Override
-	public void disconnect( BPMConnection bpmConnection ) {
+    @Override
+    public void disconnect(BPMConnection bpmConnection) {
 
-	}
+    }
 
-	@Override
-	public ConnectionValidationResult validate( BPMConnection bpmConnection ) {
-		return success();
-	}
+    @Override
+    public ConnectionValidationResult validate(BPMConnection bpmConnection) {
+        return success();
+    }
 
 }

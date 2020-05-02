@@ -4,11 +4,11 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 public final class BPMProcessFactorySettings {
 
-	@Parameter
-	private BPMProcessFactoryProperties properties;
+    @Parameter
+    private BPMProcessFactoryProperties properties;
 
-	public BPMProcessFactoryProperties getProperties() {
-		return properties;
-	}
+    public BPMProcessFactoryProperties getProperties() {
+        return properties;
+    }
 
 }

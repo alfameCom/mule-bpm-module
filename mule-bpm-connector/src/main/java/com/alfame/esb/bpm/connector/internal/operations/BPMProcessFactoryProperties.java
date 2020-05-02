@@ -5,51 +5,51 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 public class BPMProcessFactoryProperties {
 
-	@Parameter
-	private String processDefinitionKey;
-	
-	@Parameter
-	@Optional
-	private String uniqueBusinessKey;
-	
-	@Parameter
-	@Optional
-	private String tenantId;
+    @Parameter
+    private String processDefinitionKey;
 
-	@Parameter
-	@Optional
-	private String processName;
+    @Parameter
+    @Optional
+    private String uniqueBusinessKey;
 
-	public String getProcessDefinitionKey() {
-		return processDefinitionKey;
-	}
+    @Parameter
+    @Optional
+    private String tenantId;
 
-	public void setProcessDefinitionKey(String processDefinitionKey) {
-		this.processDefinitionKey = processDefinitionKey;
-	}
+    @Parameter
+    @Optional
+    private String processName;
 
-	public String getUniqueBusinessKey() {
-		return uniqueBusinessKey;
-	}
+    public String getProcessDefinitionKey() {
+        return processDefinitionKey;
+    }
 
-	public void setUniqueBusinessKey(String uniqueBusinessKey) {
-		this.uniqueBusinessKey = uniqueBusinessKey;
-	}
+    public void setProcessDefinitionKey(String processDefinitionKey) {
+        this.processDefinitionKey = processDefinitionKey;
+    }
 
-	public String getTenantId() {
-		return tenantId;
-	}
+    public String getUniqueBusinessKey() {
+        return uniqueBusinessKey;
+    }
 
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
-	}
+    public void setUniqueBusinessKey(String uniqueBusinessKey) {
+        this.uniqueBusinessKey = uniqueBusinessKey;
+    }
 
-	public String getProcessName() {
-		return processName;
-	}
+    public String getTenantId() {
+        return tenantId;
+    }
 
-	public void setProcessName(String processName) {
-		this.processName = processName;
-	}
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getProcessName() {
+        return processName;
+    }
+
+    public void setProcessName(String processName) {
+        this.processName = processName;
+    }
 
 }

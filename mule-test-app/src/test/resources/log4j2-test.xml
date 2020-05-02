@@ -21,7 +21,7 @@
 		<AsyncLogger name="org.flowable.mule" level="DEBUG" />
 
         <!--  BPM extension -->
-        <AsyncLogger name="com.alfame.esb.bpm.connector" level="INFO"/>
+        <AsyncLogger name="com.alfame.esb.bpm.connector" level="DEBUG"/>
 
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>

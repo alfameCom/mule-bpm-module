@@ -9,13 +9,13 @@ import java.io.Serializable;
 
 public class BPMTaskListenerErrorResponseBuilder {
 
-	@Parameter
-	@Content( primary = true )
-	@Optional( defaultValue = "false" )
-	private TypedValue< Serializable > value;
+    @Parameter
+    @Content(primary = true)
+    @Optional(defaultValue = "false")
+    private TypedValue<Serializable> value;
 
-	public TypedValue< Serializable > getValue() {
-		return value;
-	}
+    public TypedValue<Serializable> getValue() {
+        return value;
+    }
 
 }

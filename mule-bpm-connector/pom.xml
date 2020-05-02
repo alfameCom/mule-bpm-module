@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Alfame ESB - Mule BPM Connector</name>
+    <name>Mule BPM Connector</name>
 
-    <groupId>com.alfame.esb</groupId>
+    <groupId>com.alfame.esb.bpm</groupId>
     <artifactId>mule-bpm-connector</artifactId>
     <version>2.1.0-SNAPSHOT</version>
     <packaging>mule-extension</packaging>
@@ -16,55 +17,54 @@
         <version>1.1.7</version>
     </parent>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.alfame.esb.bpm</groupId>
+                <artifactId>mule-bpm-root</artifactId>
+                <version>2.1.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
-            <groupId>com.alfame.esb</groupId>
-            <artifactId>mule-bpm-queue</artifactId>
-            <version>2.0.0-SNAPSHOT</version>
+            <groupId>com.alfame.esb.bpm</groupId>
+            <artifactId>mule-bpm-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.alfame.esb</groupId>
-            <artifactId>mule-bpm-api</artifactId>
-            <version>2.0.0-SNAPSHOT</version>
+            <groupId>com.alfame.esb.bpm</groupId>
+            <artifactId>mule-bpm-task-queue</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alfame.esb.bpm</groupId>
+            <artifactId>mule-bpm-flowable-activity</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine</artifactId>
-            <version>6.4.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-mule4</artifactId>
-            <version>6.4.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
-        </dependency>
-		<dependency>
-			<groupId>com.zaxxer</groupId>
-			<artifactId>HikariCP</artifactId>
-			<version>3.3.1</version>
-		</dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-scripting-module</artifactId>
-            <version>1.1.6</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.199</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -84,4 +84,5 @@
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </pluginRepository>
     </pluginRepositories>
+	
 </project>

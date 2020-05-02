@@ -6,10 +6,10 @@ import org.mule.runtime.extension.api.annotation.Extensible;
 @Extensible
 public abstract class BPMDefinition {
 
-	public abstract String getType();
-	
-	public abstract String getResourceName();
-	
-	public abstract void addToDeploymentBuilder( DeploymentBuilder deploymentBuilder );
+    public abstract String getType();
+
+    public abstract String getResourceName();
+
+    public abstract void addToDeploymentBuilder(DeploymentBuilder deploymentBuilder);
 
 }

@@ -5,11 +5,15 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 
 public interface BPMEngineDetails {
-	
-	public String getName();
-	public String getDefaultTenantId();
-	public RuntimeService getRuntimeService();
-	public HistoryService getHistoryService();
-	public TaskService getTaskService();
-	
+
+    public String getName();
+
+    public String getDefaultTenantId();
+
+    public RuntimeService getRuntimeService();
+
+    public HistoryService getHistoryService();
+
+    public TaskService getTaskService();
+
 }

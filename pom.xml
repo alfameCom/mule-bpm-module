@@ -1,35 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<name>Alfame ESB</name>
+    <name>Mule BPM Root</name>
 
-	<groupId>com.alfame.esb</groupId>
-	<artifactId>mule-esb</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
+    <groupId>com.alfame.esb.bpm</groupId>
+    <artifactId>mule-bpm-root</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-	<modules>
-		<module>flowable-mule4</module>
-		<module>mule-bpm-queue</module>
-		<module>mule-bpm-api</module>
-		<module>mule-bpm-connector</module>
-		<module>mule-app-parents</module>
-  </modules>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>default-deploy</id>
-						<phase>none</phase>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+    <properties>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <mule.version>4.2.0</mule.version>
+        <mule.api.version>1.2.0</mule.api.version>
+        <flowable.version>6.4.1</flowable.version>
+        <hikari.version>3.4.3</hikari.version>
+        <h2.version>1.4.199</h2.version>
+        <commons.logging.version>1.2</commons.logging.version>
+    </properties>
+
+    <modules>
+        <module>mule-bpm-api</module>
+        <module>mule-bpm-task-queue</module>
+        <module>mule-bpm-flowable-activity</module>
+        <module>mule-bpm-connector</module>
+        <module>mule-app-parents</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.alfame.esb.bpm</groupId>
+                <artifactId>mule-bpm-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alfame.esb.bpm</groupId>
+                <artifactId>mule-bpm-task-queue</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alfame.esb.bpm</groupId>
+                <artifactId>mule-bpm-flowable-activity</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-core</artifactId>
+                <version>${mule.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-api</artifactId>
+                <version>${mule.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.tests</groupId>
+                <artifactId>mule-tests-functional</artifactId>
+                <version>${mule.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-engine</artifactId>
+                <version>${flowable.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikari.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons.logging.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>mulesoft-releases</id>
+            <name>MuleSoft Releases Repository</name>
+            <url>https://repository.mulesoft.org/releases/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
 </project>

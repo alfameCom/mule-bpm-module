@@ -7,21 +7,21 @@
     </Appenders>
 
     <Loggers>
-    
+
         <!-- Http Logger shows wire traffic on DEBUG. -->
         <!--AsyncLogger name="org.mule.service.http.impl.service.HttpMessageLogger" level="DEBUG" /-->
         <AsyncLogger name="org.mule.service.http" level="WARN"/>
         <AsyncLogger name="org.mule.extension.http" level="WARN"/>
-    
-		<!-- Mule logger -->        
+
+        <!-- Mule logger -->
         <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
-        
+
         <!--  Flowable logger -->
         <AsyncLogger name="org.flowable.job.service.impl.asyncexecutor" level="DEBUG"/>
 
         <!--  BPM extension -->
         <AsyncLogger name="com.alfame.esb.bpm.connector" level="DEBUG"/>
-        
+
         <AsyncLogger name="org.flowable.mule" level="DEBUG"/>
 
         <AsyncRoot level="INFO">

@@ -9,37 +9,38 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class BPMTaskListenerEndpointDescriptor {
 
-	@Parameter
-	private String endpointUrl;
+    @Parameter
+    private String endpointUrl;
 
-	@Parameter
-	@Optional( defaultValue = "5" )
-	private int timeout;
+    @Parameter
+    @Optional(defaultValue = "5")
+    private int timeout;
 
-	@Parameter
-	@Optional( defaultValue = "MINUTES" )
-	private TimeUnit timeoutUnit = MINUTES;
+    @Parameter
+    @Optional(defaultValue = "MINUTES")
+    private TimeUnit timeoutUnit = MINUTES;
 
-	public BPMTaskListenerEndpointDescriptor() {}
+    public BPMTaskListenerEndpointDescriptor() {
+    }
 
-	public BPMTaskListenerEndpointDescriptor( String endpointUrl ) {
-		this.endpointUrl = endpointUrl;
-	}
+    public BPMTaskListenerEndpointDescriptor(String endpointUrl) {
+        this.endpointUrl = endpointUrl;
+    }
 
-	public String getEndpointUrl() {
-		return endpointUrl;
-	}
+    public String getEndpointUrl() {
+        return endpointUrl;
+    }
 
-	public int getTimeout() {
-		return timeout;
-	}
+    public int getTimeout() {
+        return timeout;
+    }
 
-	public TimeUnit getTimeoutUnit() {
-		return timeoutUnit;
-	}
+    public TimeUnit getTimeoutUnit() {
+        return timeoutUnit;
+    }
 
-	public long getQueueTimeoutInMillis() {
-		return timeoutUnit.toMillis( timeout );
-	}
+    public long getQueueTimeoutInMillis() {
+        return timeoutUnit.toMillis(timeout);
+    }
 
 }
