@@ -22,7 +22,7 @@
 		</bean>
 		
 		<bean name="bpmEngine" class="com.alfame.esb.bpm.api.BPMEnginePool" 
-			factory-method="instance" depends-on="BPM_Config" lazy-init="true">
+			factory-method="getInstance" depends-on="BPM_Config" lazy-init="true">
 			<constructor-arg value="BPM_Config" />
 		</bean>
 		
