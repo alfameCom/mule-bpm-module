@@ -26,7 +26,7 @@ public class BPMProcessFactoryOperations {
 
         BPMProcessInstance processInstance = null;
 
-        BPMProcessInstanceBuilderImpl instanceBuilder = new BPMProcessInstanceBuilderImpl(engine);
+        BPMProcessInstanceBuilderImpl instanceBuilder = new BPMProcessInstanceBuilderImpl(engine, engine.getRuntimeService());
 
         processInstance = instanceBuilder
                 .processDefinitionKey(properties.getProcessDefinitionKey())

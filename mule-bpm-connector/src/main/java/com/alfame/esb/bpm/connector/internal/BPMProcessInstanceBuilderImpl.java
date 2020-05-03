@@ -1,8 +1,10 @@
 package com.alfame.esb.bpm.connector.internal;
 
+import com.alfame.esb.bpm.api.BPMEngine;
 import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.api.BPMProcessInstanceBuilder;
 import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessInstanceProxy;
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.slf4j.Logger;
 
@@ -12,15 +14,17 @@ public class BPMProcessInstanceBuilderImpl extends BPMProcessInstanceBuilder {
 
     private static final Logger LOGGER = getLogger(BPMProcessInstanceBuilderImpl.class);
 
-    private BPMEngineDetails engineDetails;
+    private final BPMEngine engine;
+    private final RuntimeService runtimeService;
 
-    public BPMProcessInstanceBuilderImpl(BPMEngineDetails engineDetails) {
-        this.engineDetails = engineDetails;
+    public BPMProcessInstanceBuilderImpl(BPMEngine engine, RuntimeService runtimeService) {
+        this.engine = engine;
+        this.runtimeService = runtimeService;
     }
 
     @Override
     public BPMProcessInstance startProcessInstance() {
-        ProcessInstanceBuilder instanceBuilder = this.engineDetails.getRuntimeService().createProcessInstanceBuilder();
+        ProcessInstanceBuilder instanceBuilder = this.runtimeService.createProcessInstanceBuilder();
 
         LOGGER.debug("Starting process instance with definition key: " + this.processDefinitionKey);
         instanceBuilder = instanceBuilder.processDefinitionKey(this.processDefinitionKey);
@@ -28,7 +32,7 @@ public class BPMProcessInstanceBuilderImpl extends BPMProcessInstanceBuilder {
         if (this.tenantId != null) {
             instanceBuilder = instanceBuilder.tenantId(this.tenantId);
         } else {
-            instanceBuilder = instanceBuilder.tenantId(this.engineDetails.getDefaultTenantId());
+            instanceBuilder = instanceBuilder.tenantId(this.engine.getDefaultTenantId());
         }
 
         if (this.uniqueBusinessKey != null) {

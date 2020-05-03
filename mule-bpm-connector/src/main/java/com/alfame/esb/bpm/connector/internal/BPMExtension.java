@@ -67,7 +67,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @ExternalLib(name = "BPM Flowable Activity", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-flowable-activity:2.1.0-SNAPSHOT", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 @ExternalLib(name = "BPM Task Queue", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-task-queue:2.1.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.queue.BPMTaskQueueFactory")
 @ExternalLib(name = "BPM API", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-api:2.1.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
-public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initialisable, Startable, Stoppable, TenantInfoHolder, TenantAwareAsyncExecutorFactory {
+public class BPMExtension extends BPMEngine implements Initialisable, Startable, Stoppable, TenantInfoHolder, TenantAwareAsyncExecutorFactory {
 
     private static final Logger LOGGER = getLogger(BPMExtension.class);
 
@@ -122,7 +122,7 @@ public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initial
 
     private MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration;
     private ProcessEngine processEngine;
-    private Collection<String> registeredTenantIds = new ArrayList<String>();
+    private Collection<String> registeredTenantIds = new ArrayList<>();
     private String currentTenantId;
     private TenantAwareAsyncExecutor asyncExecutor;
 
@@ -254,7 +254,7 @@ public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initial
     }
 
     public BPMProcessInstanceBuilder processInstanceBuilder() {
-        return new BPMProcessInstanceBuilderImpl(this);
+        return new BPMProcessInstanceBuilderImpl(this, this.getRuntimeService());
     }
 
     public BPMVariableInstance getVariableInstance(String executionId, String variableName) {
