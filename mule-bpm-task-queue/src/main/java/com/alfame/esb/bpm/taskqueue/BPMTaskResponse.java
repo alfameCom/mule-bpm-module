@@ -8,31 +8,31 @@ import java.util.Map;
 public class BPMTaskResponse {
 
     private final Object value;
-    private final Throwable throwable;
+    private final Throwable error;
     private Map<String, Object> variablesToUpdate = new HashMap<>();
     private List<String> variablesToRemove = new ArrayList<>();
 
     public BPMTaskResponse(Object value) {
         this.value = value;
-        this.throwable = null;
+        this.error = null;
     }
 
-    public BPMTaskResponse(Throwable throwable) {
+    public BPMTaskResponse(Throwable error) {
         this.value = null;
-        this.throwable = throwable;
+        this.error = error;
     }
 
-    public BPMTaskResponse(Object value, Throwable throwable) {
+    public BPMTaskResponse(Object value, Throwable error) {
         this.value = value;
-        this.throwable = throwable;
+        this.error = error;
     }
 
     public Object getValue() {
         return value;
     }
 
-    public Throwable getThrowable() {
-        return throwable;
+    public Throwable getError() {
+        return error;
     }
 
     public Map<String, Object> getVariablesToUpdate() {

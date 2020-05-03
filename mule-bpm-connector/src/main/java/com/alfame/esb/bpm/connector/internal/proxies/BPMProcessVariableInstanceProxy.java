@@ -1,4 +1,4 @@
-package com.alfame.esb.bpm.connector.internal.operations;
+package com.alfame.esb.bpm.connector.internal.proxies;
 
 import com.alfame.esb.bpm.api.BPMVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -59,6 +59,11 @@ public class BPMProcessVariableInstanceProxy implements BPMVariableInstance {
     @Override
     public String getTypeName() {
         return this.variableInstance.getTypeName();
+    }
+
+    @Override
+    public Object getValue() {
+        return this.variableInstance.getValue();
     }
 
 }

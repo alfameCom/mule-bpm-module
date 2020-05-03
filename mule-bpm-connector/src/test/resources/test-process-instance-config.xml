@@ -1,0 +1,35 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+
+    <bpm:config name="engineConfig" defaultTenantId="com.alfame.esb">
+        <bpm:default-data-source>
+            <bpm:generic-data-source driverClassName="org.h2.Driver"
+                                     jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1"
+                                     username="sa"
+                                     password="sa"
+                                     type="h2"/>
+        </bpm:default-data-source>
+        <bpm:definitions>
+            <bpm:classpath-definition resourceClasspath="processes/TestProcess.bpmn20.xml"/>
+        </bpm:definitions>
+        <bpm:default-async-executor/>
+    </bpm:config>
+
+    <flow name="startTestProcessFlow">
+        <bpm:process-factory config-ref="engineConfig" processDefinitionKey="testProcess" tenantId="com.alfame.esb"/>
+
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="testTaskFlow">
+        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://test.task"/>
+
+        <logger level="INFO" message="#[payload]"/>
+
+        <set-payload value="true"/>
+    </flow>
+
+</mule>

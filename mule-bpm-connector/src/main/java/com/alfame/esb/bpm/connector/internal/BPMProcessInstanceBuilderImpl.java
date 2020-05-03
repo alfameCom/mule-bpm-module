@@ -1,23 +1,25 @@
 package com.alfame.esb.bpm.connector.internal;
 
-import com.alfame.esb.bpm.api.BPMProcessBuilder;
+import com.alfame.esb.bpm.api.BPMProcessInstance;
+import com.alfame.esb.bpm.api.BPMProcessInstanceBuilder;
+import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessInstanceProxy;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BPMProcessBuilderImpl extends BPMProcessBuilder {
+public class BPMProcessInstanceBuilderImpl extends BPMProcessInstanceBuilder {
 
-    private static final Logger LOGGER = getLogger(BPMProcessBuilderImpl.class);
+    private static final Logger LOGGER = getLogger(BPMProcessInstanceBuilderImpl.class);
 
     private BPMEngineDetails engineDetails;
 
-    public BPMProcessBuilderImpl(BPMEngineDetails engineDetails) {
+    public BPMProcessInstanceBuilderImpl(BPMEngineDetails engineDetails) {
         this.engineDetails = engineDetails;
     }
 
     @Override
-    public Object startProcessInstance() {
+    public BPMProcessInstance startProcessInstance() {
         ProcessInstanceBuilder instanceBuilder = this.engineDetails.getRuntimeService().createProcessInstanceBuilder();
 
         LOGGER.debug("Starting process instance with definition key: " + this.processDefinitionKey);
@@ -41,7 +43,7 @@ public class BPMProcessBuilderImpl extends BPMProcessBuilder {
             instanceBuilder = instanceBuilder.variables(this.variables);
         }
 
-        return instanceBuilder.start();
+        return new BPMProcessInstanceProxy(instanceBuilder.start());
     }
 
 }

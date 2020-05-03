@@ -6,9 +6,11 @@ public abstract class BPMEngine {
 
     public abstract String getDefaultTenantId();
 
-    public abstract BPMProcessBuilder processInstanceBuilder();
+    public abstract BPMProcessInstanceBuilder processInstanceBuilder();
 
-    public abstract Object getVariableInstance(String executionId, String variableName);
+    public abstract BPMVariableInstance getVariableInstance(String executionId, String variableName);
+
+    public abstract BPMVariableInstance getHistoricVariableInstance(String executionId, String variableName);
 
     public abstract void setVariable(String executionId, String variableName, Object content);
 

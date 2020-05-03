@@ -2,8 +2,7 @@ package com.alfame.esb.bpm.connector.internal.operations;
 
 import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
-import com.alfame.esb.bpm.connector.internal.BPMProcessBuilderImpl;
-import org.flowable.engine.runtime.ProcessInstance;
+import com.alfame.esb.bpm.connector.internal.BPMProcessInstanceBuilderImpl;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -25,22 +24,20 @@ public class BPMProcessFactoryOperations {
             @Config BPMExtension engine
     ) {
 
-        ProcessInstance instance = null;
+        BPMProcessInstance processInstance = null;
 
-        BPMProcessBuilderImpl instanceBuilder = new BPMProcessBuilderImpl(engine);
+        BPMProcessInstanceBuilderImpl instanceBuilder = new BPMProcessInstanceBuilderImpl(engine);
 
-        instance = (ProcessInstance) instanceBuilder
+        processInstance = instanceBuilder
                 .processDefinitionKey(properties.getProcessDefinitionKey())
                 .tenantId(properties.getTenantId())
                 .uniqueBusinessKey(properties.getUniqueBusinessKey())
                 .processInstanceName(properties.getProcessName())
                 .startProcessInstance();
 
-        BPMProcessFactoryProcessInstanceProxy instanceProxy = new BPMProcessFactoryProcessInstanceProxy(instance);
+        LOGGER.debug("Started process instance " + processInstance.getProcessInstanceId());
 
-        LOGGER.debug("Started process instance " + instanceProxy.getProcessInstanceId());
-
-        return instanceProxy;
+        return processInstance;
 
     }
 

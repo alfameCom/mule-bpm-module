@@ -1,9 +1,9 @@
 package com.alfame.esb.bpm.connector.internal.operations;
 
+import com.alfame.esb.bpm.api.BPMVariableAttributes;
 import com.alfame.esb.bpm.api.BPMVariableInstance;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
 import com.alfame.esb.bpm.connector.internal.connection.BPMConnection;
-import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -30,21 +30,21 @@ public class BPMProcessVariableOperations {
     @Alias("get-variable")
     @MediaType(value = ANY, strict = false)
     @OutputResolver(output = BPMProcessVariableOutputMetadataResolver.class, attributes = BPMProcessVariableAttributesMetadataResolver.class)
-    public Result<Object, BPMVariableInstance> getVariable(
+    public Result<Object, BPMVariableAttributes> getVariable(
             @Config BPMExtension config,
             @Connection BPMConnection connection,
             @DisplayName("Variable name") String variableName
     ) {
-        Builder<Object, BPMVariableInstance> resultBuilder = Result.builder();
+        Builder<Object, BPMVariableAttributes> resultBuilder = Result.builder();
 
-        VariableInstance variableInstance = (VariableInstance) config.getVariableInstance(
+        BPMVariableInstance variableInstance = config.getVariableInstance(
                 connection.getTask().getProcessInstanceId(), variableName);
 
         if (variableInstance != null) {
             LOGGER.debug("Variable " + variableName + " found for process " + connection.getTask().getProcessInstanceId());
 
             resultBuilder.output(variableInstance.getValue());
-            resultBuilder.attributes(new BPMProcessVariableInstanceProxy(variableInstance));
+            resultBuilder.attributes(variableInstance);
         } else {
             LOGGER.debug("Variable " + variableName + " not found for process " + connection.getTask().getProcessInstanceId());
         }

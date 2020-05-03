@@ -2,12 +2,15 @@ package com.alfame.esb.bpm.connector.internal;
 
 import com.alfame.esb.bpm.api.BPMEngine;
 import com.alfame.esb.bpm.api.BPMEnginePool;
-import com.alfame.esb.bpm.api.BPMProcessBuilder;
+import com.alfame.esb.bpm.api.BPMProcessInstanceBuilder;
+import com.alfame.esb.bpm.api.BPMVariableInstance;
 import com.alfame.esb.bpm.connector.api.config.*;
 import com.alfame.esb.bpm.connector.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.bpm.connector.internal.listener.BPMTaskListener;
 import com.alfame.esb.bpm.connector.internal.operations.BPMProcessFactoryOperations;
 import com.alfame.esb.bpm.connector.internal.operations.BPMProcessVariableOperations;
+import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessHistoricVariableInstanceProxy;
+import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessVariableInstanceProxy;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.*;
@@ -17,6 +20,9 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutorFactory;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -176,7 +182,7 @@ public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initial
             this.asyncExecutor.start();
         }
 
-        BPMEnginePool.register(this.name, this);
+        BPMEnginePool.registerInstance(this.name, this);
 
         LOGGER.info(this.name + " has been started");
     }
@@ -185,7 +191,7 @@ public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initial
     public void stop() throws MuleException {
         LOGGER.info(this.name + " is going to shutdown");
 
-        BPMEnginePool.unregister(this.name);
+        BPMEnginePool.unregisterInstance(this.name);
 
         this.asyncExecutor.shutdown();
         this.processEngine.close();
@@ -247,12 +253,31 @@ public class BPMExtension extends BPMEngine implements BPMEngineDetails, Initial
         return this.processEngine.getTaskService();
     }
 
-    public BPMProcessBuilder processInstanceBuilder() {
-        return new BPMProcessBuilderImpl(this);
+    public BPMProcessInstanceBuilder processInstanceBuilder() {
+        return new BPMProcessInstanceBuilderImpl(this);
     }
 
-    public Object getVariableInstance(String executionId, String variableName) {
-        return this.getRuntimeService().getVariableInstance(executionId, variableName);
+    public BPMVariableInstance getVariableInstance(String executionId, String variableName) {
+        BPMProcessVariableInstanceProxy variableInstanceProxy = null;
+
+        VariableInstance variableInstance = this.getRuntimeService().getVariableInstance(executionId, variableName);
+        if (variableInstance != null) {
+            variableInstanceProxy = new BPMProcessVariableInstanceProxy(variableInstance);
+        }
+        return variableInstanceProxy;
+    }
+
+    public BPMVariableInstance getHistoricVariableInstance(String executionId, String variableName) {
+        BPMProcessHistoricVariableInstanceProxy historicVariableInstanceProxy = null;
+        HistoricVariableInstanceQuery variableQuery = this.getHistoryService().createHistoricVariableInstanceQuery()
+                .executionId(executionId).variableName(variableName);
+
+        HistoricVariableInstance historicVariableInstance = variableQuery.singleResult();
+        if (historicVariableInstance != null) {
+            historicVariableInstanceProxy = new BPMProcessHistoricVariableInstanceProxy(historicVariableInstance);
+        }
+
+        return historicVariableInstanceProxy;
     }
 
     public void setVariable(String executionId, String variableName, Object content) {

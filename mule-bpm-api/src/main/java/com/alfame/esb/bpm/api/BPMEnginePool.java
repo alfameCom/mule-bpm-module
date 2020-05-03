@@ -15,17 +15,17 @@ public class BPMEnginePool {
     public BPMEnginePool() {
     }
 
-    public static void register(String configName, BPMEngine engine) {
+    public static void registerInstance(String configName, BPMEngine engine) {
         logger.debug("Adding to pool " + configName);
         engines.put(configName, engine);
     }
 
-    public static void unregister(String configName) {
+    public static void unregisterInstance(String configName) {
         logger.debug("Removing from pool " + configName);
         engines.remove(configName);
     }
 
-    public static BPMEngine instance(String configName) {
+    public static BPMEngine getInstance(String configName) {
         logger.debug("Returning from pool " + configName);
         return engines.get(configName);
     }

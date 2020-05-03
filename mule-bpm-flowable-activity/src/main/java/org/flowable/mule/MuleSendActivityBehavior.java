@@ -132,9 +132,9 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
                         logger.trace("<<<<< " + execution.getProcessDefinitionId() + " / " + execution.getCurrentActivityId() + ": " + execution.getProcessInstanceId() + ": variable " + resultVariableValue + "=" + response.getValue());
                         execution.setVariable(resultVariableValue, response.getValue());
                     }
-                    if (response.getThrowable() != null) {
-                        logger.debug("<<<<< " + execution.getProcessDefinitionId() + " / " + execution.getCurrentActivityId() + ": " + execution.getProcessInstanceId(), response.getThrowable());
-                        throw new RuntimeException(response.getThrowable());
+                    if (response.getError() != null) {
+                        logger.debug("<<<<< " + execution.getProcessDefinitionId() + " / " + execution.getCurrentActivityId() + ": " + execution.getProcessInstanceId(), response.getError());
+                        throw new RuntimeException(response.getError());
                     }
                 } catch (InterruptedException e) {
                     logger.debug("<<<<< " + execution.getProcessDefinitionId() + " / " + execution.getCurrentActivityId() + ": " + execution.getProcessInstanceId(), e);
