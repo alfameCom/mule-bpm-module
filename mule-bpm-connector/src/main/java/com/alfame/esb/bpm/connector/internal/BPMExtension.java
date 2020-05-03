@@ -1,9 +1,6 @@
 package com.alfame.esb.bpm.connector.internal;
 
-import com.alfame.esb.bpm.api.BPMEngine;
-import com.alfame.esb.bpm.api.BPMEnginePool;
-import com.alfame.esb.bpm.api.BPMProcessInstanceBuilder;
-import com.alfame.esb.bpm.api.BPMVariableInstance;
+import com.alfame.esb.bpm.api.*;
 import com.alfame.esb.bpm.connector.api.config.*;
 import com.alfame.esb.bpm.connector.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.bpm.connector.internal.listener.BPMTaskListener;
@@ -255,6 +252,10 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
     public BPMProcessInstanceBuilder processInstanceBuilder() {
         return new BPMProcessInstanceBuilderImpl(this, this.getRuntimeService());
+    }
+
+    public BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder() {
+        return new BPMEngineEventSubscriptionBuilderImpl(this, this.getRuntimeService());
     }
 
     public BPMVariableInstance getVariableInstance(String executionId, String variableName) {
