@@ -42,7 +42,7 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 		<logger level="INFO" message="#[attributes.processInstanceId]" doc:id="13bd9b52-211b-49a8-a5a5-a9a6259d0482"/>
 		
 		<java:invoke doc:name="Invoke" doc:id="96ac1de6-9f5b-43e6-aeb9-66fe0621c93d" 
-			class="com.alfame.esb.test.TestComponent" instance="testComponent" method="startProcess()"/>
+			class="com.alfame.esb.test.TestComponent" instance="testComponent" method="startProcessInstance()"/>
 		<logger level="INFO" message="#[payload.processInstanceId]" />
 		
 		<bpm:set-variable variableName="test" config-ref="BPM_Config" transactionalAction="ALWAYS_JOIN">

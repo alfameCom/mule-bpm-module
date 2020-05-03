@@ -20,7 +20,7 @@ public class TestComponent {
 	@Autowired
 	private BPMEngine bpmEngine;
 	
-	public Object startProcess() {
+	public Object startProcessInstance() {
 		Map< String, Object > variables = new HashMap< String, Object >();
 		variables.put( "correct", "To be seen" );
 		variables.put( "incorrect", "NOT to be seen" );
