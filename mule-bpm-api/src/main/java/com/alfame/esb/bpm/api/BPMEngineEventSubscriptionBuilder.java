@@ -38,12 +38,8 @@ public abstract class BPMEngineEventSubscriptionBuilder {
         return this;
     }
 
-    public abstract void subscribeForEvents();
+    public abstract BPMEngineEventSubscription subscribeForEvents();
 
-    public abstract void subscribeForEvents(BPMEngineEventListener engineEventListener);
-
-    public abstract void unsubscribeForEvents();
-
-    public abstract List<BPMEngineEvent> waitAndUnsubscribeForEvents(int numberOfEvents, long timeout, TimeUnit timeUnit) throws InterruptedException;
+    public abstract BPMEngineEventSubscription subscribeForEvents(BPMEngineEventListener engineEventListener);
 
 }

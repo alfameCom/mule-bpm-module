@@ -1,9 +1,6 @@
 package com.alfame.esb.bpm.connector.internal;
 
-import com.alfame.esb.bpm.api.BPMEngine;
-import com.alfame.esb.bpm.api.BPMEngineEvent;
-import com.alfame.esb.bpm.api.BPMEngineEventListener;
-import com.alfame.esb.bpm.api.BPMEngineEventSubscriptionBuilder;
+import com.alfame.esb.bpm.api.*;
 import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessEngineEventProxy;
 import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessVariableEventProxy;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -22,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionBuilder implements FlowableEventListener {
+public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionBuilder implements BPMEngineEventSubscription, FlowableEventListener {
 
     private static final Logger LOGGER = getLogger(BPMEngineEventSubscriptionBuilderImpl.class);
 
@@ -40,7 +37,7 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
     }
 
     @Override
-    public void subscribeForEvents() {
+    public BPMEngineEventSubscription subscribeForEvents() {
         try {
             this.cacheLock.lock();
             this.cachedEvents = new ArrayList<>();
@@ -48,15 +45,19 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
         } finally {
             this.cacheLock.unlock();
         }
+
+        return this;
     }
 
     @Override
-    public void subscribeForEvents(BPMEngineEventListener engineEventListener) {
+    public BPMEngineEventSubscription subscribeForEvents(BPMEngineEventListener engineEventListener) {
         if (this.subscribedForEvents != true) {
             this.engineEventListener = engineEventListener;
             this.runtimeService.addEventListener(this);
             this.subscribedForEvents = true;
         }
+
+        return this;
     }
 
     @Override
@@ -90,7 +91,6 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
             try {
                 this.cacheLock.lock();
                 events = this.cachedEvents;
-                this.cachedEvents = null;
             } finally {
                 this.cacheLock.unlock();
             }
@@ -195,5 +195,22 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
         }
 
         return isSubscribedEvent;
+    }
+
+    public BPMEngineEvent uniqueEventByEventType(BPMEngineEventType eventType) {
+        BPMEngineEvent uniqueEvent = null;
+
+        if (this.cachedEvents != null) {
+            for (BPMEngineEvent event : this.cachedEvents) {
+                if (event.getType().equals(eventType)) {
+                    if (uniqueEvent != null) {
+                        throw new java.lang.IndexOutOfBoundsException("Multiple events found with event type " + eventType.getValue());
+                    }
+                    uniqueEvent = event;
+                }
+            }
+        }
+
+        return uniqueEvent;
     }
 }
