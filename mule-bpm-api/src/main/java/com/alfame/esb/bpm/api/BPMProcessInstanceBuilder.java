@@ -1,5 +1,6 @@
 package com.alfame.esb.bpm.api;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class BPMProcessInstanceBuilder {
@@ -8,7 +9,7 @@ public abstract class BPMProcessInstanceBuilder {
     protected String tenantId;
     protected String uniqueBusinessKey;
     protected String processInstanceName;
-    protected Map<String, Object> variables;
+    protected Map<String, Object> variables = new HashMap<>();
 
     public BPMProcessInstanceBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
@@ -30,8 +31,13 @@ public abstract class BPMProcessInstanceBuilder {
         return this;
     }
 
-    public BPMProcessInstanceBuilder variables(Map<String, Object> variables) {
-        this.variables = variables;
+    public BPMProcessInstanceBuilder variable(String variableName) {
+        variableWithValue(variableName, null);
+        return this;
+    }
+
+    public BPMProcessInstanceBuilder variableWithValue(String variableName, Object value) {
+        this.variables.put(variableName, value);
         return this;
     }
 
