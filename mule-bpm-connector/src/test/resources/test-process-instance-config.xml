@@ -22,7 +22,7 @@
         <bpm:process-factory config-ref="engineConfig" processDefinitionKey="testProcess" tenantId="com.alfame.esb">
             <bpm:process-variables>
                 <bpm:process-variable variableName="factory-variable" value="#[1 + 2]" />
-                <bpm:process-variable variableName="factory-variable2" />
+                <bpm:process-variable variableName="factory-variable2" value="#['a value']" />
             </bpm:process-variables>
         </bpm:process-factory>
 
