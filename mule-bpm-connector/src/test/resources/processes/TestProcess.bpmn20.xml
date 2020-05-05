@@ -2,7 +2,7 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
   <process id="testProcess" name="TestProcess" isExecutable="true">
     <startEvent id="startEvent1" flowable:formFieldValidation="true"></startEvent>
-    <serviceTask id="sid-415A1553-EADF-49CE-A9C2-F8466311EAEF" name="Test Mule Task" flowable:type="mule">
+    <serviceTask id="testMuleTask" name="Test Mule Task" flowable:type="mule">
       <extensionElements>
         <flowable:field name="endpointUrl">
           <flowable:string><![CDATA[bpm://test.task]]></flowable:string>
@@ -18,19 +18,19 @@
         </flowable:field>
       </extensionElements>
     </serviceTask>
-    <sequenceFlow id="sid-688E9CA7-8CD9-4267-A604-E1319016A2A9" sourceRef="startEvent1" targetRef="sid-415A1553-EADF-49CE-A9C2-F8466311EAEF"></sequenceFlow>
-    <endEvent id="sid-2B90EA4E-019B-4430-ACF1-8E654CDADCE0"></endEvent>
-    <sequenceFlow id="sid-96F9C2E1-439B-49F2-8FB1-CCAE732B32B1" sourceRef="sid-415A1553-EADF-49CE-A9C2-F8466311EAEF" targetRef="sid-2B90EA4E-019B-4430-ACF1-8E654CDADCE0"></sequenceFlow>
+    <sequenceFlow id="sid-688E9CA7-8CD9-4267-A604-E1319016A2A9" sourceRef="startEvent1" targetRef="testMuleTask"></sequenceFlow>
+    <endEvent id="endEvent1"></endEvent>
+    <sequenceFlow id="sid-96F9C2E1-439B-49F2-8FB1-CCAE732B32B1" sourceRef="testMuleTask" targetRef="endEvent1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_testProcess">
     <bpmndi:BPMNPlane bpmnElement="testProcess" id="BPMNPlane_testProcess">
       <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
         <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="164.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-415A1553-EADF-49CE-A9C2-F8466311EAEF" id="BPMNShape_sid-415A1553-EADF-49CE-A9C2-F8466311EAEF">
+      <bpmndi:BPMNShape bpmnElement="testMuleTask" id="BPMNShape_testMuleTask">
         <omgdc:Bounds height="80.0" width="100.0" x="220.0" y="139.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-2B90EA4E-019B-4430-ACF1-8E654CDADCE0" id="BPMNShape_sid-2B90EA4E-019B-4430-ACF1-8E654CDADCE0">
+      <bpmndi:BPMNShape bpmnElement="endEvent1" id="BPMNShape_endEvent1">
         <omgdc:Bounds height="28.0" width="28.0" x="405.0" y="165.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="sid-688E9CA7-8CD9-4267-A604-E1319016A2A9" id="BPMNEdge_sid-688E9CA7-8CD9-4267-A604-E1319016A2A9">

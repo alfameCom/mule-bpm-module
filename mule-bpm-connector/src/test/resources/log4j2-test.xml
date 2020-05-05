@@ -17,11 +17,11 @@
         <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
 
         <!--  Flowable logger -->
+        <AsyncLogger name="org.flowable" level="INFO"/>
         <AsyncLogger name="org.flowable.job.service.impl.asyncexecutor" level="DEBUG"/>
 
         <!--  BPM extension -->
         <AsyncLogger name="com.alfame.esb.bpm.connector" level="DEBUG"/>
-
         <AsyncLogger name="org.flowable.mule" level="DEBUG"/>
 
         <AsyncRoot level="INFO">
