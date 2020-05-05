@@ -4,6 +4,7 @@ import com.alfame.esb.bpm.api.*;
 import com.alfame.esb.bpm.connector.api.config.*;
 import com.alfame.esb.bpm.connector.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.bpm.connector.internal.listener.BPMTaskListener;
+import com.alfame.esb.bpm.connector.internal.operations.BPMEventSubscriptionOperations;
 import com.alfame.esb.bpm.connector.internal.operations.BPMProcessFactoryOperations;
 import com.alfame.esb.bpm.connector.internal.operations.BPMProcessVariableOperations;
 import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessHistoricVariableInstanceProxy;
@@ -55,7 +56,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Extension(name = "BPM", vendor = "Alfame Systems")
 @Sources(BPMTaskListener.class)
 @ConnectionProviders(BPMConnectionProvider.class)
-@Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class})
+@Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class})
 @SubTypeMapping(baseType = BPMDefinition.class,
         subTypes = {BPMClasspathDefinition.class, BPMStreamDefinition.class})
 @SubTypeMapping(baseType = BPMDataSource.class,

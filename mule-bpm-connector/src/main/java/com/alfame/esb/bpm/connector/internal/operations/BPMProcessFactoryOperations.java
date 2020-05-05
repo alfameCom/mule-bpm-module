@@ -28,8 +28,7 @@ public class BPMProcessFactoryOperations {
     public BPMProcessInstance processFactory(
             @ParameterGroup(name = "properties") BPMProcessFactoryProperties properties,
             @Config BPMExtension engine,
-            @Optional @Alias("process-variables") List<BPMProcessVariable> processVariables
-    ) {
+            @Optional @Alias("process-variables") List<BPMProcessVariable> processVariables) {
 
         BPMProcessInstance processInstance = null;
 

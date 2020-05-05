@@ -57,8 +57,7 @@ public class BPMProcessVariableOperations {
             @Config BPMExtension config,
             @Connection BPMConnection connection,
             @DisplayName("Variable name") String variableName,
-            @Content @Summary("Content for variable") TypedValue<Serializable> content
-    ) throws IOException {
+            @Content @Summary("Content for variable") TypedValue<Serializable> content) throws IOException {
 
         connection.getVariablesToUpdate().put(variableName, content.getValue());
 
@@ -70,8 +69,7 @@ public class BPMProcessVariableOperations {
     public void removeVariable(
             @Config BPMExtension config,
             @Connection BPMConnection connection,
-            @DisplayName("Variable name") String variableName
-    ) {
+            @DisplayName("Variable name") String variableName) {
 
         connection.getVariablesToRemove().add(variableName);
 

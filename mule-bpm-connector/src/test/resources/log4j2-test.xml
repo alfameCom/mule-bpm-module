@@ -23,6 +23,7 @@
         <!--  BPM extension -->
         <AsyncLogger name="com.alfame.esb.bpm.connector" level="DEBUG"/>
         <AsyncLogger name="org.flowable.mule" level="DEBUG"/>
+        <AsyncLogger name="com.alfame.esb.bpm.connector.internal.BPMEngineEventSubscriptionBuilderImpl" level="TRACE"/>
 
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>
