@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -132,7 +133,7 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
 
                         if (this.countDownLatch != null) {
                             this.countDownLatch.countDown();
-                            LOGGER.debug("Received awaited event {}", engineEvent.getType());
+                            LOGGER.debug("Received awaited event {} for process instance {}", engineEvent.getType(), engineEvent.getProcessInstanceId());
                         }
                     }
                 } finally {
@@ -163,38 +164,54 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
         if (engineEvent == null) {
             isSubscribedEvent = false;
         } else {
-            if (this.eventTypes != null
-                    && !this.eventTypes.isEmpty()
-                    && engineEvent.getType() != null
-                    && !this.eventTypes.contains(engineEvent.getType())) {
+            // Filter events, if filter of any single type has been set, and any of those are not matching the event
+            if (!isSubscribedForEvent((List) this.eventTypes, engineEvent.getType())) {
                 isSubscribedEvent = false;
-            } else if (this.processDefinitionKeys != null
-                    && !this.processDefinitionKeys.isEmpty()
-                    && engineEvent.getProcessDefinitionKey() != null
-                    && !this.processDefinitionKeys.contains(engineEvent.getProcessDefinitionKey())) {
+            } else if (!isSubscribedForEvent((List) this.processDefinitionKeys, engineEvent.getProcessDefinitionKey())) {
                 isSubscribedEvent = false;
-            } else if (this.processInstanceIds != null
-                    && !this.processInstanceIds.isEmpty()
-                    && engineEvent.getProcessInstanceId() != null
-                    && !this.processInstanceIds.contains(engineEvent.getProcessInstanceId())) {
+            } else if (!isSubscribedForEvent((List) this.processInstanceIds, engineEvent.getProcessInstanceId())) {
                 isSubscribedEvent = false;
-            } else if (this.variableValues != null
-                    && !this.variableValues.isEmpty()
-                    && engineEvent.getVariableName() != null
-                    && !this.variableValues.containsKey(engineEvent.getVariableName())) {
+            } else if (!isSubscribedForEvent((Map) this.variableValues, engineEvent.getVariableName(), engineEvent.getVariableValue())) {
                 isSubscribedEvent = false;
-            } else if (this.variableValues != null
-                    && !this.variableValues.isEmpty()
-                    && engineEvent.getVariableName() != null
-                    && this.variableValues.containsKey(engineEvent.getVariableName())
-                    && this.variableValues.get(engineEvent.getVariableName()) != null) {
-                if (!this.variableValues.get(engineEvent.getVariableName()).equals(engineEvent.getVariableValue())) {
-                    isSubscribedEvent = false;
-                }
             }
         }
 
         return isSubscribedEvent;
+    }
+
+    protected boolean isSubscribedForEvent(List<Object> subscriptionKeys, Object eventKey) {
+        boolean isSubscribed = true;
+
+        // Some filters of this type have been set?
+        if (subscriptionKeys != null
+                && !subscriptionKeys.isEmpty()
+                && eventKey != null) {
+            // Filter non-matching events
+            isSubscribed = subscriptionKeys.contains(eventKey);
+        }
+
+        return isSubscribed;
+    }
+
+    protected boolean isSubscribedForEvent(Map<Object, Object> subscriptionMap, Object eventKey, Object eventValue) {
+        boolean isSubscribed = true;
+
+        // Some filters of this type have been set?
+        if (subscriptionMap != null
+                && !subscriptionMap.isEmpty()
+                && eventKey != null) {
+            // Filter non-matching events
+            if (subscriptionMap.containsKey(eventKey)) {
+                // Filter events with non-matching values
+                if (subscriptionMap.get(eventKey) != null) {
+                    isSubscribed = subscriptionMap.get(eventKey).equals(eventValue);
+                }
+            } else {
+                isSubscribed = false;
+            }
+        }
+
+        return isSubscribed;
     }
 
     public BPMEngineEvent uniqueEventByEventType(BPMEngineEventType eventType) {
