@@ -11,26 +11,20 @@ import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionBuilder implements BPMEngineEventSubscription, FlowableEventListener {
+public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionBuilder implements FlowableEventListener, BPMEngineEventSubscriptionConnection {
 
     private static final Logger LOGGER = getLogger(BPMEngineEventSubscriptionBuilderImpl.class);
 
     private final BPMEngine engine;
     private final RuntimeService runtimeService;
-    private CountDownLatch countDownLatch;
     private BPMEngineEventListener engineEventListener;
     private boolean subscribedForEvents = false;
-    private List<BPMEngineEvent> cachedEvents = null;
-    private ReentrantLock cacheLock = new ReentrantLock();
+    private BPMEngineEventSubscriptionImpl eventSubscription;
 
     public BPMEngineEventSubscriptionBuilderImpl(BPMEngine engine, RuntimeService runtimeService) {
         this.engine = engine;
@@ -38,16 +32,18 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
     }
 
     @Override
-    public BPMEngineEventSubscription subscribeForEvents() {
-        try {
-            this.cacheLock.lock();
-            this.cachedEvents = new ArrayList<>();
-            subscribeForEvents(null);
-        } finally {
-            this.cacheLock.unlock();
-        }
+    public void open() {
+        subscribeForEvents(null);
+    }
 
-        return this;
+    @Override
+    public void close() {
+        unsubscribeForEvents();
+    }
+
+    @Override
+    public BPMEngineEventSubscription subscribeForEvents() {
+        return subscribeForEvents(null);
     }
 
     @Override
@@ -55,49 +51,19 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
         if (this.subscribedForEvents != true) {
             this.engineEventListener = engineEventListener;
             this.runtimeService.addEventListener(this);
+            this.eventSubscription = new BPMEngineEventSubscriptionImpl(this.engine, this);
             this.subscribedForEvents = true;
         }
 
-        return this;
+        return this.eventSubscription;
     }
 
-    @Override
     public void unsubscribeForEvents() {
         if (this.subscribedForEvents == true) {
             this.engineEventListener = null;
             this.runtimeService.removeEventListener(this);
             this.subscribedForEvents = false;
         }
-    }
-
-    @Override
-    public List<BPMEngineEvent> waitAndUnsubscribeForEvents(int numberOfEvents, long timeout, TimeUnit timeUnit) throws InterruptedException {
-        List<BPMEngineEvent> events = null;
-
-        try {
-            subscribeForEvents(null);
-
-            try {
-                this.cacheLock.lock();
-                this.countDownLatch = new CountDownLatch(Math.max(numberOfEvents - this.cachedEvents.size(), 0));
-            } finally {
-                this.cacheLock.unlock();
-            }
-
-            LOGGER.debug("Awaiting {} events", countDownLatch.getCount());
-            this.countDownLatch.await(timeout, timeUnit);
-        } finally {
-            unsubscribeForEvents();
-
-            try {
-                this.cacheLock.lock();
-                events = this.cachedEvents;
-            } finally {
-                this.cacheLock.unlock();
-            }
-        }
-
-        return events;
     }
 
     @Override
@@ -125,20 +91,7 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
                     this.engineEventListener.handleEngineEvent(engineEvent);
                 }
 
-                try {
-                    this.cacheLock.lock();
-                    if(this.cachedEvents != null) {
-                        this.cachedEvents.add(engineEvent);
-                        LOGGER.trace("Added event {} for process instance {}", engineEvent.getType(), engineEvent.getProcessInstanceId());
-
-                        if (this.countDownLatch != null) {
-                            this.countDownLatch.countDown();
-                            LOGGER.debug("Received awaited event {} for process instance {}", engineEvent.getType(), engineEvent.getProcessInstanceId());
-                        }
-                    }
-                } finally {
-                    this.cacheLock.unlock();
-                }
+                this.eventSubscription.cachedEvent(engineEvent);
             }
         }
     }
@@ -214,20 +167,4 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
         return isSubscribed;
     }
 
-    public BPMEngineEvent uniqueEventByEventType(BPMEngineEventType eventType) {
-        BPMEngineEvent uniqueEvent = null;
-
-        if (this.cachedEvents != null) {
-            for (BPMEngineEvent event : this.cachedEvents) {
-                if (event.getType().equals(eventType)) {
-                    if (uniqueEvent != null) {
-                        throw new java.lang.IndexOutOfBoundsException("Multiple events found with event type " + eventType.getValue());
-                    }
-                    uniqueEvent = event;
-                }
-            }
-        }
-
-        return uniqueEvent;
-    }
 }
