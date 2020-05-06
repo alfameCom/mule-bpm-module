@@ -3,6 +3,7 @@ package com.alfame.esb.bpm.connector.internal.operations;
 import com.alfame.esb.bpm.api.BPMEngineEvent;
 import com.alfame.esb.bpm.api.BPMEngineEventSubscription;
 import com.alfame.esb.bpm.api.BPMEngineEventSubscriptionBuilder;
+import com.alfame.esb.bpm.api.BPMEngineEventType;
 import com.alfame.esb.bpm.connector.api.config.BPMEventSubscriptionFilter;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -47,6 +48,19 @@ public class BPMEventSubscriptionOperations {
         LOGGER.debug("Unsubscribing for events");
 
         return eventSubscription.waitAndUnsubscribeForEvents(0, 1, TimeUnit.SECONDS);
+    }
+
+    @Alias("get-unique-event-from-subscription")
+    @MediaType(value = MediaType.ANY, strict = false)
+    @OutputResolver(output = BPMEventSubscriptionEventsOutputMetadataResolver.class)
+    public BPMEngineEvent fetchUniqueSubscriptionEvent(
+            @Config BPMExtension engine,
+            @Alias("subscription") BPMEngineEventSubscription eventSubscription,
+            @Optional @Alias("event-subscription-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilter) throws InterruptedException {
+
+        LOGGER.debug("Fetching unique event");
+
+        return eventSubscription.uniqueEventByEventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED);
     }
 
 }

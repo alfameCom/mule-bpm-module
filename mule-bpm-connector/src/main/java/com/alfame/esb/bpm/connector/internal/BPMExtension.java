@@ -61,6 +61,8 @@ import static org.slf4j.LoggerFactory.getLogger;
         subTypes = {BPMClasspathDefinition.class, BPMStreamDefinition.class})
 @SubTypeMapping(baseType = BPMDataSource.class,
         subTypes = {BPMDataSourceReference.class, BPMGenericDataSource.class})
+@SubTypeMapping(baseType = BPMEventSubscriptionFilter.class,
+        subTypes = {BPMEventSubscriptionProcessDefinitionFilter.class, BPMEventSubscriptionVariableFilter.class})
 @ExternalLib(name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl")
 @ExternalLib(name = "BPM Flowable Activity", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-flowable-activity:2.1.0-SNAPSHOT", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 @ExternalLib(name = "BPM Task Queue", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-task-queue:2.1.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.queue.BPMTaskQueueFactory")

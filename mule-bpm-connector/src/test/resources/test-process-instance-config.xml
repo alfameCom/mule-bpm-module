@@ -19,7 +19,12 @@
     </bpm:config>
 
     <flow name="startTestProcessFlow">
-        <bpm:event-subscription-builder config-ref="engineConfig" target="eventSubscription" />
+        <bpm:event-subscription-builder config-ref="engineConfig" target="eventSubscription">
+            <bpm:event-subscription-filters>
+                <bpm:process-definition-filter key="testProcess" />
+                <bpm:variable-filter variableName="factory-variable2" />
+            </bpm:event-subscription-filters>
+        </bpm:event-subscription-builder>
 
         <bpm:process-factory config-ref="engineConfig" processDefinitionKey="testProcess" tenantId="com.alfame.esb">
             <bpm:process-variables>
@@ -31,6 +36,14 @@
         <logger level="INFO" message="#[payload]"/>
 
         <bpm:wait-events-and-unsubscribe config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="events" />
+
+        <bpm:get-unique-event-from-subscription config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="event">
+            <bpm:event-subscription-filters>
+                <bpm:process-definition-filter key="testProcess" />
+                <bpm:variable-filter variableName="factory-variable2" />
+            </bpm:event-subscription-filters>
+        </bpm:get-unique-event-from-subscription>
+        <logger level="INFO" message="Process instance id #[vars.event.processInstanceId]" />
     </flow>
 
     <flow name="testTaskFlow">
