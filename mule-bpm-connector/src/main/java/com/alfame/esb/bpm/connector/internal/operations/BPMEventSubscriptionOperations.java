@@ -4,7 +4,8 @@ import com.alfame.esb.bpm.api.BPMEngineEvent;
 import com.alfame.esb.bpm.api.BPMEngineEventSubscription;
 import com.alfame.esb.bpm.api.BPMEngineEventSubscriptionBuilder;
 import com.alfame.esb.bpm.api.BPMEngineEventType;
-import com.alfame.esb.bpm.connector.api.config.BPMEventSubscriptionFilter;
+import com.alfame.esb.bpm.connector.api.config.*;
+import com.alfame.esb.bpm.connector.api.param.BPMEventType;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -27,9 +28,54 @@ public class BPMEventSubscriptionOperations {
     @OutputResolver(output = BPMEventSubscriptionOutputMetadataResolver.class)
     public BPMEngineEventSubscription eventSubscriptionBuilder(
             @Config BPMExtension engine,
-            @Optional @Alias("event-subscription-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilter) {
+            @Optional @Alias("event-subscription-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) {
 
         BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder = engine.eventSubscriptionBuilder();
+
+        for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
+            if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
+                BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =
+                        (BPMEventSubscriptionProcessDefinitionFilter) eventSubscriptionFilter;
+                LOGGER.debug("Filtering events without process definition key {}", processDefinitionFilter.getKey());
+                eventSubscriptionBuilder.processDefinitionKey(processDefinitionFilter.getKey());
+            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessInstanceFilter) {
+                BPMEventSubscriptionProcessInstanceFilter processInstanceFilter =
+                        (BPMEventSubscriptionProcessInstanceFilter) eventSubscriptionFilter;
+                LOGGER.debug("Filtering events without process instance id {}", processInstanceFilter.getProcessInstanceId());
+                eventSubscriptionBuilder.processDefinitionKey(processInstanceFilter.getProcessInstanceId());
+            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
+                BPMEventSubscriptionEventTypeFilter eventTypeFilter =
+                        (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
+                BPMEngineEventType engineEventType;
+                if (eventTypeFilter.getEventType() == BPMEventType.processInstanceCreated) {
+                    engineEventType = BPMEngineEventType.PROCESS_INSTANCE_CREATED;
+                } else if (eventTypeFilter.getEventType() == BPMEventType.processInstanceEnded) {
+                    engineEventType = BPMEngineEventType.PROCESS_INSTANCE_ENDED;
+                } else if (eventTypeFilter.getEventType() == BPMEventType.variableCreated) {
+                    engineEventType = BPMEngineEventType.VARIABLE_CREATED;
+                } else if (eventTypeFilter.getEventType() == BPMEventType.variableUpdated) {
+                    engineEventType = BPMEngineEventType.VARIABLE_UPDATED;
+                } else if (eventTypeFilter.getEventType() == BPMEventType.variableRemoved) {
+                    engineEventType = BPMEngineEventType.VARIABLE_REMOVED;
+                } else {
+                    engineEventType = BPMEngineEventType.UNKNOWN;
+                }
+                LOGGER.debug("Filtering events without event type {}", engineEventType);
+                eventSubscriptionBuilder.eventType(engineEventType);
+            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionVariableFilter) {
+                BPMEventSubscriptionVariableFilter variableFilter =
+                        (BPMEventSubscriptionVariableFilter) eventSubscriptionFilter;
+                if (variableFilter.getValue() != null) {
+                    LOGGER.debug("Filtering events without variables {} with value {}", variableFilter.getVariableName(), variableFilter.getValue());
+                    eventSubscriptionBuilder.variableWithValue(variableFilter.getVariableName(), variableFilter.getValue());
+                } else {
+                    LOGGER.debug("Filtering events without variables {}", variableFilter.getVariableName());
+                    eventSubscriptionBuilder.variable(variableFilter.getVariableName());
+                }
+            } else {
+                throw new IllegalArgumentException("Unsupported filter");
+            }
+        }
 
         BPMEngineEventSubscription engineEventSubscription = eventSubscriptionBuilder.subscribeForEvents();
 
@@ -56,7 +102,7 @@ public class BPMEventSubscriptionOperations {
     public BPMEngineEvent fetchUniqueSubscriptionEvent(
             @Config BPMExtension engine,
             @Alias("subscription") BPMEngineEventSubscription eventSubscription,
-            @Optional @Alias("event-subscription-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilter) throws InterruptedException {
+            @Optional @Alias("event-subscription-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) throws InterruptedException {
 
         LOGGER.debug("Fetching unique event");
 
