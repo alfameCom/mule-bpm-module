@@ -35,7 +35,7 @@
 
         <logger level="INFO" message="#[payload]"/>
 
-        <bpm:wait-events-and-unsubscribe config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="events" />
+        <bpm:wait-events-and-unsubscribe config-ref="engineConfig" subscription="#[vars.eventSubscription]" numberOfEvents="4" target="events" />
 
         <bpm:get-unique-event-from-subscription config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="event">
             <bpm:event-subscription-filters>

@@ -12,6 +12,7 @@ import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -89,11 +90,14 @@ public class BPMEventSubscriptionOperations {
     @OutputResolver(output = BPMEventSubscriptionEventsOutputMetadataResolver.class)
     public List<BPMEngineEvent> waitAndUnsubscribeForEvents(
             @Config BPMExtension engine,
-            @Alias("subscription") BPMEngineEventSubscription eventSubscription) throws InterruptedException {
+            @Alias("subscription") BPMEngineEventSubscription eventSubscription,
+            int numberOfEvents,
+            @Optional(defaultValue = "5") @Placement(tab = "Advanced", order = 1) Long timeout,
+            @Optional(defaultValue = "SECONDS") @Placement(tab = "Advanced", order = 2) TimeUnit timeoutUnit) throws InterruptedException {
 
-        LOGGER.debug("Unsubscribing for events");
+        LOGGER.debug("Waiting for {} events", numberOfEvents);
 
-        return eventSubscription.waitAndUnsubscribeForEvents(0, 1, TimeUnit.SECONDS);
+        return eventSubscription.waitAndUnsubscribeForEvents(numberOfEvents, timeout, timeoutUnit);
     }
 
     @Alias("get-unique-event-from-subscription")
