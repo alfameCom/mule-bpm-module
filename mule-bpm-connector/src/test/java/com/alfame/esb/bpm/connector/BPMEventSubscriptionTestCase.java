@@ -39,16 +39,20 @@ public class BPMEventSubscriptionTestCase extends BPMAbstractTestCase {
         Assert.assertNotNull("Returned engine events should not not be NULL", engineEvents);
         Assert.assertEquals("Two engine events should be returned", 2, engineEvents.size());
 
-        BPMEngineEvent processInstanceEndedEvent = eventSubscription
-                .uniqueEventByEventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED);
+        BPMEngineEventFinder processInstanceEndedFinder = eventSubscription.eventFinder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED);
+        Assert.assertNotNull("Returned process instance ended finder should not not be NULL", processInstanceEndedFinder);
+        BPMEngineEvent processInstanceEndedEvent = processInstanceEndedFinder.uniqueEvent();
         Assert.assertNotNull("Returned process instance ended event should not not be NULL", processInstanceEndedEvent);
         Assert.assertEquals("Returned process instance ended event's process definition key should be set to testProcess",
                 "testProcess", processInstanceEndedEvent.getProcessDefinitionKey());
         Assert.assertEquals("Returned process instance ended event's process instance id should be set to same as returned by process instance builder",
                 processInstance.getProcessInstanceId(), processInstanceEndedEvent.getProcessInstanceId());
 
-        BPMEngineEvent processVariableCreatedEvent = eventSubscription
-                .uniqueEventByEventType(BPMEngineEventType.VARIABLE_CREATED);
+        BPMEngineEventFinder processVariableCreatedFinder = eventSubscription.eventFinder()
+                .eventType(BPMEngineEventType.VARIABLE_CREATED);
+        Assert.assertNotNull("Returned process variable created finder should not not be NULL", processVariableCreatedFinder);
+        BPMEngineEvent processVariableCreatedEvent = processVariableCreatedFinder.uniqueEvent();
         Assert.assertNotNull("Returned process variable created event should not not be NULL", processVariableCreatedEvent);
         Assert.assertEquals("Returned process variable created event's process definition key should be set to testProcess",
                 "testProcess", processVariableCreatedEvent.getProcessDefinitionKey());

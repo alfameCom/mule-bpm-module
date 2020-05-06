@@ -1,9 +1,6 @@
 package com.alfame.esb.bpm.connector.internal.operations;
 
-import com.alfame.esb.bpm.api.BPMEngineEvent;
-import com.alfame.esb.bpm.api.BPMEngineEventSubscription;
-import com.alfame.esb.bpm.api.BPMEngineEventSubscriptionBuilder;
-import com.alfame.esb.bpm.api.BPMEngineEventType;
+import com.alfame.esb.bpm.api.*;
 import com.alfame.esb.bpm.connector.api.config.*;
 import com.alfame.esb.bpm.connector.api.param.BPMEventType;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
@@ -47,20 +44,7 @@ public class BPMEventSubscriptionOperations {
             } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
                 BPMEventSubscriptionEventTypeFilter eventTypeFilter =
                         (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
-                BPMEngineEventType engineEventType;
-                if (eventTypeFilter.getEventType() == BPMEventType.processInstanceCreated) {
-                    engineEventType = BPMEngineEventType.PROCESS_INSTANCE_CREATED;
-                } else if (eventTypeFilter.getEventType() == BPMEventType.processInstanceEnded) {
-                    engineEventType = BPMEngineEventType.PROCESS_INSTANCE_ENDED;
-                } else if (eventTypeFilter.getEventType() == BPMEventType.variableCreated) {
-                    engineEventType = BPMEngineEventType.VARIABLE_CREATED;
-                } else if (eventTypeFilter.getEventType() == BPMEventType.variableUpdated) {
-                    engineEventType = BPMEngineEventType.VARIABLE_UPDATED;
-                } else if (eventTypeFilter.getEventType() == BPMEventType.variableRemoved) {
-                    engineEventType = BPMEngineEventType.VARIABLE_REMOVED;
-                } else {
-                    engineEventType = BPMEngineEventType.UNKNOWN;
-                }
+                BPMEngineEventType engineEventType = mapEventType(eventTypeFilter.getEventType());
                 LOGGER.debug("Filtering events without event type {}", engineEventType);
                 eventSubscriptionBuilder.eventType(engineEventType);
             } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionVariableFilter) {
@@ -108,9 +92,62 @@ public class BPMEventSubscriptionOperations {
             @Alias("subscription") BPMEngineEventSubscription eventSubscription,
             @Optional @Alias("event-subscription-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) throws InterruptedException {
 
+        BPMEngineEventFinder eventFinder = eventSubscription.eventFinder();
+
+        for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
+            if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
+                BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =
+                        (BPMEventSubscriptionProcessDefinitionFilter) eventSubscriptionFilter;
+                LOGGER.debug("Filtering events without process definition key {}", processDefinitionFilter.getKey());
+                eventFinder.processDefinitionKey(processDefinitionFilter.getKey());
+            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessInstanceFilter) {
+                BPMEventSubscriptionProcessInstanceFilter processInstanceFilter =
+                        (BPMEventSubscriptionProcessInstanceFilter) eventSubscriptionFilter;
+                LOGGER.debug("Filtering events without process instance id {}", processInstanceFilter.getProcessInstanceId());
+                eventFinder.processDefinitionKey(processInstanceFilter.getProcessInstanceId());
+            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
+                BPMEventSubscriptionEventTypeFilter eventTypeFilter =
+                        (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
+                BPMEngineEventType engineEventType = mapEventType(eventTypeFilter.getEventType());
+                LOGGER.debug("Filtering events without event type {}", engineEventType);
+                eventFinder.eventType(engineEventType);
+            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionVariableFilter) {
+                BPMEventSubscriptionVariableFilter variableFilter =
+                        (BPMEventSubscriptionVariableFilter) eventSubscriptionFilter;
+                if (variableFilter.getValue() != null) {
+                    LOGGER.debug("Filtering events without variables {} with value {}", variableFilter.getVariableName(), variableFilter.getValue());
+                    eventFinder.variableWithValue(variableFilter.getVariableName(), variableFilter.getValue());
+                } else {
+                    LOGGER.debug("Filtering events without variables {}", variableFilter.getVariableName());
+                    eventFinder.variable(variableFilter.getVariableName());
+                }
+            } else {
+                throw new IllegalArgumentException("Unsupported filter");
+            }
+        }
+
         LOGGER.debug("Fetching unique event");
 
-        return eventSubscription.uniqueEventByEventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED);
+        return eventFinder.uniqueEvent();
     }
 
+    protected BPMEngineEventType mapEventType(BPMEventType eventType) {
+        BPMEngineEventType engineEventType;
+
+        if (eventType == BPMEventType.processInstanceCreated) {
+            engineEventType = BPMEngineEventType.PROCESS_INSTANCE_CREATED;
+        } else if (eventType == BPMEventType.processInstanceEnded) {
+            engineEventType = BPMEngineEventType.PROCESS_INSTANCE_ENDED;
+        } else if (eventType == BPMEventType.variableCreated) {
+            engineEventType = BPMEngineEventType.VARIABLE_CREATED;
+        } else if (eventType == BPMEventType.variableUpdated) {
+            engineEventType = BPMEngineEventType.VARIABLE_UPDATED;
+        } else if (eventType == BPMEventType.variableRemoved) {
+            engineEventType = BPMEngineEventType.VARIABLE_REMOVED;
+        } else {
+            engineEventType = BPMEngineEventType.UNKNOWN;
+        }
+
+        return engineEventType;
+    }
 }

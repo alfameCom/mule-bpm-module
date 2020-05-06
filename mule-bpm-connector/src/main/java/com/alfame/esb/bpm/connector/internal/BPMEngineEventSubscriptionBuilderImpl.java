@@ -11,9 +11,6 @@ import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.slf4j.Logger;
 
-import java.util.List;
-import java.util.Map;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionBuilder implements FlowableEventListener, BPMEngineEventSubscriptionConnection {
@@ -86,12 +83,12 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
                 }
             }
 
-            if(isSubscribedEvent(engineEvent)) {
+            if(isUnfilteredEvent(engineEvent)) {
                 if (this.engineEventListener != null) {
                     this.engineEventListener.handleEngineEvent(engineEvent);
                 }
 
-                this.eventSubscription.cachedEvent(engineEvent);
+                this.eventSubscription.cacheEvent(engineEvent);
             }
         }
     }
@@ -109,62 +106,6 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
     @Override
     public String getOnTransaction() {
         return null;
-    }
-
-    protected boolean isSubscribedEvent(BPMEngineEvent engineEvent) {
-        boolean isSubscribedEvent = true;
-
-        if (engineEvent == null) {
-            isSubscribedEvent = false;
-        } else {
-            // Filter events, if filter of any single type has been set, and any of those are not matching the event
-            if (!isSubscribedForEvent((List) this.eventTypes, engineEvent.getType())) {
-                isSubscribedEvent = false;
-            } else if (!isSubscribedForEvent((List) this.processDefinitionKeys, engineEvent.getProcessDefinitionKey())) {
-                isSubscribedEvent = false;
-            } else if (!isSubscribedForEvent((List) this.processInstanceIds, engineEvent.getProcessInstanceId())) {
-                isSubscribedEvent = false;
-            } else if (!isSubscribedForEvent((Map) this.variableValues, engineEvent.getVariableName(), engineEvent.getVariableValue())) {
-                isSubscribedEvent = false;
-            }
-        }
-
-        return isSubscribedEvent;
-    }
-
-    protected boolean isSubscribedForEvent(List<Object> subscriptionKeys, Object eventKey) {
-        boolean isSubscribed = true;
-
-        // Some filters of this type have been set?
-        if (subscriptionKeys != null
-                && !subscriptionKeys.isEmpty()
-                && eventKey != null) {
-            // Filter non-matching events
-            isSubscribed = subscriptionKeys.contains(eventKey);
-        }
-
-        return isSubscribed;
-    }
-
-    protected boolean isSubscribedForEvent(Map<Object, Object> subscriptionMap, Object eventKey, Object eventValue) {
-        boolean isSubscribed = true;
-
-        // Some filters of this type have been set?
-        if (subscriptionMap != null
-                && !subscriptionMap.isEmpty()
-                && eventKey != null) {
-            // Filter non-matching events
-            if (subscriptionMap.containsKey(eventKey)) {
-                // Filter events with non-matching values
-                if (subscriptionMap.get(eventKey) != null) {
-                    isSubscribed = subscriptionMap.get(eventKey).equals(eventValue);
-                }
-            } else {
-                isSubscribed = false;
-            }
-        }
-
-        return isSubscribed;
     }
 
 }

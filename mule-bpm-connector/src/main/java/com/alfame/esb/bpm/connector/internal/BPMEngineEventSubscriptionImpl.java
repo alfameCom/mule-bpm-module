@@ -1,9 +1,6 @@
 package com.alfame.esb.bpm.connector.internal;
 
-import com.alfame.esb.bpm.api.BPMEngine;
-import com.alfame.esb.bpm.api.BPMEngineEvent;
-import com.alfame.esb.bpm.api.BPMEngineEventSubscription;
-import com.alfame.esb.bpm.api.BPMEngineEventType;
+import com.alfame.esb.bpm.api.*;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -64,7 +61,12 @@ public class BPMEngineEventSubscriptionImpl implements BPMEngineEventSubscriptio
         return events;
     }
 
-    void cachedEvent(BPMEngineEvent engineEvent) {
+    @Override
+    public BPMEngineEventFinder eventFinder() {
+        return new BPMEngineEventSubscriptionEventFinder(this.cachedEvents);
+    }
+
+    void cacheEvent(BPMEngineEvent engineEvent) {
         try {
             this.cacheLock.lock();
             if(this.cachedEvents != null) {
@@ -81,20 +83,4 @@ public class BPMEngineEventSubscriptionImpl implements BPMEngineEventSubscriptio
         }
     }
 
-    public BPMEngineEvent uniqueEventByEventType(BPMEngineEventType eventType) {
-        BPMEngineEvent uniqueEvent = null;
-
-        if (this.cachedEvents != null) {
-            for (BPMEngineEvent event : this.cachedEvents) {
-                if (event.getType().equals(eventType)) {
-                    if (uniqueEvent != null) {
-                        throw new IndexOutOfBoundsException("Multiple events found with event type " + eventType.getValue());
-                    }
-                    uniqueEvent = event;
-                }
-            }
-        }
-
-        return uniqueEvent;
-    }
 }

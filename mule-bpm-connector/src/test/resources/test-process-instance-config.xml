@@ -40,7 +40,7 @@
         <bpm:get-unique-event-from-subscription config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="event">
             <bpm:event-subscription-filters>
                 <bpm:process-definition-filter key="testProcess" />
-                <bpm:variable-filter variableName="factory-variable2" />
+                <bpm:event-type-filter eventType="processInstanceEnded" />
             </bpm:event-subscription-filters>
         </bpm:get-unique-event-from-subscription>
         <logger level="INFO" message="Process instance id #[vars.event.processInstanceId]" />
