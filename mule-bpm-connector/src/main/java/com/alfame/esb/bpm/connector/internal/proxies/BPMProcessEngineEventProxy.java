@@ -5,7 +5,9 @@ import com.alfame.esb.bpm.api.BPMEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
 
-public class BPMProcessEngineEventProxy implements BPMEngineEvent {
+import java.text.MessageFormat;
+
+public class BPMProcessEngineEventProxy extends BPMEngineEvent {
 
     private final FlowableProcessEngineEvent processEngineEvent;
 
@@ -14,7 +16,7 @@ public class BPMProcessEngineEventProxy implements BPMEngineEvent {
     }
 
     @Override
-    public BPMEngineEventType getType() {
+    public BPMEngineEventType getEventType() {
         BPMEngineEventType type = null;
 
         if (this.processEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_CREATED)) {
@@ -46,11 +48,6 @@ public class BPMProcessEngineEventProxy implements BPMEngineEvent {
     @Override
     public Object getVariableValue() {
         return null;
-    }
-
-    @Override
-    public String toString() {
-        return this.getType().getValue();
     }
 
 }

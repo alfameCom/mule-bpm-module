@@ -44,7 +44,7 @@ public abstract class BPMEngineEventFilter<T> {
             isUnfilteredEvent = false;
         } else {
             // Filter events, if filter of any single type has been set, and any of those are not matching the event
-            if (!isUnfilteredEvent((List) this.eventTypes, engineEvent.getType())) {
+            if (!isUnfilteredEvent((List) this.eventTypes, engineEvent.getEventType())) {
                 isUnfilteredEvent = false;
             } else if (!isUnfilteredEvent((List) this.processDefinitionKeys, engineEvent.getProcessDefinitionKey())) {
                 isUnfilteredEvent = false;
