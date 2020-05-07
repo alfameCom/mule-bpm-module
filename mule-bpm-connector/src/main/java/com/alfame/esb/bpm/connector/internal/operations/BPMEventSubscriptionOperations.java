@@ -68,6 +68,21 @@ public class BPMEventSubscriptionOperations {
         return eventFinder.uniqueEvent();
     }
 
+    @Alias("get-events-from-subscription")
+    @MediaType(value = MediaType.ANY, strict = false)
+    @OutputResolver(output = BPMEventSubscriptionEventsOutputMetadataResolver.class)
+    public List<BPMEngineEvent> fetchSubscriptionEvents(
+            @Config BPMExtension engine,
+            @Alias("subscription") BPMEngineEventSubscription eventSubscription,
+            @Optional @Alias("event-subscription-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) throws InterruptedException {
+
+        BPMEngineEventFinder eventFinder = createEventFinder(eventSubscription, eventSubscriptionFilters);
+
+        LOGGER.debug("Fetching events");
+
+        return eventFinder.events();
+    }
+
     protected BPMEngineEventSubscriptionBuilder createEventSubscriptionBuilder(
             BPMExtension engine,
             List<BPMEventSubscriptionFilter> eventSubscriptionFilters) {

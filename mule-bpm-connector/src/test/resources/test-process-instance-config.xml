@@ -36,6 +36,18 @@
         <logger level="INFO" message="#[payload]"/>
 
         <bpm:wait-events-and-unsubscribe config-ref="engineConfig" subscription="#[vars.eventSubscription]" numberOfEvents="4" target="events" />
+        <foreach collection="#[vars.events]" counterVariableName="eventIndex">
+            <logger level="INFO" message="Event ##[vars.eventIndex] #[payload]" />
+        </foreach>
+
+        <bpm:get-events-from-subscription config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="events">
+            <bpm:event-subscription-filters>
+                <bpm:process-definition-filter key="testProcess" />
+            </bpm:event-subscription-filters>
+        </bpm:get-events-from-subscription>
+        <foreach collection="#[vars.events]" counterVariableName="eventIndex">
+            <logger level="INFO" message="Event ##[vars.eventIndex] #[payload]" />
+        </foreach>
 
         <bpm:get-unique-event-from-subscription config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="event">
             <bpm:event-subscription-filters>
@@ -43,7 +55,7 @@
                 <bpm:event-type-filter eventType="processInstanceEnded" />
             </bpm:event-subscription-filters>
         </bpm:get-unique-event-from-subscription>
-        <logger level="INFO" message="Process instance id #[vars.event.processInstanceId]" />
+        <logger level="INFO" message="Event #[vars.event]" />
     </flow>
 
     <flow name="testTaskFlow">
