@@ -30,7 +30,6 @@
         <module>mule-bpm-task-queue</module>
         <module>mule-bpm-flowable-activity</module>
         <module>mule-bpm-connector</module>
-        <module>mule-app-parents</module>
     </modules>
 
     <dependencies>
