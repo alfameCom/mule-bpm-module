@@ -5,9 +5,12 @@
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",
     "attributes": {
-      "exportedPackages": [],
+      "exportedPackages": [
+      	"org.h2"
+      ],
       "exportedResources": [
-        "api/api.raml"
+        "api/api.raml",
+        "processes/sampleSplitter.bpmn20.xml"
       ]
     }
   },
