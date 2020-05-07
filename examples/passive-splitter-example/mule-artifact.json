@@ -1,6 +1,6 @@
 {
   "name": "passive-splitter-example",
-  "minMuleVersion": "4.0.0",
+  "minMuleVersion": "4.2.0",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",

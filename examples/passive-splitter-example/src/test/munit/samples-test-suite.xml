@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="new-test-suite.xml" />
+	<http:request-config
+		name="HTTP_Request_configuration"
+		doc:name="HTTP Request configuration"
+		doc:id="16c74cb9-30f7-4c4c-8beb-7a76dbbf8d49" basePath="/api">
+		<http:request-connection host="0.0.0.0" port="${http.port}" />
+	</http:request-config>
+	<munit:test name="test-suite-get" description="Test" doc:id="20bc1302-33ad-4785-9fac-f13081da5294" >
+  <munit:enable-flow-sources>            
+        <munit:enable-flow-source value="main-api"/>
+        <munit:enable-flow-source value="post:\sample:application\json:router-config"/>
+  </munit:enable-flow-sources>
+  <munit:execution >
+    <set-payload value='#[%dw 2.0
+output application/json
+---
+{
+	"samples": [
+		{
+			"id": "550e8400-e29b-41d4-a716-446655440000",
+			"name": "Exact sample",
+			"value": 4
+		},
+		{
+			"id": "550e8400-e29b-41d4-a716-446655440111",
+			"name": "Small sample",
+			"value": 1
+		}
+	]
+}]' doc:name="Set Payload" doc:id="4d35cbe8-568f-4a27-b8bd-c2d1992b9d2b" mimeType="application/json"/>
+			<http:request method="POST" path="/sample" doc:name="Request" doc:id="c470f743-eec9-4102-9f43-c583b3d66496" config-ref="HTTP_Request_configuration" />
+  </munit:execution>
+  <munit:validation >
+    <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]" message="The HTTP Status code is not correct!" doc:name="Assert that" doc:id="0fd2cc80-a710-4f19-ba12-6e9bf990abda" />
+  </munit:validation>
+</munit:test>
+</mule>
