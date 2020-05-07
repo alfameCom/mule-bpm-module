@@ -28,6 +28,50 @@ public class BPMEventSubscriptionOperations {
             @Config BPMExtension engine,
             @Optional @Alias("event-subscription-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) {
 
+        BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder =
+                createEventSubscriptionBuilder(engine, eventSubscriptionFilters);
+
+        BPMEngineEventSubscription engineEventSubscription = eventSubscriptionBuilder.subscribeForEvents();
+
+        LOGGER.debug("Subscribed for events");
+
+        return engineEventSubscription;
+    }
+
+    @Alias("wait-events-and-unsubscribe")
+    @MediaType(value = MediaType.ANY, strict = false)
+    @OutputResolver(output = BPMEventSubscriptionEventsOutputMetadataResolver.class)
+    public List<BPMEngineEvent> waitAndUnsubscribeForEvents(
+            @Config BPMExtension engine,
+            @Alias("subscription") BPMEngineEventSubscription eventSubscription,
+            int numberOfEvents,
+            @Optional(defaultValue = "5") @Placement(tab = "Advanced", order = 1) Long timeout,
+            @Optional(defaultValue = "SECONDS") @Placement(tab = "Advanced", order = 2) TimeUnit timeoutUnit) throws InterruptedException {
+
+        LOGGER.debug("Waiting for {} events", numberOfEvents);
+
+        return eventSubscription.waitAndUnsubscribeForEvents(numberOfEvents, timeout, timeoutUnit);
+    }
+
+    @Alias("get-unique-event-from-subscription")
+    @MediaType(value = MediaType.ANY, strict = false)
+    @OutputResolver(output = BPMEventSubscriptionEventsOutputMetadataResolver.class)
+    public BPMEngineEvent fetchUniqueSubscriptionEvent(
+            @Config BPMExtension engine,
+            @Alias("subscription") BPMEngineEventSubscription eventSubscription,
+            @Optional @Alias("event-subscription-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) throws InterruptedException {
+
+        BPMEngineEventFinder eventFinder = createEventFinder(eventSubscription, eventSubscriptionFilters);
+
+        LOGGER.debug("Fetching unique event");
+
+        return eventFinder.uniqueEvent();
+    }
+
+    protected BPMEngineEventSubscriptionBuilder createEventSubscriptionBuilder(
+            BPMExtension engine,
+            List<BPMEventSubscriptionFilter> eventSubscriptionFilters) {
+
         BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder = engine.eventSubscriptionBuilder();
 
         for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
@@ -62,35 +106,12 @@ public class BPMEventSubscriptionOperations {
             }
         }
 
-        BPMEngineEventSubscription engineEventSubscription = eventSubscriptionBuilder.subscribeForEvents();
-
-        LOGGER.debug("Subscribed for events");
-
-        return engineEventSubscription;
+        return eventSubscriptionBuilder;
     }
 
-    @Alias("wait-events-and-unsubscribe")
-    @MediaType(value = MediaType.ANY, strict = false)
-    @OutputResolver(output = BPMEventSubscriptionEventsOutputMetadataResolver.class)
-    public List<BPMEngineEvent> waitAndUnsubscribeForEvents(
-            @Config BPMExtension engine,
-            @Alias("subscription") BPMEngineEventSubscription eventSubscription,
-            int numberOfEvents,
-            @Optional(defaultValue = "5") @Placement(tab = "Advanced", order = 1) Long timeout,
-            @Optional(defaultValue = "SECONDS") @Placement(tab = "Advanced", order = 2) TimeUnit timeoutUnit) throws InterruptedException {
-
-        LOGGER.debug("Waiting for {} events", numberOfEvents);
-
-        return eventSubscription.waitAndUnsubscribeForEvents(numberOfEvents, timeout, timeoutUnit);
-    }
-
-    @Alias("get-unique-event-from-subscription")
-    @MediaType(value = MediaType.ANY, strict = false)
-    @OutputResolver(output = BPMEventSubscriptionEventsOutputMetadataResolver.class)
-    public BPMEngineEvent fetchUniqueSubscriptionEvent(
-            @Config BPMExtension engine,
-            @Alias("subscription") BPMEngineEventSubscription eventSubscription,
-            @Optional @Alias("event-subscription-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) throws InterruptedException {
+    protected BPMEngineEventFinder createEventFinder(
+            BPMEngineEventSubscription eventSubscription,
+            List<BPMEventSubscriptionFilter> eventSubscriptionFilters) {
 
         BPMEngineEventFinder eventFinder = eventSubscription.eventFinder();
 
@@ -126,9 +147,7 @@ public class BPMEventSubscriptionOperations {
             }
         }
 
-        LOGGER.debug("Fetching unique event");
-
-        return eventFinder.uniqueEvent();
+        return eventFinder;
     }
 
     protected BPMEngineEventType mapEventType(BPMEventType eventType) {
