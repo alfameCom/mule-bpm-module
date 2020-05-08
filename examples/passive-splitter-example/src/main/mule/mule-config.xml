@@ -1,148 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
-	xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd       http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
-	<configuration-properties
-		file="mule-artifact.properties" />
-	<apikit:config name="router-config" api="api.raml"
-		raml="api.raml" outboundHeadersMapName="outboundHeaders"
-		httpStatusVarName="httpStatus" />
-	<http:listener-config
-		name="httpListenerConfigDefault">
-		<http:listener-connection host="0.0.0.0"
-			port="${http.port}" />
-	</http:listener-config>
-	<bpm:config name="engineConfig"
-		defaultTenantId="com.alfame.esb.bpm.examples">
-		<bpm:task-listener-connection />
-		<bpm:default-data-source>
-			<bpm:generic-data-source
-				driverClassName="org.h2.Driver"
-				jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1" username="sa"
-				password="sa" type="h2" />
-		</bpm:default-data-source>
-		<bpm:definitions>
-			<bpm:classpath-definition
-				resourceClasspath="processes/sampleSplitter.bpmn20.xml" />
-		</bpm:definitions>
-		<bpm:default-async-executor />
-	</bpm:config>
-	<flow name="main-api">
-		<http:listener config-ref="httpListenerConfigDefault"
-			path="/api/*">
-			<http:response
-				statusCode="#[vars.httpStatus default 200]">
-				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
-			</http:response>
-			<http:error-response
-				statusCode="#[vars.httpStatus default 500]">
-				<http:body>#[payload]</http:body>
-				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
-			</http:error-response>
-		</http:listener>
-		<apikit:router config-ref="router-config" />
-		<error-handler>
-			<on-error-propagate type="APIKIT:BAD_REQUEST">
-				<set-variable variableName="outboundHeaders"
-					value="#[{'Content-Type':'application/json'}]" />
-				<set-payload
-					value="{ &quot;message&quot;: &quot;Bad request&quot; }" />
-				<set-variable variableName="httpStatus" value="400" />
-			</on-error-propagate>
-			<on-error-propagate type="APIKIT:NOT_FOUND">
-				<set-variable variableName="outboundHeaders"
-					value="#[{'Content-Type':'application/json'}]" />
-				<set-payload
-					value="{ &quot;message&quot;: &quot;Resource not found&quot; }" />
-				<set-variable variableName="httpStatus" value="404" />
-			</on-error-propagate>
-			<on-error-propagate
-				type="APIKIT:METHOD_NOT_ALLOWED">
-				<set-variable variableName="outboundHeaders"
-					value="#[{'Content-Type':'application/json'}]" />
-				<set-payload
-					value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" />
-				<set-variable variableName="httpStatus" value="405" />
-			</on-error-propagate>
-			<on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
-				<set-variable variableName="outboundHeaders"
-					value="#[{'Content-Type':'application/json'}]" />
-				<set-payload
-					value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" />
-				<set-variable variableName="httpStatus" value="406" />
-			</on-error-propagate>
-			<on-error-propagate
-				type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
-				<set-variable variableName="outboundHeaders"
-					value="#[{'Content-Type':'application/json'}]" />
-				<set-payload
-					value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" />
-				<set-variable variableName="httpStatus" value="415" />
-			</on-error-propagate>
-			<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
-				<set-variable variableName="outboundHeaders"
-					value="#[{'Content-Type':'application/json'}]" />
-				<set-payload
-					value="{ &quot;message&quot;: &quot;Not implemented&quot; }" />
-				<set-variable variableName="httpStatus" value="501" />
-			</on-error-propagate>
-		</error-handler>
-	</flow>
-	<flow name="main-console">
-		<http:listener config-ref="httpListenerConfigDefault"
-			path="/console/*">
-			<http:response
-				statusCode="#[vars.httpStatus default 200]">
-				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
-			</http:response>
-			<http:error-response
-				statusCode="#[vars.httpStatus default 500]">
-				<http:body>#[payload]</http:body>
-				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
-			</http:error-response>
-		</http:listener>
-		<apikit:console config-ref="router-config" />
-		<error-handler>
-			<on-error-propagate type="APIKIT:NOT_FOUND">
-				<set-variable variableName="outboundHeaders"
-					value="#[{'Content-Type':'application/json'}]" />
-				<set-payload
-					value="{ &quot;message&quot;: &quot;Resource not found&quot; }" />
-				<set-variable variableName="httpStatus" value="404" />
-			</on-error-propagate>
-		</error-handler>
-	</flow>
-	<flow name="post:\samples:application\json:router-config"
-		doc:id="75e7e97f-ef65-42de-854b-d7cdf1732a38">
-		<logger level="INFO"
-			message="post:\samples:application\json:router-config" />
-		<logger level="INFO" message="#[payload]" />
-		<set-payload
-			value='#[%dw 2.0
+      xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+      xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd       http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+    <configuration-properties
+            file="mule-artifact.properties"/>
+    <apikit:config name="router-config" api="api.raml"
+                   raml="api.raml" outboundHeadersMapName="outboundHeaders"
+                   httpStatusVarName="httpStatus"/>
+    <http:listener-config
+            name="httpListenerConfigDefault">
+        <http:listener-connection host="0.0.0.0"
+                                  port="${http.port}"/>
+    </http:listener-config>
+    <bpm:config name="engineConfig"
+                defaultTenantId="com.alfame.esb.bpm.examples">
+        <bpm:task-listener-connection/>
+        <bpm:default-data-source>
+            <bpm:generic-data-source
+                    driverClassName="org.h2.Driver"
+                    jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1" username="sa"
+                    password="sa" type="h2"/>
+        </bpm:default-data-source>
+        <bpm:definitions>
+            <bpm:classpath-definition
+                    resourceClasspath="processes/sampleSplitter.bpmn20.xml"/>
+        </bpm:definitions>
+        <bpm:default-async-executor/>
+    </bpm:config>
+    <flow name="main-api">
+        <http:listener config-ref="httpListenerConfigDefault"
+                       path="/api/*">
+            <http:response
+                    statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response
+                    statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="router-config"/>
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <set-variable variableName="outboundHeaders"
+                              value="#[{'Content-Type':'application/json'}]"/>
+                <set-payload
+                        value="{ &quot;message&quot;: &quot;Bad request&quot; }"/>
+                <set-variable variableName="httpStatus" value="400"/>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <set-variable variableName="outboundHeaders"
+                              value="#[{'Content-Type':'application/json'}]"/>
+                <set-payload
+                        value="{ &quot;message&quot;: &quot;Resource not found&quot; }"/>
+                <set-variable variableName="httpStatus" value="404"/>
+            </on-error-propagate>
+            <on-error-propagate
+                    type="APIKIT:METHOD_NOT_ALLOWED">
+                <set-variable variableName="outboundHeaders"
+                              value="#[{'Content-Type':'application/json'}]"/>
+                <set-payload
+                        value="{ &quot;message&quot;: &quot;Method not allowed&quot; }"/>
+                <set-variable variableName="httpStatus" value="405"/>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <set-variable variableName="outboundHeaders"
+                              value="#[{'Content-Type':'application/json'}]"/>
+                <set-payload
+                        value="{ &quot;message&quot;: &quot;Not acceptable&quot; }"/>
+                <set-variable variableName="httpStatus" value="406"/>
+            </on-error-propagate>
+            <on-error-propagate
+                    type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <set-variable variableName="outboundHeaders"
+                              value="#[{'Content-Type':'application/json'}]"/>
+                <set-payload
+                        value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }"/>
+                <set-variable variableName="httpStatus" value="415"/>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <set-variable variableName="outboundHeaders"
+                              value="#[{'Content-Type':'application/json'}]"/>
+                <set-payload
+                        value="{ &quot;message&quot;: &quot;Not implemented&quot; }"/>
+                <set-variable variableName="httpStatus" value="501"/>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="main-console">
+        <http:listener config-ref="httpListenerConfigDefault"
+                       path="/console/*">
+            <http:response
+                    statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response
+                    statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="router-config"/>
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <set-variable variableName="outboundHeaders"
+                              value="#[{'Content-Type':'application/json'}]"/>
+                <set-payload
+                        value="{ &quot;message&quot;: &quot;Resource not found&quot; }"/>
+                <set-variable variableName="httpStatus" value="404"/>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\samples:application\json:router-config"
+          doc:id="75e7e97f-ef65-42de-854b-d7cdf1732a38">
+        <logger level="INFO"
+                message="post:\samples:application\json:router-config"/>
+        <logger level="INFO" message="#[payload]"/>
+
+        <set-payload
+                value='#[%dw 2.0
 output application/java
 ---
 write(payload, "application/json")]'
-			doc:name="Set Payload" doc:id="cc7aa769-f4d0-483b-a669-620562ff257b" />
-		<bpm:process-factory doc:name="Process factory" doc:id="abcdba62-3943-452f-a4d3-3e0fd6aaf05d" config-ref="engineConfig" processDefinitionKey="sampleSplitter" tenantId="com.alfame.esb.bpm.examples">
+                doc:name="Set Payload" doc:id="cc7aa769-f4d0-483b-a669-620562ff257b"/>
+        <bpm:process-factory doc:name="Process factory" doc:id="abcdba62-3943-452f-a4d3-3e0fd6aaf05d"
+                             config-ref="engineConfig" processDefinitionKey="sampleSplitter"
+                             tenantId="com.alfame.esb.bpm.examples">
             <bpm:process-variables>
-                <bpm:process-variable variableName="samplesJson" value="#[payload]" />
+                <bpm:process-variable variableName="samplesJson" value="#[payload]"/>
             </bpm:process-variables>
         </bpm:process-factory>
-        <set-payload value="#[%dw 2.0 output application/json --- {}]" doc:name="Set Payload" doc:id="853ac9a3-de5d-4715-9574-a9edb67e299f" mimeType="application/json" />
+
+        <set-payload value="#[%dw 2.0 output application/json --- {}]" doc:name="Set Payload"
+                     doc:id="853ac9a3-de5d-4715-9574-a9edb67e299f" mimeType="application/json"/>
     </flow>
     <flow name="sampleSplitTaskFlow" doc:id="9a132271-ff93-4a6a-8552-8690601bd779">
-        <bpm:task-listener doc:name="Task listener" doc:id="3ce3527d-e5a7-4416-9c74-c709e1ba7f50" endpointUrl="bpm://split.samples" config-ref="engineConfig" transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN" />
-        <bpm:get-variable doc:name="Get variable" doc:id="f3f47365-7952-4d3d-b95b-dd7266f763bb" config-ref="engineConfig" variableName="samplesJson" transactionalAction="ALWAYS_JOIN"/>
-		<set-payload value='#[%dw 2.0
+        <bpm:task-listener doc:name="Task listener" doc:id="3ce3527d-e5a7-4416-9c74-c709e1ba7f50"
+                           endpointUrl="bpm://split.samples" config-ref="engineConfig" transactionType="LOCAL"
+                           transactionalAction="ALWAYS_BEGIN"/>
+
+        <bpm:get-variable doc:name="Get variable" doc:id="f3f47365-7952-4d3d-b95b-dd7266f763bb"
+                          config-ref="engineConfig" variableName="samplesJson" transactionalAction="ALWAYS_JOIN"/>
+        <set-payload value='#[%dw 2.0
 output application/json
 ---
-read(payload as String, "application/json")]' doc:name="Set Payload" doc:id="3d0b87cd-921c-4c25-9d32-cd7affa2a8ab" />
+read(payload as String, "application/json")]' doc:name="Set Payload" doc:id="3d0b87cd-921c-4c25-9d32-cd7affa2a8ab"/>
         <foreach collection="#[payload.samples]">
-            <logger level="INFO" doc:name="Logger" doc:id="74560b68-5224-446d-82b6-12d28964449e" />
+            <logger level="INFO" doc:name="Logger" doc:id="74560b68-5224-446d-82b6-12d28964449e"/>
         </foreach>
     </flow>
 </mule>

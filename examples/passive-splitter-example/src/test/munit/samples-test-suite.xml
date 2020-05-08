@@ -1,45 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
-	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xsi:schemaLocation="
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
-http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
-	<munit:config name="new-test-suite.xml" />
-	<http:request-config
-		name="HTTP_Request_configuration"
-		doc:name="HTTP Request configuration"
-		doc:id="16c74cb9-30f7-4c4c-8beb-7a76dbbf8d49" basePath="/api">
-		<http:request-connection host="0.0.0.0"
-			port="${http.port}" />
-	</http:request-config>
-	<munit:test name="test-suite-get" description="Test"
-		doc:id="20bc1302-33ad-4785-9fac-f13081da5294">
-		<munit:enable-flow-sources>
-			<munit:enable-flow-source value="main-api" />
-			<munit:enable-flow-source
-				value="post:\samples:application\json:router-config" />
-			<munit:enable-flow-source
-				value="sampleSplitTaskFlow" />
-		</munit:enable-flow-sources>
-		<munit:execution>
-			<bpm:event-subscription-builder
-				doc:name="Event subscription builder"
-				doc:id="96711f44-7282-4102-a763-cef742ac71eb"
-				config-ref="engineConfig" target="eventSubscription">
-				<bpm:event-subscription-filters >
-					<bpm:event-type-filter eventType="processInstanceEnded" />
-				</bpm:event-subscription-filters>
-			</bpm:event-subscription-builder>
-			<set-payload value='#[%dw 2.0
+		http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+    <munit:config name="samples-test-suite.xml"/>
+    <http:request-config
+            name="samplesApiRequestConfig"
+            doc:name="HTTP Request configuration"
+            doc:id="16c74cb9-30f7-4c4c-8beb-7a76dbbf8d49" basePath="/api">
+        <http:request-connection host="0.0.0.0"
+                                 port="${http.port}"/>
+    </http:request-config>
+    <munit:test name="test-suite-get" description="Test"
+                doc:id="20bc1302-33ad-4785-9fac-f13081da5294">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="main-api"/>
+            <munit:enable-flow-source
+                    value="post:\samples:application\json:router-config"/>
+            <munit:enable-flow-source
+                    value="sampleSplitTaskFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <bpm:event-subscription-builder
+                    doc:name="Event subscription builder"
+                    doc:id="96711f44-7282-4102-a763-cef742ac71eb"
+                    config-ref="engineConfig" target="eventSubscription">
+                <bpm:event-subscription-filters>
+                    <bpm:event-type-filter eventType="processInstanceEnded"/>
+                </bpm:event-subscription-filters>
+            </bpm:event-subscription-builder>
+
+            <set-payload value='#[%dw 2.0
 output application/json
 ---
 {
@@ -55,13 +56,27 @@ output application/json
 			"value": 1
 		}
 	]
-}]' doc:name="Set Payload" doc:id="4d35cbe8-568f-4a27-b8bd-c2d1992b9d2b" mimeType="application/json"/>
-			<http:request method="POST" path="/samples" doc:name="Request" doc:id="c470f743-eec9-4102-9f43-c583b3d66496" config-ref="HTTP_Request_configuration" />
-			<bpm:wait-events-and-unsubscribe doc:name="Wait events and unsubscribe" doc:id="ce91e15b-18f6-4471-a356-e31737e23cb3" config-ref="engineConfig" subscription="#[vars.eventSubscription]" numberOfEvents="1" target="events" />
-  </munit:execution>
-  <munit:validation >
-    <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]" message="The HTTP Status code is not correct!" doc:name="Assert that" doc:id="0fd2cc80-a710-4f19-ba12-6e9bf990abda" />
-	<munit-tools:assert-equals doc:name="Assert equals" doc:id="5cad4ade-910a-4a0e-855f-fc000e4dfbd2" actual="#[%dw 2.0 output application/java --- sizeOf(vars.events)]" expected="#[1]" message="Only one process ending event should be present"/>
-  </munit:validation>
-</munit:test>
+}]' doc:name="Set Payload" doc:id="4d35cbe8-568f-4a27-b8bd-c2d1992b9d2b"/>
+            <http:request method="POST" path="/samples" doc:name="Request" doc:id="c470f743-eec9-4102-9f43-c583b3d66496"
+                          config-ref="samplesApiRequestConfig"/>
+
+            <bpm:wait-events-and-unsubscribe config-ref="engineConfig"
+                                             subscription="#[vars.eventSubscription]" numberOfEvents="1"
+                                             target="events" doc:name="Wait events and unsubscribe"
+                                             doc:id="ce91e15b-18f6-4471-a356-e31737e23cb3"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]"
+                                     message="The HTTP Status code is not correct!" doc:name="Assert response code"
+                                     doc:id="0fd2cc80-a710-4f19-ba12-6e9bf990abda"/>
+            <munit-tools:assert-that expression="#[attributes.headers.'content-type']"
+                                     is="#[MunitTools::equalTo('application/json')]"
+                                     message="The HTTP Content-type is not correct!" doc:name="Assert content type"
+                                     doc:id="0XX2cc8b-1v10-4f10-a1sz-1v9bf910ab30"/>
+            <munit-tools:assert-equals
+                    actual="#[%dw 2.0 output application/java --- sizeOf(vars.events)]"
+                    expected="#[1]" message="Only one process ending event should be present" doc:name="Assert equals"
+                    doc:id="5cad4ade-910a-4a0e-855f-fc000e4dfbd2"/>
+        </munit:validation>
+    </munit:test>
 </mule>
