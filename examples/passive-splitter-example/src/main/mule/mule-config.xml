@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
       xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd       http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+            http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
     <configuration-properties
             file="mule-artifact.properties"/>
     <apikit:config name="router-config" api="api.raml"
@@ -16,6 +22,11 @@
         <http:listener-connection host="0.0.0.0"
                                   port="${http.port}"/>
     </http:listener-config>
+    <ftp:config name="ftpConfig">
+        <ftp:connection host="0.0.0.0" port="${ftp.port}"
+                        username="${ftp.user}" password="${ftp.password}"
+                        workingDir="${ftp.path}"/>
+    </ftp:config>
     <bpm:config name="engineConfig"
                 defaultTenantId="com.alfame.esb.bpm.examples">
         <bpm:task-listener-connection/>
@@ -130,57 +141,112 @@ output application/java
 ---
 write(payload, "application/json")]'
                 doc:name="Set Payload" doc:id="cc7aa769-f4d0-483b-a669-620562ff257b"/>
-        <bpm:process-factory doc:name="Process factory" doc:id="abcdba62-3943-452f-a4d3-3e0fd6aaf05d"
+        <bpm:process-factory doc:name="Process factory"
+                             doc:id="abcdba62-3943-452f-a4d3-3e0fd6aaf05d"
                              config-ref="engineConfig" processDefinitionKey="sampleSplitter"
                              tenantId="com.alfame.esb.bpm.examples">
             <bpm:process-variables>
-                <bpm:process-variable variableName="samplesJson" value="#[payload]"/>
+                <bpm:process-variable
+                        variableName="samplesJson" value="#[payload]"/>
             </bpm:process-variables>
         </bpm:process-factory>
 
-        <set-payload value="#[%dw 2.0 output application/json --- {}]" doc:name="Set Payload"
-                     doc:id="853ac9a3-de5d-4715-9574-a9edb67e299f" mimeType="application/json"/>
+        <set-payload
+                value="#[%dw 2.0 output application/json --- {}]"
+                doc:name="Set Payload" doc:id="853ac9a3-de5d-4715-9574-a9edb67e299f"
+                mimeType="application/json"/>
     </flow>
-    <flow name="sampleSplitTaskFlow" doc:id="9a132271-ff93-4a6a-8552-8690601bd779">
-        <bpm:task-listener doc:name="Task listener" doc:id="3ce3527d-e5a7-4416-9c74-c709e1ba7f50"
-                           endpointUrl="bpm://split.samples" config-ref="engineConfig" transactionType="LOCAL"
-                           transactionalAction="ALWAYS_BEGIN"/>
+    <flow name="sampleSplitTaskFlow"
+          doc:id="9a132271-ff93-4a6a-8552-8690601bd779">
+        <bpm:task-listener doc:name="Task listener"
+                           doc:id="3ce3527d-e5a7-4416-9c74-c709e1ba7f50"
+                           endpointUrl="bpm://split.samples" config-ref="engineConfig"
+                           transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN"/>
 
-        <bpm:get-variable doc:name="Get variable" doc:id="f3f47365-7952-4d3d-b95b-dd7266f763bb"
-                          config-ref="engineConfig" variableName="samplesJson" transactionalAction="ALWAYS_JOIN"/>
-        <set-payload value='#[%dw 2.0
+        <bpm:get-variable doc:name="Get variable"
+                          doc:id="f3f47365-7952-4d3d-b95b-dd7266f763bb"
+                          config-ref="engineConfig" variableName="samplesJson"
+                          transactionalAction="ALWAYS_JOIN"/>
+        <set-payload
+                value='#[%dw 2.0
 output application/json
 ---
-read(payload as String, "application/json")]' doc:name="Set Payload" doc:id="3d0b87cd-921c-4c25-9d32-cd7affa2a8ab"/>
+read(payload as String, "application/json")]'
+                doc:name="Set Payload" doc:id="3d0b87cd-921c-4c25-9d32-cd7affa2a8ab"/>
         <foreach collection="#[payload.samples]">
-            <logger level="INFO" doc:name="Logger" doc:id="74560b68-5224-446d-82b6-12d28964449e"/>
             <set-payload
                     value='#[%dw 2.0
 output application/java
 ---
 write(payload, "application/json")]'
                     doc:name="Set Payload" doc:id="cc7aa769-f4d0-483b-a669-620562ff257b"/>
-            <bpm:process-factory doc:name="Process factory" doc:id="9a132271-921c-82b6-a4d3-74560b68"
-                                 config-ref="engineConfig" processDefinitionKey="sampleSubmitter"
+            <bpm:process-factory doc:name="Process factory"
+                                 doc:id="9a132271-921c-82b6-a4d3-74560b68" config-ref="engineConfig"
+                                 processDefinitionKey="sampleSubmitter"
                                  tenantId="com.alfame.esb.bpm.examples">
                 <bpm:process-variables>
-                    <bpm:process-variable variableName="sampleJson" value="#[payload]"/>
+                    <bpm:process-variable
+                            variableName="sampleJson" value="#[payload]"/>
                 </bpm:process-variables>
             </bpm:process-factory>
         </foreach>
     </flow>
-    <flow name="sampleMappingTaskFlow" doc:id="9a132272-9c74-4416-8552-cd7affa2a8ab">
-        <bpm:task-listener doc:name="Task listener" doc:id="4ce3527d-e5a7-4416-9c74-8690601bd779"
-                           endpointUrl="bpm://map.sample" config-ref="engineConfig" transactionType="LOCAL"
-                           transactionalAction="ALWAYS_BEGIN"/>
-        <logger message="" />
+    <flow name="sampleMappingTaskFlow"
+          doc:id="9a132272-9c74-4416-8552-cd7affa2a8ab">
+        <bpm:task-listener doc:name="Task listener"
+                           doc:id="4ce3527d-e5a7-4416-9c74-8690601bd779"
+                           endpointUrl="bpm://map.sample" config-ref="engineConfig"
+                           transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN"/>
+        <bpm:get-variable doc:name="Get variable"
+                          doc:id="51f1e51f-62ca-4ed0-a393-edfac1208be1"
+                          config-ref="engineConfig" variableName="sampleJson"
+                          transactionalAction="ALWAYS_JOIN"/>
+        <set-payload
+                value='#[%dw 2.0
+var jsonSample = read(payload as String, "application/json")
 
+output application/xml
+---
+sample: {
+	sampleId: jsonSample.id,
+	name: jsonSample.name,
+	value: jsonSample.value
+}]'
+                doc:name="Set Payload" doc:id="c586a5c5-caca-4950-8252-4fc62a9262a6"/>
+        <set-payload
+                value='#[%dw 2.0
+output application/java
+---
+write(payload, "application/xml")]'
+                doc:name="Set Payload" doc:id="0755ebe0-83e0-423c-b149-94e6f288f9a8"/>
+        <bpm:set-variable doc:name="Set variable"
+                          doc:id="15beda4f-4054-4f7c-884e-c3a2b6c2a8c4"
+                          config-ref="engineConfig" variableName="sampleXml"
+                          transactionalAction="ALWAYS_JOIN">
+            <bpm:content>#[payload]</bpm:content>
+        </bpm:set-variable>
     </flow>
-    <flow name="sampleSubmittingTaskFlow" doc:id="9a132271-9c74-a4d3-8552-cd7affa2a8ab">
-        <bpm:task-listener doc:name="Task listener" doc:id="75e7e97f-a4d3-a4d3-e5a7-dd7266f763bb"
-                           endpointUrl="bpm://submit.sample" config-ref="engineConfig" transactionType="LOCAL"
-                           transactionalAction="ALWAYS_BEGIN"/>
-        <logger message="" />
+    <flow name="sampleSubmittingTaskFlow"
+          doc:id="9a132271-9c74-a4d3-8552-cd7affa2a8ab">
+        <bpm:task-listener doc:name="Task listener"
+                           doc:id="75e7e97f-a4d3-a4d3-e5a7-dd7266f763bb"
+                           endpointUrl="bpm://submit.sample" config-ref="engineConfig"
+                           transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN"/>
 
+        <bpm:get-variable doc:name="Get variable"
+                          doc:id="3e8eb59a-0c1f-41c4-83ed-791af774812a"
+                          config-ref="engineConfig" variableName="sampleXml"
+                          transactionalAction="ALWAYS_JOIN"/>
+        <set-variable variableName="filename"
+                      value='#[%dw 2.0
+var xmlSample = read(payload as String, "application/xml")
+
+output application/java
+---
+"samples_" ++ xmlSample.sample.sampleId ++ ".xml"]'
+                      doc:name="Set variable" doc:id="45661aa2-2c70-48ef-aef8-9426be2e1fa5"/>
+        <logger message="#[vars.filename]"/>
+        <ftp:write config-ref="ftpConfig" path="#[vars.filename]"
+                   doc:name="Write" doc:id="2211540f-ef8e-468a-a1b0-a62bc2180657"/>
     </flow>
 </mule>

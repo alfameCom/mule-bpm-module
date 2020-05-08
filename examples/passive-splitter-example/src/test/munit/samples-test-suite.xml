@@ -1,26 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
-      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
-      xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-      xsi:schemaLocation="
-		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
-		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
-		http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+<mule
+        xmlns:ftpserver="http://www.mulesoft.org/schema/mule/ftpserver"
+        xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+        xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+        xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+            http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+            http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
+            http://www.mulesoft.org/schema/mule/ftpserver http://www.mulesoft.org/schema/mule/ftpserver/current/mule-ftpserver.xsd">
     <munit:config name="samples-test-suite.xml"/>
-    <http:request-config
-            name="samplesApiRequestConfig"
-            doc:name="HTTP Request configuration"
-            doc:id="16c74cb9-30f7-4c4c-8beb-7a76dbbf8d49" basePath="/api">
+    <http:request-config name="samplesApiRequestConfig"
+                         doc:name="HTTP Request configuration"
+                         doc:id="16c74cb9-30f7-4c4c-8beb-7a76dbbf8d49" basePath="/api">
         <http:request-connection host="0.0.0.0"
                                  port="${http.port}"/>
     </http:request-config>
+    <ftpserver:config name="MUnit_FTP_Server_Config"
+                      doc:name="MUnit FTP Server Config"
+                      doc:id="d7ef8f82-71e1-45ce-a5f9-a4a15bf6520b">
+        <ftpserver:connection port="${ftp.port}"
+                              username="${ftp.user}" password="${ftp.password}" secure="false"
+                              homeDir="${app.home}"/>
+    </ftpserver:config>
     <munit:test name="test-suite-get" description="Test"
                 doc:id="20bc1302-33ad-4785-9fac-f13081da5294">
         <munit:enable-flow-sources>
@@ -40,13 +48,17 @@
                     doc:id="96711f44-7282-4102-a763-cef742ac71eb"
                     config-ref="engineConfig" target="eventSubscription">
                 <bpm:event-subscription-filters>
-                    <bpm:event-type-filter eventType="processInstanceEnded"/>
-                    <bpm:process-definition-filter key="sampleSplitter"/>
-                    <bpm:process-definition-filter key="sampleSubmitter"/>
+                    <bpm:event-type-filter
+                            eventType="processInstanceEnded"/>
+                    <bpm:process-definition-filter
+                            key="sampleSplitter"/>
+                    <bpm:process-definition-filter
+                            key="sampleSubmitter"/>
                 </bpm:event-subscription-filters>
             </bpm:event-subscription-builder>
 
-            <set-payload value='#[%dw 2.0
+            <set-payload
+                    value='#[%dw 2.0
 output application/json
 ---
 {
@@ -62,54 +74,80 @@ output application/json
 			"value": 1
 		}
 	]
-}]' doc:name="Set Payload" doc:id="4d35cbe8-568f-4a27-b8bd-c2d1992b9d2b"/>
-            <http:request method="POST" path="/samples" doc:name="Request" doc:id="c470f743-eec9-4102-9f43-c583b3d66496"
+}]'
+                    doc:name="Set Payload" doc:id="4d35cbe8-568f-4a27-b8bd-c2d1992b9d2b"/>
+            <http:request method="POST" path="/samples"
+                          doc:name="Request" doc:id="c470f743-eec9-4102-9f43-c583b3d66496"
                           config-ref="samplesApiRequestConfig"/>
 
-            <bpm:wait-events-and-unsubscribe config-ref="engineConfig"
-                                             subscription="#[vars.eventSubscription]" numberOfEvents="3"
-                                             target="events" doc:name="Wait events and unsubscribe"
-                                             doc:id="ce91e15b-18f6-4471-a356-e31737e23cb3"/>
+            <bpm:wait-events-and-unsubscribe
+                    config-ref="engineConfig" subscription="#[vars.eventSubscription]"
+                    numberOfEvents="3" target="events"
+                    doc:name="Wait events and unsubscribe"
+                    doc:id="ce91e15b-18f6-4471-a356-e31737e23cb3"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]"
-                                     message="The HTTP Status code is not correct!" doc:name="Assert response code"
-                                     doc:id="0fd2cc80-a710-4f19-ba12-6e9bf990abda"/>
-            <munit-tools:assert-that expression="#[attributes.headers.'content-type']"
-                                     is="#[MunitTools::equalTo('application/json')]"
-                                     message="The HTTP Content-type is not correct!" doc:name="Assert content type"
-                                     doc:id="0XX2cc8b-1v10-4f10-a1sz-1v9bf910ab30"/>
+            <munit-tools:assert-that
+                    expression="#[attributes.statusCode]"
+                    is="#[MunitTools::equalTo(200)]"
+                    message="The HTTP Status code is not correct!"
+                    doc:name="Assert response code"
+                    doc:id="0fd2cc80-a710-4f19-ba12-6e9bf990abda"/>
+            <munit-tools:assert-that
+                    expression="#[attributes.headers.'content-type']"
+                    is="#[MunitTools::equalTo('application/json')]"
+                    message="The HTTP Content-type is not correct!"
+                    doc:name="Assert content type"
+                    doc:id="0XX2cc8b-1v10-4f10-a1sz-1v9bf910ab30"/>
             <munit-tools:assert-equals
                     actual="#[%dw 2.0 output application/java --- sizeOf(vars.events)]"
-                    expected="#[3]" message="Three process ending events in total should be present"
+                    expected="#[3]"
+                    message="Three process ending events in total should be present"
                     doc:name="Assert equals"
                     doc:id="5cad4ade-910a-4a0e-855f-fc000e4dfbd2"/>
-            <bpm:get-events-from-subscription config-ref="engineConfig"
-                                              subscription="#[vars.eventSubscription]"
-                                              target="splitEvents" doc:name="Get split events from subscription"
-                                              doc:id="0fd2cc80-18f6-4f19-a1sz-c2d1992b9d2b">
+            <bpm:get-events-from-subscription
+                    config-ref="engineConfig" subscription="#[vars.eventSubscription]"
+                    target="splitEvents" doc:name="Get split events from subscription"
+                    doc:id="0fd2cc80-18f6-4f19-a1sz-c2d1992b9d2b">
                 <bpm:event-subscription-filters>
-                    <bpm:process-definition-filter key="sampleSplitter"/>
+                    <bpm:process-definition-filter
+                            key="sampleSplitter"/>
                 </bpm:event-subscription-filters>
             </bpm:get-events-from-subscription>
             <munit-tools:assert-equals
                     actual="#[%dw 2.0 output application/java --- sizeOf(vars.splitEvents)]"
-                    expected="#[1]" message="One split process ending event should be present"
+                    expected="#[1]"
+                    message="One split process ending event should be present"
                     doc:name="Assert equals"
                     doc:id="5cad4ade-568f-4a0e-855f-e31737e23cb3"/>
-            <bpm:get-events-from-subscription config-ref="engineConfig"
-                                              subscription="#[vars.eventSubscription]"
-                                              target="submitEvents" doc:name="Get submit events from subscription"
-                                              doc:id="6b6283a7-3610-4120-bc5d-b0cef69afe78">
+            <bpm:get-events-from-subscription
+                    config-ref="engineConfig" subscription="#[vars.eventSubscription]"
+                    target="submitEvents" doc:name="Get submit events from subscription"
+                    doc:id="6b6283a7-3610-4120-bc5d-b0cef69afe78">
                 <bpm:event-subscription-filters>
-                    <bpm:process-definition-filter key="sampleSubmitter"/>
+                    <bpm:process-definition-filter
+                            key="sampleSubmitter"/>
                 </bpm:event-subscription-filters>
             </bpm:get-events-from-subscription>
             <munit-tools:assert-equals
                     actual="#[%dw 2.0 output application/java --- sizeOf(vars.submitEvents)]"
-                    expected="#[2]" message="Two submit process ending events should be present"
+                    expected="#[2]"
+                    message="Two submit process ending events should be present"
                     doc:name="Assert equals"
                     doc:id="85945a65-23d9-4d14-abc1-c6c30dcf9f90"/>
+            <foreach
+                    collection="#[%dw 2.0
+output application/java
+---
+[
+	'samples_550e8400-e29b-41d4-a716-446655440111.xml',
+	'samples_550e8400-e29b-41d4-a716-446655440000.xml'
+]]">
+                <ftpserver:contains-files
+                        config-ref="MUnit_FTP_Server_Config" file="#[payload]"
+                        path="${ftp.path}" doc:name="Contains files"
+                        doc:id="f88b4ee7-7aa0-4ab7-81f8-75e06407656a"/>
+            </foreach>
         </munit:validation>
     </munit:test>
 </mule>
