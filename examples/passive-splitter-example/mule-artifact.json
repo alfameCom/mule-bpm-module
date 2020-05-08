@@ -10,7 +10,8 @@
       ],
       "exportedResources": [
         "api/api.raml",
-        "processes/sampleSplitter.bpmn20.xml"
+        "processes/sampleSplitter.bpmn20.xml",
+        "processes/sampleSubmitter.bpmn20.xml"
       ]
     }
   },

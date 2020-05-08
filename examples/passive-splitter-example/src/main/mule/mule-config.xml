@@ -28,6 +28,8 @@
         <bpm:definitions>
             <bpm:classpath-definition
                     resourceClasspath="processes/sampleSplitter.bpmn20.xml"/>
+            <bpm:classpath-definition
+                    resourceClasspath="processes/sampleSubmitter.bpmn20.xml"/>
         </bpm:definitions>
         <bpm:default-async-executor/>
     </bpm:config>
@@ -152,6 +154,33 @@ output application/json
 read(payload as String, "application/json")]' doc:name="Set Payload" doc:id="3d0b87cd-921c-4c25-9d32-cd7affa2a8ab"/>
         <foreach collection="#[payload.samples]">
             <logger level="INFO" doc:name="Logger" doc:id="74560b68-5224-446d-82b6-12d28964449e"/>
+            <set-payload
+                    value='#[%dw 2.0
+output application/java
+---
+write(payload, "application/json")]'
+                    doc:name="Set Payload" doc:id="cc7aa769-f4d0-483b-a669-620562ff257b"/>
+            <bpm:process-factory doc:name="Process factory" doc:id="9a132271-921c-82b6-a4d3-74560b68"
+                                 config-ref="engineConfig" processDefinitionKey="sampleSubmitter"
+                                 tenantId="com.alfame.esb.bpm.examples">
+                <bpm:process-variables>
+                    <bpm:process-variable variableName="sampleJson" value="#[payload]"/>
+                </bpm:process-variables>
+            </bpm:process-factory>
         </foreach>
+    </flow>
+    <flow name="sampleMappingTaskFlow" doc:id="9a132272-9c74-4416-8552-cd7affa2a8ab">
+        <bpm:task-listener doc:name="Task listener" doc:id="4ce3527d-e5a7-4416-9c74-8690601bd779"
+                           endpointUrl="bpm://map.sample" config-ref="engineConfig" transactionType="LOCAL"
+                           transactionalAction="ALWAYS_BEGIN"/>
+        <logger message="" />
+
+    </flow>
+    <flow name="sampleSubmittingTaskFlow" doc:id="9a132271-9c74-a4d3-8552-cd7affa2a8ab">
+        <bpm:task-listener doc:name="Task listener" doc:id="75e7e97f-a4d3-a4d3-e5a7-dd7266f763bb"
+                           endpointUrl="bpm://submit.sample" config-ref="engineConfig" transactionType="LOCAL"
+                           transactionalAction="ALWAYS_BEGIN"/>
+        <logger message="" />
+
     </flow>
 </mule>
