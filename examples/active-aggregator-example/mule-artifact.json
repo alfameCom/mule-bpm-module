@@ -1,0 +1,22 @@
+{
+  "name": "active-aggregator-example",
+  "minMuleVersion": "4.2.0",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [
+      	"org.h2"
+      ],
+      "exportedResources": []
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  },
+  "configs": [
+    "mule-config.xml"
+  ],
+  "domain": "default"
+}

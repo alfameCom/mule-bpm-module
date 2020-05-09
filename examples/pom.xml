@@ -13,6 +13,7 @@
 
     <modules>
         <module>passive-splitter-example</module>
+        <module>active-aggregator-example</module>
     </modules>
 
     <repositories>
