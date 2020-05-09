@@ -29,7 +29,7 @@
                               username="${ftp.user}" password="${ftp.password}" secure="false"
                               homeDir="${app.home}"/>
     </ftpserver:config>
-    <munit:test name="test-suite-get" description="Test"
+    <munit:test name="samples-test-suite" description="Samples Test"
                 doc:id="20bc1302-33ad-4785-9fac-f13081da5294">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="main-api"/>
