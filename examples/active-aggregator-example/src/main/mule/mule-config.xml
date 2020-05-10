@@ -17,11 +17,18 @@
                 defaultTenantId="com.alfame.esb.bpm.examples">
         <bpm:definitions>
             <bpm:classpath-definition resourceClasspath="processes/invoiceRetriever.bpmn20.xml"/>
+            <bpm:classpath-definition resourceClasspath="processes/paymentRetriever.bpmn20.xml"/>
         </bpm:definitions>
     </bpm:config>
-    <sftp:config name="Invoice_SFTP_Config" doc:name="SFTP Config" doc:id="e7f31a7a-e791-4548-a8d5-6ad25e668ac0">
+    <sftp:config name="Invoice_SFTP_Config" doc:name="Invoice SFTP Config"
+                 doc:id="e7f31a7a-e791-4548-a8d5-6ad25e668ac0">
         <sftp:connection workingDir="${invoice.sftp.path}" host="${invoice.sftp.host}" port="${invoice.sftp.port}"
                          username="${invoice.sftp.user}" password="${invoice.sftp.password}"/>
+    </sftp:config>
+    <sftp:config name="Payment_SFTP_Config" doc:name="Payment SFTP Config"
+                 doc:id="884c176c-de9d-44cc-8ef2-ab0958f4951c">
+        <sftp:connection workingDir="${payment.sftp.path}" host="${payment.sftp.host}" port="${payment.sftp.port}"
+                         username="${payment.sftp.user}" password="${payment.sftp.password}"/>
     </sftp:config>
     <flow name="retrieveInvoicesTaskFlow" doc:id="88668ff9-6faf-4e8b-a765-c04b8919e024">
         <bpm:task-listener config-ref="BPM_Config" doc:name="Task listener"
@@ -34,7 +41,23 @@
         <foreach doc:name="For Each" doc:id="8b0d5af4-9ae3-43e2-9364-8cabace4762c">
             <logger level="INFO" doc:name="Logger" doc:id="4f273a01-1c67-4b6f-8222-041d8b7ecb37"/>
             <logger level="INFO" message="#[payload]" doc:name="Logger" doc:id="9c848520-856e-4935-a71f-5349b226c72a"/>
-			<sftp:delete doc:name="Delete" doc:id="b5ef666b-aadc-4c4f-b3c8-a2824e9549be" config-ref="Invoice_SFTP_Config" path="#[attributes.path]"/>
+            <sftp:delete doc:name="Delete" doc:id="b5ef666b-aadc-4c4f-b3c8-a2824e9549be"
+                         config-ref="Invoice_SFTP_Config" path="#[attributes.path]"/>
+        </foreach>
+    </flow>
+    <flow name="retrievePaymentsTaskFlow" doc:id="13ede409-2fa9-456c-8b82-4201218ec0c8">
+        <bpm:task-listener config-ref="BPM_Config" doc:name="Task listener"
+                           doc:id="3a3fa24f-77b7-4b19-9bf6-22bf769a7771" endpointUrl="bpm://retrieve.payments"/>
+        <sftp:list config-ref="Payment_SFTP_Config" doc:name="List" doc:id="061ee33a-eb78-4939-8ed6-f0c0cfe253c0"
+                   directoryPath="/">
+            <sftp:matcher
+                    filenamePattern="payment_*.json"/>
+        </sftp:list>
+        <foreach doc:name="For Each" doc:id="04eb799c-e8fa-41af-bae6-3b0c7e6ef834">
+            <logger level="INFO" doc:name="Logger" doc:id="a6f58258-7a47-4364-ba00-78194431a15b"/>
+            <logger level="INFO" message="#[payload]" doc:name="Logger" doc:id="0db85856-3096-465d-b669-1276712700a0"/>
+            <sftp:delete doc:name="Delete" doc:id="b4575413-5ad9-4d82-a598-c848c9eb0fae"
+                         config-ref="Payment_SFTP_Config" path="#[attributes.path]"/>
         </foreach>
     </flow>
 

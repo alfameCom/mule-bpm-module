@@ -22,11 +22,25 @@
                               username="${invoice.sftp.user}" password="${invoice.sftp.password}"
                               secure="true" homeDir="${app.home}"/>
     </ftpserver:config>
+    <ftpserver:config
+            name="MUnit_Payment_SFTP_Server_Config"
+            doc:name="MUnit Payment SFTP Server Config"
+            doc:id="8f435fd9-f1ed-4b3f-a3f6-2c24b36b0dc1">
+        <ftpserver:connection port="${payment.sftp.port}"
+                              username="${payment.sftp.user}" password="${payment.sftp.password}"
+                              secure="true" homeDir="${app.home}"/>
+    </ftpserver:config>
     <sftp:config name="MUnit_Invoice_SFTP_Config"
                  doc:name="SFTP Config" doc:id="ec381f6a-57bc-4adf-9d94-827c1237223a">
         <sftp:connection host="${invoice.sftp.host}"
                          port="${invoice.sftp.port}" username="${invoice.sftp.user}"
                          password="${invoice.sftp.password}" workingDir="${invoice.sftp.path}"/>
+    </sftp:config>
+    <sftp:config name="MUnit_Payment_SFTP_Config"
+                 doc:name="SFTP Config" doc:id="47439702-6df3-4a0c-af4f-78bf6fc450ec">
+        <sftp:connection host="${payment.sftp.host}"
+                         port="${payment.sftp.port}" username="${payment.sftp.user}"
+                         password="${payment.sftp.password}" workingDir="${payment.sftp.path}"/>
     </sftp:config>
     <munit:test name="transactions-test-suite"
                 description="Transactions Test"
@@ -34,6 +48,8 @@
         <munit:enable-flow-sources>
             <munit:enable-flow-source
                     value="retrieveInvoicesTaskFlow"/>
+            <munit:enable-flow-source
+                    value="retrievePaymentsTaskFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
             <sftp:write config-ref="MUnit_Invoice_SFTP_Config"
@@ -45,24 +61,57 @@ output application/xml
 invoice: {
 	id: 29,
 	transactionId: "2514-234x-df23-35fa",
+	payee: "Big company",
 	description: "Important things",
 	amount: 999.99
 }]]]></sftp:content>
             </sftp:write>
+            <sftp:write config-ref="MUnit_Payment_SFTP_Config"
+                        path="payment_31.json" doc:name="Write"
+                        doc:id="6a1f344a-9882-48f3-a56a-d9d56e72a4c7">
+                <sftp:content><![CDATA[#[%dw 2.0
+output application/json
+---
+invoice: {
+	id: 21,
+	transactionId: "2514-234x-df23-35fa",
+	description: "Important payment",
+	payer: "Wealthy person",
+	amount: 999.99
+}]]]></sftp:content>
+            </sftp:write>
             <bpm:event-subscription-builder
-                    config-ref="BPM_Config" target="eventSubscription"
+                    config-ref="BPM_Config" target="invoiceEventSubscription"
                     doc:name="Event subscription builder"
                     doc:id="16057127-3616-410c-9051-9c994a6f3654">
                 <bpm:event-subscription-filters>
+                    <bpm:process-definition-filter
+                            key="invoiceRetriever"/>
+                    <bpm:event-type-filter
+                            eventType="processInstanceEnded"/>
+                </bpm:event-subscription-filters>
+            </bpm:event-subscription-builder>
+            <bpm:event-subscription-builder
+                    config-ref="BPM_Config" target="paymentEventSubscription"
+                    doc:name="Event subscription builder"
+                    doc:id="a06deb13-4f98-4698-be70-f4d61e672b0e">
+                <bpm:event-subscription-filters>
+                    <bpm:process-definition-filter
+                            key="paymentRetriever"/>
                     <bpm:event-type-filter
                             eventType="processInstanceEnded"/>
                 </bpm:event-subscription-filters>
             </bpm:event-subscription-builder>
             <bpm:wait-events-and-unsubscribe
-                    config-ref="BPM_Config" subscription="#[vars.eventSubscription]"
+                    config-ref="BPM_Config" subscription="#[vars.invoiceEventSubscription]"
                     numberOfEvents="1" timeout="10"
-                    doc:name="Wait events and unsubscribe"
+                    doc:name="Wait invoice events and unsubscribe"
                     doc:id="f0704484-5db5-4884-890f-3c5a239de1e6"/>
+            <bpm:wait-events-and-unsubscribe
+                    config-ref="BPM_Config" subscription="#[vars.paymentEventSubscription]"
+                    numberOfEvents="1" timeout="10"
+                    doc:name="Wait payment events and unsubscribe"
+                    doc:id="b006f8c1-42b9-4540-bff4-b8c3a99ca632"/>
         </munit:execution>
     </munit:test>
 </mule>
