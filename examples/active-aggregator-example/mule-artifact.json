@@ -8,7 +8,9 @@
       "exportedPackages": [
       	"org.h2"
       ],
-      "exportedResources": []
+      "exportedResources": [
+      	"processes/invoiceRetriever.bpmn20.xml"
+      ]
     }
   },
   "bundleDescriptorLoader": {

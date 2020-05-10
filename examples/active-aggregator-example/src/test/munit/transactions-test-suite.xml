@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+<mule xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
       xmlns:ftpserver="http://www.mulesoft.org/schema/mule/ftpserver"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
@@ -10,22 +11,34 @@
 			http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 			http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 			http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
-			http://www.mulesoft.org/schema/mule/ftpserver http://www.mulesoft.org/schema/mule/ftpserver/current/mule-ftpserver.xsd">
+			http://www.mulesoft.org/schema/mule/ftpserver http://www.mulesoft.org/schema/mule/ftpserver/current/mule-ftpserver.xsd
+			http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
     <munit:config name="transactions-test-suite.xml"/>
-    <ftpserver:config name="MUnit_Invoice_SFTP_Server_Config" doc:name="MUnit Invoice SFTP Server Config"
-                      doc:id="a6754d65-368a-4ccc-bf73-48848e8f5668">
-        <ftpserver:connection port="${invoice.sftp.port}" username="${invoice.sftp.user}"
-                              password="${invoice.sftp.password}" secure="true" homeDir="${app.home}"/>
+    <ftpserver:config
+            name="MUnit_Invoice_SFTP_Server_Config"
+            doc:name="MUnit Invoice SFTP Server Config"
+            doc:id="a6754d65-368a-4ccc-bf73-48848e8f5668">
+        <ftpserver:connection port="${invoice.sftp.port}"
+                              username="${invoice.sftp.user}" password="${invoice.sftp.password}"
+                              secure="true" homeDir="${app.home}"/>
     </ftpserver:config>
-    <sftp:config name="Invoice_SFTP_Config" doc:name="SFTP Config" doc:id="ec381f6a-57bc-4adf-9d94-827c1237223a">
-        <sftp:connection host="${invoice.sftp.host}" port="${invoice.sftp.port}" username="${invoice.sftp.user}"
+    <sftp:config name="Invoice_SFTP_Config"
+                 doc:name="SFTP Config" doc:id="ec381f6a-57bc-4adf-9d94-827c1237223a">
+        <sftp:connection host="${invoice.sftp.host}"
+                         port="${invoice.sftp.port}" username="${invoice.sftp.user}"
                          password="${invoice.sftp.password}" workingDir="${invoice.sftp.path}"/>
     </sftp:config>
-    <munit:test name="transactions-test-suite" description="Transactions Test"
+    <munit:test name="transactions-test-suite"
+                description="Transactions Test"
                 doc:id="e1db564b-50f5-46d3-abfc-9e66b840ae63">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source
+                    value="retrieveInvoicesTaskFlow"/>
+        </munit:enable-flow-sources>
         <munit:execution>
-            <sftp:write config-ref="Invoice_SFTP_Config" doc:name="Write" doc:id="9b4141a4-9981-4a2c-8949-68cde49c123b"
-                        path="invoice_29.xml">
+            <sftp:write config-ref="Invoice_SFTP_Config"
+                        path="invoice_29.xml" doc:name="Write"
+                        doc:id="cabe1ea9-c9a1-45c1-83dc-345881de6487">
                 <sftp:content><![CDATA[#[%dw 2.0
 output application/xml
 ---
@@ -36,14 +49,20 @@ invoice: {
 	amount: 999.99
 }]]]></sftp:content>
             </sftp:write>
-            <sftp:list doc:name="List" doc:id="adcc731b-622c-4bb0-af0e-a7f41efa48fd" config-ref="Invoice_SFTP_Config"
-                       directoryPath="/">
-                <sftp:matcher
-                        filenamePattern="invoice_*.xml"/>
-            </sftp:list>
-            <foreach doc:name="For Each" doc:id="0ace7dd9-64b8-499b-8a5f-638079711276" collection="#[payload]">
-                <logger level="INFO" doc:name="Logger" doc:id="80b0f0e2-97ef-4976-ba46-ed72942d7ecb" message=""/>
-            </foreach>
+            <bpm:event-subscription-builder
+                    config-ref="BPM_Config" target="eventSubscription"
+                    doc:name="Event subscription builder"
+                    doc:id="16057127-3616-410c-9051-9c994a6f3654">
+                <bpm:event-subscription-filters>
+                    <bpm:event-type-filter
+                            eventType="processInstanceEnded"/>
+                </bpm:event-subscription-filters>
+            </bpm:event-subscription-builder>
+            <bpm:wait-events-and-unsubscribe
+                    config-ref="BPM_Config" subscription="#[vars.eventSubscription]"
+                    numberOfEvents="1" timeout="10"
+                    doc:name="Wait events and unsubscribe"
+                    doc:id="f0704484-5db5-4884-890f-3c5a239de1e6"/>
         </munit:execution>
     </munit:test>
 </mule>
