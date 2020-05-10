@@ -18,6 +18,7 @@
         <bpm:definitions>
             <bpm:classpath-definition resourceClasspath="processes/invoiceRetriever.bpmn20.xml"/>
             <bpm:classpath-definition resourceClasspath="processes/paymentRetriever.bpmn20.xml"/>
+            <bpm:classpath-definition resourceClasspath="processes/transactionFiler.bpmn20.xml"/>
         </bpm:definitions>
     </bpm:config>
     <sftp:config name="Invoice_SFTP_Config" doc:name="Invoice SFTP Config"
@@ -40,8 +41,9 @@
         </sftp:list>
         <foreach doc:name="For Each" doc:id="8b0d5af4-9ae3-43e2-9364-8cabace4762c">
             <logger level="INFO" doc:name="Logger" doc:id="4f273a01-1c67-4b6f-8222-041d8b7ecb37"/>
-            <logger level="INFO" message="#[payload]" doc:name="Logger" doc:id="9c848520-856e-4935-a71f-5349b226c72a"/>
-            <sftp:delete doc:name="Delete" doc:id="b5ef666b-aadc-4c4f-b3c8-a2824e9549be"
+            <bpm:process-factory doc:name="Process factory" doc:id="137276d6-7e7a-432d-8490-4250f2976521" config-ref="BPM_Config" processDefinitionKey="transactionFiler" uniqueBusinessKey="23" tenantId="com.alfame.esb.bpm.examples" target="transactionProcess"/>
+            <logger level="INFO" message="#[vars.transactionProcess]" doc:name="Logger" doc:id="25f7b704-7da9-462c-9a42-2ae3414a7642"/>
+			<sftp:delete doc:name="Delete" doc:id="b5ef666b-aadc-4c4f-b3c8-a2824e9549be"
                          config-ref="Invoice_SFTP_Config" path="#[attributes.path]"/>
         </foreach>
     </flow>
@@ -55,10 +57,15 @@
         </sftp:list>
         <foreach doc:name="For Each" doc:id="04eb799c-e8fa-41af-bae6-3b0c7e6ef834">
             <logger level="INFO" doc:name="Logger" doc:id="a6f58258-7a47-4364-ba00-78194431a15b"/>
-            <logger level="INFO" message="#[payload]" doc:name="Logger" doc:id="0db85856-3096-465d-b669-1276712700a0"/>
-            <sftp:delete doc:name="Delete" doc:id="b4575413-5ad9-4d82-a598-c848c9eb0fae"
+            <bpm:process-factory doc:name="Process factory" doc:id="90f1d63f-ed43-4870-aa69-ed47bf304af9" config-ref="BPM_Config" processDefinitionKey="transactionFiler" uniqueBusinessKey="23" tenantId="com.alfame.esb.bpm.examples" target="transactionProcess"/>
+            <logger level="INFO" message="#[vars.transactionProcess]" doc:name="Logger" doc:id="381a2174-551a-448e-a5fc-88d2040ee550"/>
+			<sftp:delete doc:name="Delete" doc:id="b4575413-5ad9-4d82-a598-c848c9eb0fae"
                          config-ref="Payment_SFTP_Config" path="#[attributes.path]"/>
         </foreach>
     </flow>
-
+    <flow name="fileTransactionTaskFlow" doc:id="695f0d5b-a31e-4802-a427-9b387a6ca1c1">
+        <bpm:task-listener config-ref="BPM_Config" doc:name="Task listener"
+                           doc:id="7b4ce3b7-b0b2-4958-b6d4-1a1d6fe3041c" endpointUrl="bpm://file.transaction"/>
+        <logger level="INFO" doc:name="Logger" doc:id="38f4cdab-37d3-4328-8a15-29bea90d89d4"/>
+    </flow>
 </mule>

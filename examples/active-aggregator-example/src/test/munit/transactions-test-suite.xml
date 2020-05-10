@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
-      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xmlns:ftpserver="http://www.mulesoft.org/schema/mule/ftpserver"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
-      xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-      xsi:schemaLocation="
+<mule
+        xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+        xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+        xmlns:ftpserver="http://www.mulesoft.org/schema/mule/ftpserver"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+        xsi:schemaLocation="
 			http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 			http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 			http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
@@ -52,6 +53,8 @@
                     value="retrieveInvoicesTaskFlow"/>
             <munit:enable-flow-source
                     value="retrievePaymentsTaskFlow"/>
+            <munit:enable-flow-source
+                    value="fileTransactionTaskFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
             <sftp:write config-ref="MUnit_Invoice_SFTP_Config"
@@ -84,7 +87,7 @@ invoice: {
             </sftp:write>
             <bpm:event-subscription-builder
                     config-ref="BPM_Config" target="invoiceEventSubscription"
-                    doc:name="Event subscription builder"
+                    doc:name="Invoice event subscription builder"
                     doc:id="16057127-3616-410c-9051-9c994a6f3654">
                 <bpm:event-subscription-filters>
                     <bpm:process-definition-filter
@@ -95,7 +98,7 @@ invoice: {
             </bpm:event-subscription-builder>
             <bpm:event-subscription-builder
                     config-ref="BPM_Config" target="paymentEventSubscription"
-                    doc:name="Event subscription builder"
+                    doc:name="Payment event subscription builder"
                     doc:id="a06deb13-4f98-4698-be70-f4d61e672b0e">
                 <bpm:event-subscription-filters>
                     <bpm:process-definition-filter
@@ -104,16 +107,50 @@ invoice: {
                             eventType="processInstanceEnded"/>
                 </bpm:event-subscription-filters>
             </bpm:event-subscription-builder>
+            <bpm:event-subscription-builder
+                    config-ref="BPM_Config" target="transactionEventSubscription"
+                    doc:name="Transaction event subscription builder"
+                    doc:id="fe8a9cf0-c226-4bef-910b-5bcf5455121c">
+                <bpm:event-subscription-filters>
+                    <bpm:process-definition-filter
+                            key="transactionFiler"/>
+                    <bpm:event-type-filter
+                            eventType="processInstanceEnded"/>
+                </bpm:event-subscription-filters>
+            </bpm:event-subscription-builder>
             <bpm:wait-events-and-unsubscribe
-                    config-ref="BPM_Config" subscription="#[vars.invoiceEventSubscription]"
-                    numberOfEvents="1" timeout="10"
-                    doc:name="Wait invoice events and unsubscribe"
+                    config-ref="BPM_Config"
+                    subscription="#[vars.invoiceEventSubscription]" numberOfEvents="1"
+                    timeout="10" doc:name="Wait invoice events and unsubscribe"
                     doc:id="f0704484-5db5-4884-890f-3c5a239de1e6"/>
             <bpm:wait-events-and-unsubscribe
-                    config-ref="BPM_Config" subscription="#[vars.paymentEventSubscription]"
-                    numberOfEvents="1" timeout="10"
-                    doc:name="Wait payment events and unsubscribe"
+                    config-ref="BPM_Config"
+                    subscription="#[vars.paymentEventSubscription]" numberOfEvents="1"
+                    timeout="10" doc:name="Wait payment events and unsubscribe"
                     doc:id="b006f8c1-42b9-4540-bff4-b8c3a99ca632"/>
+            <bpm:wait-events-and-unsubscribe
+                    config-ref="BPM_Config"
+                    subscription="#[vars.transactionEventSubscription]"
+                    numberOfEvents="1" timeout="15"
+                    doc:name="Wait transaction events and unsubscribe"
+                    doc:id="9b34ec66-617f-4c27-b66b-14d6138a866c"/>
         </munit:execution>
+        <munit:validation>
+            <bpm:get-unique-event-from-subscription
+                    doc:name="Get unique event from subscription"
+                    doc:id="ccfbbc66-afd3-4e6d-b595-a9ceaf36fa46"
+                    config-ref="BPM_Config"
+                    subscription="#[vars.transactionEventSubscription]">
+                <bpm:event-subscription-filters>
+                    <bpm:event-type-filter
+                            eventType="processInstanceEnded"/>
+                    <bpm:process-definition-filter
+                            key="transactionFiler"/>
+                </bpm:event-subscription-filters>
+            </bpm:get-unique-event-from-subscription>
+            <!-- munit-tools:assert-that expression="#[payload]" is="#[MunitTools::notNullValue()]"
+                message="Transaction process ending must be found" doc:name="Assert that"
+                doc:id="dd4efc83-3f9b-4e55-a912-d8a01786defd"/ -->
+        </munit:validation>
     </munit:test>
 </mule>

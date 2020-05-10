@@ -10,7 +10,8 @@
       ],
       "exportedResources": [
       	"processes/invoiceRetriever.bpmn20.xml",
-      	"processes/paymentRetriever.bpmn20.xml"
+      	"processes/paymentRetriever.bpmn20.xml",
+      	"processes/transactionFiler.bpmn20.xml"
       ]
     }
   },
