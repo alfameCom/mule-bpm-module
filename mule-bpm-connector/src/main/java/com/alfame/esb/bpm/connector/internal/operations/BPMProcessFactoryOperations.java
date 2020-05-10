@@ -62,4 +62,15 @@ public class BPMProcessFactoryOperations {
 
     }
 
+    @Alias("trigger-signal")
+    @MediaType(value = MediaType.ANY, strict = false)
+    public void triggerSignal(
+            @Config BPMExtension engine,
+            String processInstanceId,
+            String signalName) {
+
+        engine.triggerSignal(processInstanceId, signalName);
+
+        LOGGER.debug("Signaled process instance " + processInstanceId + " with " + signalName);
+    }
 }

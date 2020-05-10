@@ -14,6 +14,7 @@ import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.*;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
@@ -259,6 +260,17 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
     public void setVariable(String executionId, String variableName, Object content) {
         this.getRuntimeService().setVariable(executionId, variableName, content);
+    }
+
+    public void triggerSignal(String processInstanceId, String signalName) {
+        Execution execution = this.getRuntimeService().createExecutionQuery()
+                .signalEventSubscriptionName(signalName).processInstanceId(processInstanceId)
+                .singleResult();
+        if (execution != null) {
+            this.getRuntimeService().trigger(execution.getId());
+        } else {
+            throw new IllegalArgumentException("No such signal listener");
+        }
     }
 
     private DataSource buildDataSource(String tenantId) {

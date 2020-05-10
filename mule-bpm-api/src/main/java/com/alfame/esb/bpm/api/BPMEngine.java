@@ -13,4 +13,6 @@ public abstract class BPMEngine {
     public abstract BPMVariableInstance getHistoricVariableInstance(String executionId, String variableName);
     public abstract void setVariable(String executionId, String variableName, Object content);
 
+    public abstract void triggerSignal(String executionId, String signalName);
+
 }
