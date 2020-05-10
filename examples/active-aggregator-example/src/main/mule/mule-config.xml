@@ -1,20 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+<mule xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+      xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+			http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+			http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
+			http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
 
-    <configuration-properties file="mule-artifact.properties"/>
-	<bpm:config name="BPM_Config" doc:name="BPM Config" doc:id="69a5b251-f382-4521-80ce-6161ba2ca84b" defaultTenantId="com.alfame.esb.bpm.examples" >
-		<bpm:definitions >
-			<bpm:classpath-definition resourceClasspath="processes/invoiceRetriever.bpmn20.xml" />
-		</bpm:definitions>
-	</bpm:config>
-	<flow name="retrieveInvoicesTaskFlow" doc:id="88668ff9-6faf-4e8b-a765-c04b8919e024" >
-		<bpm:task-listener config-ref="BPM_Config" doc:name="Task listener" doc:id="e867459a-7f86-4402-a8a9-6122d241ff51" endpointUrl="bpm://retrieve.invoices"/>
-		<logger level="INFO" doc:name="Logger" doc:id="4f273a01-1c67-4b6f-8222-041d8b7ecb37" />
-	</flow>
+    <configuration-properties
+            file="mule-artifact.properties"/>
+    <bpm:config name="BPM_Config" doc:name="BPM Config"
+                doc:id="69a5b251-f382-4521-80ce-6161ba2ca84b"
+                defaultTenantId="com.alfame.esb.bpm.examples">
+        <bpm:definitions>
+            <bpm:classpath-definition resourceClasspath="processes/invoiceRetriever.bpmn20.xml"/>
+        </bpm:definitions>
+    </bpm:config>
+    <sftp:config name="Invoice_SFTP_Config" doc:name="SFTP Config" doc:id="e7f31a7a-e791-4548-a8d5-6ad25e668ac0">
+        <sftp:connection workingDir="${invoice.sftp.path}" host="${invoice.sftp.host}" port="${invoice.sftp.port}"
+                         username="${invoice.sftp.user}" password="${invoice.sftp.password}"/>
+    </sftp:config>
+    <flow name="retrieveInvoicesTaskFlow" doc:id="88668ff9-6faf-4e8b-a765-c04b8919e024">
+        <bpm:task-listener config-ref="BPM_Config" doc:name="Task listener"
+                           doc:id="e867459a-7f86-4402-a8a9-6122d241ff51" endpointUrl="bpm://retrieve.invoices"/>
+        <sftp:list config-ref="Invoice_SFTP_Config" doc:name="List" doc:id="890fab6d-f30f-4290-af92-626a5e8693dd"
+                   directoryPath="/">
+            <sftp:matcher
+                    filenamePattern="invoice_*.xml"/>
+        </sftp:list>
+        <foreach doc:name="For Each" doc:id="8b0d5af4-9ae3-43e2-9364-8cabace4762c">
+            <logger level="INFO" doc:name="Logger" doc:id="4f273a01-1c67-4b6f-8222-041d8b7ecb37"/>
+            <logger level="INFO" message="#[payload]" doc:name="Logger" doc:id="9c848520-856e-4935-a71f-5349b226c72a"/>
+			<sftp:delete doc:name="Delete" doc:id="b5ef666b-aadc-4c4f-b3c8-a2824e9549be" config-ref="Invoice_SFTP_Config" path="#[attributes.path]"/>
+        </foreach>
+    </flow>
 
 </mule>

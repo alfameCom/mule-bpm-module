@@ -22,7 +22,7 @@
                               username="${invoice.sftp.user}" password="${invoice.sftp.password}"
                               secure="true" homeDir="${app.home}"/>
     </ftpserver:config>
-    <sftp:config name="Invoice_SFTP_Config"
+    <sftp:config name="MUnit_Invoice_SFTP_Config"
                  doc:name="SFTP Config" doc:id="ec381f6a-57bc-4adf-9d94-827c1237223a">
         <sftp:connection host="${invoice.sftp.host}"
                          port="${invoice.sftp.port}" username="${invoice.sftp.user}"
@@ -36,7 +36,7 @@
                     value="retrieveInvoicesTaskFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
-            <sftp:write config-ref="Invoice_SFTP_Config"
+            <sftp:write config-ref="MUnit_Invoice_SFTP_Config"
                         path="invoice_29.xml" doc:name="Write"
                         doc:id="cabe1ea9-c9a1-45c1-83dc-345881de6487">
                 <sftp:content><![CDATA[#[%dw 2.0
