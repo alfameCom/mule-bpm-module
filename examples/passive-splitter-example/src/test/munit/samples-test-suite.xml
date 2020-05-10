@@ -16,6 +16,8 @@
             http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
             http://www.mulesoft.org/schema/mule/ftpserver http://www.mulesoft.org/schema/mule/ftpserver/current/mule-ftpserver.xsd">
     <munit:config name="samples-test-suite.xml"/>
+    <munit:dynamic-port propertyName="http.port"/>
+    <munit:dynamic-port propertyName="ftp.port"/>
     <http:request-config name="samplesApiRequestConfig"
                          doc:name="HTTP Request configuration"
                          doc:id="16c74cb9-30f7-4c4c-8beb-7a76dbbf8d49" basePath="/api">

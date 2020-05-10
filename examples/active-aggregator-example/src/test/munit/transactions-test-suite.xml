@@ -14,6 +14,8 @@
 			http://www.mulesoft.org/schema/mule/ftpserver http://www.mulesoft.org/schema/mule/ftpserver/current/mule-ftpserver.xsd
 			http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
     <munit:config name="transactions-test-suite.xml"/>
+    <munit:dynamic-port propertyName="invoice.sftp.port"/>
+    <munit:dynamic-port propertyName="payment.sftp.port"/>
     <ftpserver:config
             name="MUnit_Invoice_SFTP_Server_Config"
             doc:name="MUnit Invoice SFTP Server Config"
