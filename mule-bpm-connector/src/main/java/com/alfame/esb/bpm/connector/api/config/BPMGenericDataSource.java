@@ -3,8 +3,8 @@ package com.alfame.esb.bpm.connector.api.config;
 import com.zaxxer.hikari.HikariDataSource;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
@@ -18,25 +18,25 @@ public class BPMGenericDataSource extends BPMDataSource {
     @Parameter
     @Placement(order = 2)
     @Expression(NOT_SUPPORTED)
-    @Example("org.h2.Driver")
+    @Optional(defaultValue = "org.h2.Driver")
     private String driverClassName;
 
     @Parameter
     @Placement(order = 3)
     @Expression(NOT_SUPPORTED)
-    @Example("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1")
+    @Optional(defaultValue = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1")
     private String jdbcUrl;
 
     @Parameter
     @Placement(order = 4)
     @Expression(NOT_SUPPORTED)
-    @Example("sa")
+    @Optional(defaultValue = "sa")
     private String username;
 
     @Parameter
     @Placement(order = 5)
     @Expression(NOT_SUPPORTED)
-    @Example("sa")
+    @Optional(defaultValue = "sa")
     @Password
     private String password;
 

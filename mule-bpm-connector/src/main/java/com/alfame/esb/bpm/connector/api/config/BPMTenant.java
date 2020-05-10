@@ -2,6 +2,7 @@ package com.alfame.esb.bpm.connector.api.config;
 
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -19,6 +20,7 @@ public class BPMTenant {
     @Parameter
     @Expression(NOT_SUPPORTED)
     @Optional
+    @NullSafe(defaultImplementingType = com.alfame.esb.bpm.connector.api.config.BPMGenericDataSource.class)
     private BPMDataSource dataSource;
 
     @Parameter

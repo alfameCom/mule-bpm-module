@@ -15,9 +15,6 @@ import org.flowable.engine.*;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
-import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutorFactory;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -29,6 +26,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.extension.api.annotation.*;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.RefName;
@@ -38,7 +36,6 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
 
 import javax.sql.DataSource;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -61,13 +58,15 @@ import static org.slf4j.LoggerFactory.getLogger;
         subTypes = {BPMClasspathDefinition.class, BPMStreamDefinition.class})
 @SubTypeMapping(baseType = BPMDataSource.class,
         subTypes = {BPMDataSourceReference.class, BPMGenericDataSource.class})
+@SubTypeMapping(baseType = BPMAsyncExecutor.class,
+        subTypes = {BPMDefaultAsyncExecutor.class})
 @SubTypeMapping(baseType = BPMEventSubscriptionFilter.class,
         subTypes = {BPMEventSubscriptionProcessDefinitionFilter.class, BPMEventSubscriptionProcessInstanceFilter.class, BPMEventSubscriptionEventTypeFilter.class, BPMEventSubscriptionVariableFilter.class})
 @ExternalLib(name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.RuntimeService")
 @ExternalLib(name = "BPM Flowable Activity", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-flowable-activity:2.1.1-SNAPSHOT", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 @ExternalLib(name = "BPM Task Queue", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-task-queue:2.1.1-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory")
 @ExternalLib(name = "BPM API", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-api:2.1.1-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
-public class BPMExtension extends BPMEngine implements Initialisable, Startable, Stoppable, TenantInfoHolder, TenantAwareAsyncExecutorFactory {
+public class BPMExtension extends BPMEngine implements Initialisable, Startable, Stoppable, TenantInfoHolder {
 
     private static final Logger LOGGER = getLogger(BPMExtension.class);
 
@@ -92,6 +91,7 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
     @Parameter
     @Expression(NOT_SUPPORTED)
     @Optional
+    @NullSafe(defaultImplementingType = com.alfame.esb.bpm.connector.api.config.BPMGenericDataSource.class)
     @Placement(tab = "General", order = 3)
     @DisplayName("Default data source")
     private BPMDataSource defaultDataSource;
@@ -106,11 +106,12 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
     @Parameter
     @Optional
+    @NullSafe(defaultImplementingType = BPMDefaultAsyncExecutor.class)
     @Expression(NOT_SUPPORTED)
-    @Alias("default-async-executor")
+    @Alias("async-executor")
     @Placement(tab = "General", order = 5)
     @DisplayName("BPM Async executor")
-    private BPMAsyncExecutor defaultAsyncExecutor;
+    private BPMAsyncExecutor asyncExecutor;
 
     @Parameter
     @Optional
@@ -124,7 +125,6 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
     private ProcessEngine processEngine;
     private Collection<String> registeredTenantIds = new ArrayList<>();
     private String currentTenantId;
-    private TenantAwareAsyncExecutor asyncExecutor;
 
     @Override
     public void initialise() throws InitialisationException {
@@ -144,25 +144,9 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
             }
         }
 
-        if (this.defaultAsyncExecutor != null) {
-            try {
-                Class<?> asyncExecutorClass = Class.forName(this.defaultAsyncExecutor.getClassName());
-                Constructor<?> asyncExecutorCostructor = null;
-                try {
-                    asyncExecutorCostructor = asyncExecutorClass.getConstructor(TenantInfoHolder.class, TenantAwareAsyncExecutorFactory.class);
-                    this.asyncExecutor = (TenantAwareAsyncExecutor) asyncExecutorCostructor.newInstance(this, this);
-                } catch (NoSuchMethodException factoriedException) {
-                    asyncExecutorCostructor = asyncExecutorClass.getConstructor(TenantInfoHolder.class);
-                    this.asyncExecutor = (TenantAwareAsyncExecutor) asyncExecutorCostructor.newInstance(this);
-                }
-            } catch (Exception e) {
-                throw new InitialisationException(e, this);
-            }
-            this.asyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(this.defaultAsyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis());
-            this.asyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(this.defaultAsyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis());
-            this.asyncExecutor.setMaxAsyncJobsDuePerAcquisition(this.defaultAsyncExecutor.getMaxAsyncJobsDuePerAcquisition());
-            this.asyncExecutor.setMaxTimerJobsPerAcquisition(this.defaultAsyncExecutor.getMaxTimerJobsPerAcquisition());
-            this.processEngineConfiguration.setAsyncExecutor(this.asyncExecutor);
+        if (this.asyncExecutor != null) {
+            AsyncExecutor asyncExecutor = this.asyncExecutor.createAsyncExecutor(this, this);
+            this.processEngineConfiguration.setAsyncExecutor(asyncExecutor);
         }
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
     }
@@ -178,8 +162,8 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
             }
         }
 
-        if (this.asyncExecutor != null) {
-            this.asyncExecutor.start();
+        if (this.processEngineConfiguration.getAsyncExecutor() != null) {
+            this.processEngineConfiguration.getAsyncExecutor().start();
         }
 
         BPMEnginePool.registerInstance(this.name, this);
@@ -193,7 +177,9 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
         BPMEnginePool.unregisterInstance(this.name);
 
-        this.asyncExecutor.shutdown();
+        if (this.processEngineConfiguration.getAsyncExecutor() != null) {
+            this.processEngineConfiguration.getAsyncExecutor().shutdown();
+        }
         this.processEngine.close();
     }
 
@@ -214,19 +200,6 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
     @Override
     public void setCurrentTenantId(String currentTenantId) {
         this.currentTenantId = currentTenantId;
-    }
-
-    @Override
-    public AsyncExecutor createAsyncExecutor(String tenantId) {
-        DefaultAsyncJobExecutor tenantExecutor = null;
-
-        if (this.defaultAsyncExecutor != null) {
-            tenantExecutor = new DefaultAsyncJobExecutor();
-            tenantExecutor.setCorePoolSize(this.defaultAsyncExecutor.getMinThreads());
-            tenantExecutor.setMaxPoolSize(this.defaultAsyncExecutor.getMaxThreads());
-        }
-
-        return tenantExecutor;
     }
 
     public AsyncExecutor getAsyncExecutor(String tenantId) {

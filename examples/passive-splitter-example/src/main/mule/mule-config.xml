@@ -42,7 +42,9 @@
             <bpm:classpath-definition
                     resourceClasspath="processes/sampleSubmitter.bpmn20.xml"/>
         </bpm:definitions>
-        <bpm:default-async-executor/>
+        <bpm:async-executor>
+        	<bpm:default-async-executor/>
+        </bpm:async-executor>
     </bpm:config>
     <flow name="main-api">
         <http:listener config-ref="httpListenerConfigDefault"

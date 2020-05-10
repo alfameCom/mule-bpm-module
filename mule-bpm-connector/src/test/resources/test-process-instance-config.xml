@@ -15,7 +15,9 @@
         <bpm:definitions>
             <bpm:classpath-definition resourceClasspath="processes/TestProcess.bpmn20.xml"/>
         </bpm:definitions>
-        <bpm:default-async-executor/>
+        <bpm:async-executor>
+            <bpm:default-async-executor/>
+        </bpm:async-executor>
     </bpm:config>
 
     <flow name="startTestProcessFlow">
