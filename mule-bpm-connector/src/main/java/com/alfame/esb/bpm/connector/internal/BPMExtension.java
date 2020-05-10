@@ -10,6 +10,7 @@ import com.alfame.esb.bpm.connector.internal.operations.BPMProcessVariableOperat
 import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessHistoricVariableInstanceProxy;
 import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessVariableInstanceProxy;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.cfg.multitenant.TenantAwareDataSource;
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.*;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
@@ -37,6 +38,8 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -129,7 +132,7 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
     @Override
     public void initialise() throws InitialisationException {
-        this.processEngineConfiguration = new MultiSchemaMultiTenantProcessEngineConfiguration(this);
+        this.processEngineConfiguration = new CustomMultiSchemaMultiTenantProcessEngineConfiguration(this);
 
         this.processEngineConfiguration.setDisableIdmEngine(true);
 
@@ -150,6 +153,38 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
             this.processEngineConfiguration.setAsyncExecutor(asyncExecutor);
         }
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
+    }
+
+    public class CustomMultiSchemaMultiTenantProcessEngineConfiguration extends MultiSchemaMultiTenantProcessEngineConfiguration {
+
+        public CustomMultiSchemaMultiTenantProcessEngineConfiguration(TenantInfoHolder tenantInfoHolder) {
+            super(tenantInfoHolder);
+        }
+
+        @Override
+        protected void createTenantSchema(String tenantId) {
+            super.createTenantSchema(tenantId);
+
+            DataSource dataSource = ((TenantAwareDataSource) super.getDataSource()).getDataSources().get(tenantId);
+            Connection connection = null;
+            try {
+                connection = dataSource.getConnection();
+                connection.setAutoCommit(false);
+                connection.createStatement().execute("alter table ACT_HI_PROCINST drop constraint ALFAME_UNIQ_BUSINESS_KEY if exists");
+                connection.createStatement().execute("alter table ACT_HI_PROCINST add constraint ALFAME_UNIQ_BUSINESS_KEY unique (BUSINESS_KEY_)");
+                connection.commit();
+            } catch (SQLException exception) {
+                throw new RuntimeException(exception);
+            } finally {
+                if (connection != null) {
+                    try {
+                        connection.close();
+                    } catch (SQLException exception) {
+                        throw new RuntimeException(exception);
+                    }
+                }
+            }
+        }
     }
 
     @Override
