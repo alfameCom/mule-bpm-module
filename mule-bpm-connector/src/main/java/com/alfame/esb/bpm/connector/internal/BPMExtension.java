@@ -4,6 +4,7 @@ import com.alfame.esb.bpm.api.*;
 import com.alfame.esb.bpm.connector.api.config.*;
 import com.alfame.esb.bpm.connector.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.bpm.connector.internal.listener.BPMTaskListener;
+import com.alfame.esb.bpm.connector.internal.operations.BPMAttachmentOperations;
 import com.alfame.esb.bpm.connector.internal.operations.BPMEventSubscriptionOperations;
 import com.alfame.esb.bpm.connector.internal.operations.BPMProcessFactoryOperations;
 import com.alfame.esb.bpm.connector.internal.operations.BPMProcessVariableOperations;
@@ -57,7 +58,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Extension(name = "BPM", vendor = "Alfame Systems")
 @Sources(BPMTaskListener.class)
 @ConnectionProviders(BPMConnectionProvider.class)
-@Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class})
+@Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class, BPMAttachmentOperations.class})
 @SubTypeMapping(baseType = BPMDefinition.class,
         subTypes = {BPMClasspathDefinition.class, BPMStreamDefinition.class})
 @SubTypeMapping(baseType = BPMDataSource.class,
@@ -242,14 +243,6 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
         return this.processEngineConfiguration.getAsyncExecutor();
     }
 
-    public String getName() {
-        return this.name;
-    }
-
-    public String getDefaultTenantId() {
-        return this.defaultTenantId;
-    }
-
     public RuntimeService getRuntimeService() {
         return this.processEngine.getRuntimeService();
     }
@@ -262,14 +255,27 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
         return this.processEngine.getTaskService();
     }
 
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public String getDefaultTenantId() {
+        return this.defaultTenantId;
+    }
+
+    @Override
     public BPMProcessInstanceBuilder processInstanceBuilder() {
         return new BPMProcessInstanceBuilderImpl(this, this.getRuntimeService(), this.getHistoryService());
     }
 
+    @Override
     public BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder() {
         return new BPMEngineEventSubscriptionBuilderImpl(this, this.getRuntimeService());
     }
 
+    @Override
     public BPMVariableInstance getVariableInstance(String executionId, String variableName) {
         BPMProcessVariableInstanceProxy variableInstanceProxy = null;
 
@@ -280,6 +286,7 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
         return variableInstanceProxy;
     }
 
+    @Override
     public BPMVariableInstance getHistoricVariableInstance(String executionId, String variableName) {
         BPMProcessHistoricVariableInstanceProxy historicVariableInstanceProxy = null;
         HistoricVariableInstanceQuery variableQuery = this.getHistoryService().createHistoricVariableInstanceQuery()
@@ -293,8 +300,14 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
         return historicVariableInstanceProxy;
     }
 
+    @Override
     public void setVariable(String executionId, String variableName, Object content) {
         this.getRuntimeService().setVariable(executionId, variableName, content);
+    }
+
+    @Override
+    public BPMAttachmentBuilder attachmentBuilder() {
+        return new BPMAttachmentBuilderImpl(this.getTaskService());
     }
 
     public void triggerSignal(String processInstanceId, String signalName) {

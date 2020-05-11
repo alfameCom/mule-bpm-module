@@ -57,9 +57,9 @@ public class BPMProcessVariableOperations {
             @Config BPMExtension config,
             @Connection BPMConnection connection,
             @DisplayName("Variable name") String variableName,
-            @Content @Summary("Content for variable") TypedValue<Serializable> content) throws IOException {
+            @Alias("variable-content") @Content @Summary("Content for variable") TypedValue<Serializable> variableContent) throws IOException {
 
-        connection.getVariablesToUpdate().put(variableName, content.getValue());
+        connection.getVariablesToUpdate().put(variableName, variableContent.getValue());
 
         LOGGER.debug("Variable " + variableName + " set to be updated for process " + connection.getTask().getProcessInstanceId());
     }

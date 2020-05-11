@@ -42,10 +42,12 @@
         <foreach doc:name="For Each" doc:id="8b0d5af4-9ae3-43e2-9364-8cabace4762c">
             <logger level="INFO" doc:name="Logger" doc:id="4f273a01-1c67-4b6f-8222-041d8b7ecb37"/>
             <bpm:process-factory doc:name="Process factory" doc:id="137276d6-7e7a-432d-8490-4250f2976521" config-ref="BPM_Config" processDefinitionKey="transactionFiler" uniqueBusinessKey="23" tenantId="com.alfame.esb.bpm.examples" returnCollidedInstance="true" target="transactionProcess"/>
+            <bpm:attachment-builder processInstanceId="#[vars.transactionProcess.processInstanceId]" attachmentName="invoice" type="application/xml" config-ref="BPM_Config" target="invoiceAttachment">
+            	<bpm:attachment-content>#[payload]</bpm:attachment-content>
+            </bpm:attachment-builder>
             <until-successful maxRetries="5" doc:name="Until Successful" doc:id="596dd623-ed95-47a5-83a0-ffe8d0d2727a" millisBetweenRetries="100">
 				<bpm:trigger-signal signalName="receiveInvoice" processInstanceId="#[vars.transactionProcess.processInstanceId]" doc:name="Trigger signal" doc:id="24ea8f10-9dd6-43e2-8fca-cc6ad887a935" config-ref="BPM_Config" />
 			</until-successful>
-			<logger level="INFO" message="#[vars.transactionProcess]" doc:name="Logger" doc:id="25f7b704-7da9-462c-9a42-2ae3414a7642"/>
 			<sftp:delete doc:name="Delete" doc:id="b5ef666b-aadc-4c4f-b3c8-a2824e9549be"
                          config-ref="Invoice_SFTP_Config" path="#[attributes.path]"/>
         </foreach>
@@ -61,10 +63,12 @@
         <foreach doc:name="For Each" doc:id="04eb799c-e8fa-41af-bae6-3b0c7e6ef834">
             <logger level="INFO" doc:name="Logger" doc:id="a6f58258-7a47-4364-ba00-78194431a15b"/>
             <bpm:process-factory doc:name="Process factory" doc:id="90f1d63f-ed43-4870-aa69-ed47bf304af9" config-ref="BPM_Config" processDefinitionKey="transactionFiler" uniqueBusinessKey="23" tenantId="com.alfame.esb.bpm.examples" returnCollidedInstance="true" target="transactionProcess"/>
+            <bpm:attachment-builder processInstanceId="#[vars.transactionProcess.processInstanceId]" attachmentName="payment" type="application/json" config-ref="BPM_Config" target="paymentAttachment">
+            	<bpm:attachment-content>#[payload]</bpm:attachment-content>
+            </bpm:attachment-builder>
 			<until-successful maxRetries="5" doc:name="Until Successful" doc:id="2b2f0787-b10c-4974-b492-144e370f636c" millisBetweenRetries="100">
 				<bpm:trigger-signal signalName="receivePayment" processInstanceId="#[vars.transactionProcess.processInstanceId]" doc:name="Trigger signal" doc:id="790ada30-3341-4f8a-b3da-e8f3028a81c0" config-ref="BPM_Config" />
 			</until-successful>
-			<logger level="INFO" message="#[vars.transactionProcess]" doc:name="Logger" doc:id="381a2174-551a-448e-a5fc-88d2040ee550"/>
 			<sftp:delete doc:name="Delete" doc:id="b4575413-5ad9-4d82-a598-c848c9eb0fae"
                          config-ref="Payment_SFTP_Config" path="#[attributes.path]"/>
         </foreach>

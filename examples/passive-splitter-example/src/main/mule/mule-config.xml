@@ -225,7 +225,7 @@ write(payload, "application/xml")]'
                           doc:id="15beda4f-4054-4f7c-884e-c3a2b6c2a8c4"
                           config-ref="engineConfig" variableName="sampleXml"
                           transactionalAction="ALWAYS_JOIN">
-            <bpm:content>#[payload]</bpm:content>
+            <bpm:variable-content>#[payload]</bpm:variable-content>
         </bpm:set-variable>
     </flow>
     <flow name="sampleSubmittingTaskFlow"
