@@ -32,13 +32,15 @@ public class BPMProcessFactoryOperations {
 
         BPMProcessInstance processInstance = null;
 
-        BPMProcessInstanceBuilderImpl instanceBuilder = new BPMProcessInstanceBuilderImpl(engine, engine.getRuntimeService());
+        BPMProcessInstanceBuilderImpl instanceBuilder = new BPMProcessInstanceBuilderImpl(
+                engine, engine.getRuntimeService(), engine.getHistoryService());
 
         instanceBuilder
                 .processDefinitionKey(properties.getProcessDefinitionKey())
                 .tenantId(properties.getTenantId())
                 .uniqueBusinessKey(properties.getUniqueBusinessKey())
-                .processInstanceName(properties.getProcessName());
+                .processInstanceName(properties.getProcessName())
+                .returnCollidedInstance(properties.getReturnCollidedInstance());
 
         if (processVariables != null) {
             for (BPMProcessVariable processVariable : processVariables) {

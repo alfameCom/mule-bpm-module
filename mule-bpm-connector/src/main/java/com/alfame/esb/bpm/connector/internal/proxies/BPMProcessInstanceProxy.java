@@ -78,4 +78,9 @@ public class BPMProcessInstanceProxy implements BPMProcessInstance {
         return this.processInstance.getStartTime();
     }
 
+    @Override
+    public Date getEndTime() {
+        return null;
+    }
+
 }

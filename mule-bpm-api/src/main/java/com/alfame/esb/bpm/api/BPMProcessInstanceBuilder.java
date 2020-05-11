@@ -10,6 +10,7 @@ public abstract class BPMProcessInstanceBuilder {
     protected String uniqueBusinessKey;
     protected String processInstanceName;
     protected Map<String, Object> variables = new HashMap<>();
+    protected boolean returnCollidedInstance;
 
     public BPMProcessInstanceBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
@@ -38,6 +39,11 @@ public abstract class BPMProcessInstanceBuilder {
 
     public BPMProcessInstanceBuilder variableWithValue(String variableName, Object value) {
         this.variables.put(variableName, value);
+        return this;
+    }
+
+    public BPMProcessInstanceBuilder returnCollidedInstance(boolean returnCollidedInstance) {
+        this.returnCollidedInstance = returnCollidedInstance;
         return this;
     }
 

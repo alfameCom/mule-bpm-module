@@ -3,8 +3,11 @@ package com.alfame.esb.bpm.connector.internal;
 import com.alfame.esb.bpm.api.BPMEngine;
 import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.api.BPMProcessInstanceBuilder;
+import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessHistoricInstanceProxy;
 import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessInstanceProxy;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.slf4j.Logger;
@@ -19,14 +22,17 @@ public class BPMProcessInstanceBuilderImpl extends BPMProcessInstanceBuilder {
 
     private final BPMEngine engine;
     private final RuntimeService runtimeService;
+    private final HistoryService historyService;
 
-    public BPMProcessInstanceBuilderImpl(BPMEngine engine, RuntimeService runtimeService) {
+    public BPMProcessInstanceBuilderImpl(BPMEngine engine, RuntimeService runtimeService, HistoryService historyService) {
         this.engine = engine;
         this.runtimeService = runtimeService;
+        this.historyService = historyService;
     }
 
     @Override
     public BPMProcessInstance startProcessInstance() {
+        BPMProcessInstance builtProcessInstance = null;
         ProcessInstance processInstance = null;
         ProcessInstanceBuilder instanceBuilder = this.runtimeService.createProcessInstanceBuilder();
         long startTime = System.currentTimeMillis();
@@ -63,13 +69,31 @@ public class BPMProcessInstanceBuilderImpl extends BPMProcessInstanceBuilder {
 
         try {
             processInstance = instanceBuilder.start();
+            builtProcessInstance = new BPMProcessInstanceProxy(processInstance);
         } catch (Exception exception) {
-            LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance.getProcessInstanceId(), exception, System.currentTimeMillis() - startTime);
-            throw exception;
+            try {
+                if (this.uniqueBusinessKey != null && this.returnCollidedInstance) {
+                    HistoricProcessInstance historicProcessInstance =
+                            this.historyService.createHistoricProcessInstanceQuery()
+                                    .processInstanceBusinessKey(this.uniqueBusinessKey).singleResult();
+                    if (historicProcessInstance != null) {
+                        builtProcessInstance = new BPMProcessHistoricInstanceProxy(historicProcessInstance);
+                    } else {
+                        LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId(): null, exception, System.currentTimeMillis() - startTime);
+                        throw exception;
+                    }
+                } else {
+                    LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId(): null, exception, System.currentTimeMillis() - startTime);
+                    throw exception;
+                }
+            } catch (Exception historyException) {
+                LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId(): null, historyException, System.currentTimeMillis() - startTime);
+                throw historyException;
+            }
         }
 
-        LOGGER.info("<<<<< process definition {}: instance {} started in {} ms", this.processDefinitionKey, processInstance.getProcessInstanceId(), System.currentTimeMillis() - startTime);
-        return new BPMProcessInstanceProxy(processInstance);
+        LOGGER.info("<<<<< process definition {}: instance {} started in {} ms", this.processDefinitionKey, builtProcessInstance.getProcessInstanceId(), System.currentTimeMillis() - startTime);
+        return builtProcessInstance;
     }
 
 }

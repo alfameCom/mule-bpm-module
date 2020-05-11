@@ -20,6 +20,10 @@ public class BPMProcessFactoryProperties {
     @Optional
     private String processName;
 
+    @Parameter
+    @Optional(defaultValue = "false")
+    private boolean returnCollidedInstance;
+
     public String getProcessDefinitionKey() {
         return processDefinitionKey;
     }
@@ -46,6 +50,10 @@ public class BPMProcessFactoryProperties {
 
     public String getProcessName() {
         return processName;
+    }
+
+    public boolean getReturnCollidedInstance() {
+        return returnCollidedInstance;
     }
 
     public void setProcessName(String processName) {

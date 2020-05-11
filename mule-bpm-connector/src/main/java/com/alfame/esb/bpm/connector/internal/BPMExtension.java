@@ -263,7 +263,7 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
     }
 
     public BPMProcessInstanceBuilder processInstanceBuilder() {
-        return new BPMProcessInstanceBuilderImpl(this, this.getRuntimeService());
+        return new BPMProcessInstanceBuilderImpl(this, this.getRuntimeService(), this.getHistoryService());
     }
 
     public BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder() {

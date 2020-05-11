@@ -19,6 +19,7 @@
         <!--  Flowable logger -->
         <AsyncLogger name="org.flowable" level="INFO"/>
         <AsyncLogger name="org.flowable.job.service.impl.asyncexecutor" level="DEBUG"/>
+        <AsyncLogger name="org.flowable.common.engine.impl.interceptor.CommandContext" level="FATAL"/>
 
         <!--  BPM extension -->
         <AsyncLogger name="com.alfame.esb.bpm.connector" level="DEBUG"/>

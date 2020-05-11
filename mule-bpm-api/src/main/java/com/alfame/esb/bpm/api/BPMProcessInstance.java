@@ -71,4 +71,9 @@ public interface BPMProcessInstance {
      */
     Date getStartTime();
 
+    /**
+     * Returns the end time of this process instance.
+     */
+    Date getEndTime();
+
 }
