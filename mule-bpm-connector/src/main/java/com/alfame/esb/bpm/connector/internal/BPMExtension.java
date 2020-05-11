@@ -39,6 +39,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
 
 import javax.sql.DataSource;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -67,6 +68,8 @@ import static org.slf4j.LoggerFactory.getLogger;
         subTypes = {BPMDefaultAsyncExecutor.class})
 @SubTypeMapping(baseType = BPMEventSubscriptionFilter.class,
         subTypes = {BPMEventSubscriptionProcessDefinitionFilter.class, BPMEventSubscriptionProcessInstanceFilter.class, BPMEventSubscriptionEventTypeFilter.class, BPMEventSubscriptionVariableFilter.class})
+@SubTypeMapping(baseType = BPMAttachmentFilter.class,
+        subTypes = {BPMAttachmentNameFilter.class})
 @ExternalLib(name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.4.1", requiredClassName = "org.flowable.engine.RuntimeService")
 @ExternalLib(name = "BPM Flowable Activity", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-flowable-activity:2.1.1-SNAPSHOT", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 @ExternalLib(name = "BPM Task Queue", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-task-queue:2.1.1-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory")
@@ -308,6 +311,11 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
     @Override
     public BPMAttachmentBuilder attachmentBuilder() {
         return new BPMAttachmentBuilderImpl(this.getTaskService());
+    }
+
+    @Override
+    public InputStream getAttachmentContent(String attachmentId) {
+        return this.getTaskService().getAttachmentContent(attachmentId);
     }
 
     public void triggerSignal(String processInstanceId, String signalName) {

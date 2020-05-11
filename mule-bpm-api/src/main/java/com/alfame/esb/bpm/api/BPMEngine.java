@@ -1,5 +1,7 @@
 package com.alfame.esb.bpm.api;
 
+import java.io.InputStream;
+
 public abstract class BPMEngine {
 
     public abstract String getName();
@@ -14,6 +16,7 @@ public abstract class BPMEngine {
     public abstract void setVariable(String executionId, String variableName, Object content);
 
     public abstract BPMAttachmentBuilder attachmentBuilder();
+    public abstract InputStream getAttachmentContent(String attachmentId);
 
     public abstract void triggerSignal(String executionId, String signalName);
 
