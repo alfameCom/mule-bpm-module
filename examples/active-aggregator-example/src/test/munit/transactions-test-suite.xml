@@ -77,7 +77,7 @@ invoice: {
                 <sftp:content><![CDATA[#[%dw 2.0
 output application/json
 ---
-invoice: {
+{
 	id: 21,
 	transactionId: "2514-234x-df23-35fa",
 	description: "Important payment",

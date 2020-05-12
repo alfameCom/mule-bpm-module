@@ -41,8 +41,15 @@
         </sftp:list>
         <foreach doc:name="For Each" doc:id="8b0d5af4-9ae3-43e2-9364-8cabace4762c">
             <logger level="INFO" doc:name="Logger" doc:id="4f273a01-1c67-4b6f-8222-041d8b7ecb37"/>
+            <set-payload
+                    value='#[%dw 2.0
+output application/java
+---
+write(payload, "application/xml")]'
+                    doc:name="Set Payload" doc:id="8d69b4ab-de01-4f9e-b87f-5bdbbb71a7f1"/>
             <bpm:process-factory doc:name="Process factory" doc:id="137276d6-7e7a-432d-8490-4250f2976521"
-                                 config-ref="BPM_Config" processDefinitionKey="transactionFiler" uniqueBusinessKey="23"
+                                 config-ref="BPM_Config" processDefinitionKey="transactionFiler"
+                                 uniqueBusinessKey="#[%dw 2.0 var invoice = read(payload, 'application/xml') output application/java --- invoice.invoice.transactionId]"
                                  tenantId="com.alfame.esb.bpm.examples" returnCollidedInstance="true"
                                  target="transactionProcess"/>
             <bpm:create-attachment processInstanceId="#[vars.transactionProcess.processInstanceId]"
@@ -71,8 +78,15 @@
         </sftp:list>
         <foreach doc:name="For Each" doc:id="04eb799c-e8fa-41af-bae6-3b0c7e6ef834">
             <logger level="INFO" doc:name="Logger" doc:id="a6f58258-7a47-4364-ba00-78194431a15b"/>
+            <set-payload
+                    value='#[%dw 2.0
+output application/java
+---
+write(payload, "application/json")]'
+                    doc:name="Set Payload" doc:id="b80be76f-10e6-4e3b-99cf-69b469592696"/>
             <bpm:process-factory doc:name="Process factory" doc:id="90f1d63f-ed43-4870-aa69-ed47bf304af9"
-                                 config-ref="BPM_Config" processDefinitionKey="transactionFiler" uniqueBusinessKey="23"
+                                 config-ref="BPM_Config" processDefinitionKey="transactionFiler"
+                                 uniqueBusinessKey="#[%dw 2.0 var payment = read(payload, 'application/json') output application/java --- payment.transactionId]"
                                  tenantId="com.alfame.esb.bpm.examples" returnCollidedInstance="true"
                                  target="transactionProcess"/>
             <bpm:create-attachment processInstanceId="#[vars.transactionProcess.processInstanceId]"
@@ -96,19 +110,34 @@
                            doc:id="7b4ce3b7-b0b2-4958-b6d4-1a1d6fe3041c" endpointUrl="bpm://file.transaction"
                            transactionalAction="ALWAYS_BEGIN"/>
         <logger level="INFO" doc:name="Logger" doc:id="38f4cdab-37d3-4328-8a15-29bea90d89d4"/>
-        <bpm:get-latest-attachment doc:name="Get latest attachment" doc:id="28088d4f-fb5b-4ebe-b5e2-dfce8fc6a5ee"
-                                   config-ref="BPM_Config" processInstanceId="#[attributes.processInstanceId]">
+        <bpm:get-latest-attachment doc:name="Get latest invoice attachment"
+                                   doc:id="28088d4f-fb5b-4ebe-b5e2-dfce8fc6a5ee"
+                                   config-ref="BPM_Config" processInstanceId="#[attributes.processInstanceId]"
+                                   target="invoice">
             <bpm:attachment-filters>
                 <bpm:attachment-name-filter attachmentName="invoice"/>
             </bpm:attachment-filters>
         </bpm:get-latest-attachment>
-        <logger level="INFO" doc:name="Logger" doc:id="1708dc72-a2b9-461f-9329-ed8330eb9570" message="#[payload]"/>
-        <bpm:get-latest-attachment doc:name="Get latest attachment" doc:id="5b790309-4917-48bc-92ae-e5cf7baee054"
-                                   config-ref="BPM_Config" processInstanceId="#[attributes.processInstanceId]">
+        <bpm:get-latest-attachment doc:name="Get latest payment attachment"
+                                   doc:id="5b790309-4917-48bc-92ae-e5cf7baee054"
+                                   config-ref="BPM_Config" processInstanceId="#[attributes.processInstanceId]"
+                                   target="payment">
             <bpm:attachment-filters>
                 <bpm:attachment-name-filter attachmentName="payment"/>
             </bpm:attachment-filters>
         </bpm:get-latest-attachment>
+        <set-payload value='#[%dw 2.0
+var invoice = read(vars.invoice, "application/xml")
+var payment = read(vars.payment, "application/json")
+
+output application/xml
+---
+transaction : {
+	transactionId: payment.transactionId,
+	payee: invoice.invoice.payee,
+	payer: payment.payer,
+	amount: payment.amount
+}]' doc:name="Set Payload" doc:id="1b2925d3-6873-45be-93d5-d408d8fabb65"/>
         <logger level="INFO" doc:name="Logger" doc:id="5aa174da-8fdc-4ef1-a620-c4ccd2d35a9a" message="#[payload]"/>
     </flow>
 </mule>
