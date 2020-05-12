@@ -26,7 +26,7 @@ public class BPMProcessFactoryOperations {
     @MediaType(value = MediaType.ANY, strict = false)
     @OutputResolver(output = BPMProcessFactoryOutputMetadataResolver.class)
     public BPMProcessInstance processFactory(
-            @ParameterGroup(name = "properties") BPMProcessFactoryProperties properties,
+            @ParameterGroup(name = "Factory properties") BPMProcessFactoryProperties properties,
             @Config BPMExtension engine,
             @Optional @Alias("process-variables") List<BPMProcessVariable> processVariables) {
 

@@ -97,14 +97,14 @@
                            transactionalAction="ALWAYS_BEGIN"/>
         <logger level="INFO" doc:name="Logger" doc:id="38f4cdab-37d3-4328-8a15-29bea90d89d4"/>
         <bpm:get-latest-attachment doc:name="Get latest attachment" doc:id="28088d4f-fb5b-4ebe-b5e2-dfce8fc6a5ee"
-                                   config-ref="BPM_Config" transactionalAction="ALWAYS_JOIN">
+                                   config-ref="BPM_Config" processInstanceId="#[attributes.processInstanceId]">
             <bpm:attachment-filters>
                 <bpm:attachment-name-filter attachmentName="invoice"/>
             </bpm:attachment-filters>
         </bpm:get-latest-attachment>
         <logger level="INFO" doc:name="Logger" doc:id="1708dc72-a2b9-461f-9329-ed8330eb9570" message="#[payload]"/>
         <bpm:get-latest-attachment doc:name="Get latest attachment" doc:id="5b790309-4917-48bc-92ae-e5cf7baee054"
-                                   config-ref="BPM_Config" transactionalAction="ALWAYS_JOIN">
+                                   config-ref="BPM_Config" processInstanceId="#[attributes.processInstanceId]">
             <bpm:attachment-filters>
                 <bpm:attachment-name-filter attachmentName="payment"/>
             </bpm:attachment-filters>

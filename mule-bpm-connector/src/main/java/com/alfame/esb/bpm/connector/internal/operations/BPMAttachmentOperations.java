@@ -7,7 +7,6 @@ import com.alfame.esb.bpm.connector.api.config.BPMAttachmentFilter;
 import com.alfame.esb.bpm.connector.api.config.BPMAttachmentNameFilter;
 import com.alfame.esb.bpm.connector.internal.BPMAttachmentFinderImpl;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
-import com.alfame.esb.bpm.connector.internal.connection.BPMConnection;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.*;
@@ -54,16 +53,14 @@ public class BPMAttachmentOperations {
     @OutputResolver(attributes = BPMAttachmentAttributesMetadataResolver.class)
     public Result<InputStream, BPMAttachmentAttributes> getLatestAttachment(
             @Config BPMExtension config,
-            @Connection BPMConnection connection,
+            @ParameterGroup(name = "Attachment association properties") BPMAttachmentAssociationProperties properties,
             @Optional @Alias("attachment-filters") List<BPMAttachmentFilter> attachmentFilters) {
-        if (connection == null || connection.getTask() == null) {
-            throw new IllegalStateException("Get attachment operation must join to task listener transaction");
-        }
 
         Result.Builder<InputStream, BPMAttachmentAttributes> resultBuilder = Result.builder();
 
         BPMAttachmentFinder attachmentFinder = new BPMAttachmentFinderImpl(config.getTaskService())
-                .processInstanceId(connection.getTask().getProcessInstanceId());
+                .processInstanceId(properties.getProcessInstanceId())
+                .taskId(properties.getTaskId());
 
         for (BPMAttachmentFilter attachmentFilter : attachmentFilters) {
             if (attachmentFilter instanceof BPMAttachmentNameFilter) {
@@ -74,12 +71,14 @@ public class BPMAttachmentOperations {
 
         BPMAttachmentInstance attachmentInstance = attachmentFinder.latestAttachment();
         if (attachmentInstance != null) {
-            LOGGER.debug("Attachment " + attachmentInstance.getId() + " found for process " + connection.getTask().getProcessInstanceId());
+            LOGGER.debug("Attachment {} found for process instance {} and task {}",
+                    attachmentInstance.getId(), properties.getProcessInstanceId(), properties.getTaskId());
 
             resultBuilder.output(config.getAttachmentContent(attachmentInstance.getId()));
             resultBuilder.attributes(attachmentInstance);
         } else {
-            LOGGER.debug("Attachment " + attachmentInstance.getId() + " not found for process " + connection.getTask().getProcessInstanceId());
+            LOGGER.debug("Attachment {} not found for process instance {} and task {}",
+                    attachmentInstance.getId(), properties.getProcessInstanceId(), properties.getTaskId());
         }
 
         return resultBuilder.build();
