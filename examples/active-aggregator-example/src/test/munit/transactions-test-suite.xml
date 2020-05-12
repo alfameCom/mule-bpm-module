@@ -89,46 +89,46 @@ invoice: {
                     config-ref="BPM_Config" target="invoiceEventSubscription"
                     doc:name="Invoice event subscription builder"
                     doc:id="16057127-3616-410c-9051-9c994a6f3654">
-                <bpm:event-subscription-filters>
+                <bpm:event-filters>
                     <bpm:process-definition-filter
                             key="invoiceRetriever"/>
                     <bpm:event-type-filter
                             eventType="processInstanceEnded"/>
-                </bpm:event-subscription-filters>
+                </bpm:event-filters>
             </bpm:event-subscription-builder>
             <bpm:event-subscription-builder
                     config-ref="BPM_Config" target="paymentEventSubscription"
                     doc:name="Payment event subscription builder"
                     doc:id="a06deb13-4f98-4698-be70-f4d61e672b0e">
-                <bpm:event-subscription-filters>
+                <bpm:event-filters>
                     <bpm:process-definition-filter
                             key="paymentRetriever"/>
                     <bpm:event-type-filter
                             eventType="processInstanceEnded"/>
-                </bpm:event-subscription-filters>
+                </bpm:event-filters>
             </bpm:event-subscription-builder>
             <bpm:event-subscription-builder
                     config-ref="BPM_Config" target="transactionEventSubscription"
                     doc:name="Transaction event subscription builder"
                     doc:id="fe8a9cf0-c226-4bef-910b-5bcf5455121c">
-                <bpm:event-subscription-filters>
+                <bpm:event-filters>
                     <bpm:process-definition-filter
                             key="transactionFiler"/>
                     <bpm:event-type-filter
                             eventType="processInstanceEnded"/>
-                </bpm:event-subscription-filters>
+                </bpm:event-filters>
             </bpm:event-subscription-builder>
-            <bpm:wait-events-and-unsubscribe
+            <bpm:wait-for-events
                     config-ref="BPM_Config"
                     subscription="#[vars.invoiceEventSubscription]" numberOfEvents="1"
                     timeout="10" doc:name="Wait invoice events and unsubscribe"
                     doc:id="f0704484-5db5-4884-890f-3c5a239de1e6"/>
-            <bpm:wait-events-and-unsubscribe
+            <bpm:wait-for-events
                     config-ref="BPM_Config"
                     subscription="#[vars.paymentEventSubscription]" numberOfEvents="1"
                     timeout="10" doc:name="Wait payment events and unsubscribe"
                     doc:id="b006f8c1-42b9-4540-bff4-b8c3a99ca632"/>
-            <bpm:wait-events-and-unsubscribe
+            <bpm:wait-for-events
                     config-ref="BPM_Config"
                     subscription="#[vars.transactionEventSubscription]"
                     numberOfEvents="1" timeout="15"
@@ -136,18 +136,18 @@ invoice: {
                     doc:id="9b34ec66-617f-4c27-b66b-14d6138a866c"/>
         </munit:execution>
         <munit:validation>
-            <bpm:get-unique-event-from-subscription
+            <bpm:get-unique-event
                     doc:name="Get unique event from subscription"
                     doc:id="ccfbbc66-afd3-4e6d-b595-a9ceaf36fa46"
                     config-ref="BPM_Config"
                     subscription="#[vars.transactionEventSubscription]">
-                <bpm:event-subscription-filters>
+                <bpm:event-filters>
                     <bpm:event-type-filter
                             eventType="processInstanceEnded"/>
                     <bpm:process-definition-filter
                             key="transactionFiler"/>
-                </bpm:event-subscription-filters>
-            </bpm:get-unique-event-from-subscription>
+                </bpm:event-filters>
+            </bpm:get-unique-event>
             <!-- munit-tools:assert-that expression="#[payload]" is="#[MunitTools::notNullValue()]"
                 message="Transaction process ending must be found" doc:name="Assert that"
                 doc:id="dd4efc83-3f9b-4e55-a912-d8a01786defd"/ -->

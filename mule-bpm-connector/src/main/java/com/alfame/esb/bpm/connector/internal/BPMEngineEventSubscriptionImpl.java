@@ -35,7 +35,7 @@ public class BPMEngineEventSubscriptionImpl implements BPMEngineEventSubscriptio
     }
 
     @Override
-    public List<BPMEngineEvent> waitAndUnsubscribeForEvents(int numberOfEvents, long timeout, TimeUnit timeUnit) throws InterruptedException {
+    public List<BPMEngineEvent> waitForEvents(int numberOfEvents, long timeout, TimeUnit timeUnit) throws InterruptedException {
         List<BPMEngineEvent> events = null;
 
         try {
@@ -57,8 +57,6 @@ public class BPMEngineEventSubscriptionImpl implements BPMEngineEventSubscriptio
             LOGGER.warn("Waiting of {} events was interrupted, after receiving {} events in {} ms",
                     numberOfEvents, numberOfEvents - countDownLatch.getCount(), TimeUnit.MILLISECONDS.convert(timeout, timeUnit));
         } finally {
-            unsubscribeForEvents();
-
             try {
                 this.cacheLock.lock();
                 events = this.cachedEvents;

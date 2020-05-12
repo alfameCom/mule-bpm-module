@@ -35,7 +35,8 @@ public class BPMEventSubscriptionTestCase extends BPMAbstractTestCase {
         Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
 
         List<BPMEngineEvent> engineEvents = eventSubscription
-                .waitAndUnsubscribeForEvents(2, 5, TimeUnit.SECONDS);
+                .waitForEvents(2, 5, TimeUnit.SECONDS);
+        eventSubscription.unsubscribeForEvents();
         Assert.assertNotNull("Returned engine events should not not be NULL", engineEvents);
         Assert.assertEquals("Two engine events should be returned", 2, engineEvents.size());
 

@@ -22,42 +22,43 @@
 
     <flow name="startTestProcessFlow">
         <bpm:event-subscription-builder config-ref="engineConfig" target="eventSubscription">
-            <bpm:event-subscription-filters>
-                <bpm:process-definition-filter key="testProcess" />
-                <bpm:variable-filter variableName="factory-variable2" />
-            </bpm:event-subscription-filters>
+            <bpm:event-filters>
+                <bpm:process-definition-filter key="testProcess"/>
+                <bpm:variable-filter variableName="factory-variable2"/>
+            </bpm:event-filters>
         </bpm:event-subscription-builder>
 
         <bpm:process-factory config-ref="engineConfig" processDefinitionKey="testProcess" tenantId="com.alfame.esb">
             <bpm:process-variables>
-                <bpm:process-variable variableName="factory-variable" value="#[1 + 2]" />
-                <bpm:process-variable variableName="factory-variable2" value="#['a value']" />
+                <bpm:process-variable variableName="factory-variable" value="#[1 + 2]"/>
+                <bpm:process-variable variableName="factory-variable2" value="#['a value']"/>
             </bpm:process-variables>
         </bpm:process-factory>
 
         <logger level="INFO" message="#[payload]"/>
 
-        <bpm:wait-events-and-unsubscribe config-ref="engineConfig" subscription="#[vars.eventSubscription]" numberOfEvents="4" target="events" />
+        <bpm:wait-for-events config-ref="engineConfig" subscription="#[vars.eventSubscription]" numberOfEvents="4"
+                             target="events"/>
         <foreach collection="#[vars.events]" counterVariableName="eventIndex">
-            <logger level="INFO" message="Event ##[vars.eventIndex] #[payload]" />
+            <logger level="INFO" message="Event ##[vars.eventIndex] #[payload]"/>
         </foreach>
 
-        <bpm:get-events-from-subscription config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="events">
-            <bpm:event-subscription-filters>
-                <bpm:process-definition-filter key="testProcess" />
-            </bpm:event-subscription-filters>
-        </bpm:get-events-from-subscription>
+        <bpm:get-events config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="events">
+            <bpm:event-filters>
+                <bpm:process-definition-filter key="testProcess"/>
+            </bpm:event-filters>
+        </bpm:get-events>
         <foreach collection="#[vars.events]" counterVariableName="eventIndex">
-            <logger level="INFO" message="Event ##[vars.eventIndex] #[payload]" />
+            <logger level="INFO" message="Event ##[vars.eventIndex] #[payload]"/>
         </foreach>
 
-        <bpm:get-unique-event-from-subscription config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="event">
-            <bpm:event-subscription-filters>
-                <bpm:process-definition-filter key="testProcess" />
-                <bpm:event-type-filter eventType="processInstanceEnded" />
-            </bpm:event-subscription-filters>
-        </bpm:get-unique-event-from-subscription>
-        <logger level="INFO" message="Event #[vars.event]" />
+        <bpm:get-unique-event config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="event">
+            <bpm:event-filters>
+                <bpm:process-definition-filter key="testProcess"/>
+                <bpm:event-type-filter eventType="processInstanceEnded"/>
+            </bpm:event-filters>
+        </bpm:get-unique-event>
+        <logger level="INFO" message="Event #[vars.event]"/>
     </flow>
 
     <flow name="testTaskFlow">
