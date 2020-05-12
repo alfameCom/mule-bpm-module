@@ -1,6 +1,9 @@
 package com.alfame.esb.bpm.connector.internal;
 
-import com.alfame.esb.bpm.api.*;
+import com.alfame.esb.bpm.api.BPMEngine;
+import com.alfame.esb.bpm.api.BPMEngineEvent;
+import com.alfame.esb.bpm.api.BPMEngineEventFinder;
+import com.alfame.esb.bpm.api.BPMEngineEventSubscription;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -46,7 +49,13 @@ public class BPMEngineEventSubscriptionImpl implements BPMEngineEventSubscriptio
             }
 
             LOGGER.debug("Awaiting {} events", countDownLatch.getCount());
-            this.countDownLatch.await(timeout, timeUnit);
+            if (this.countDownLatch.await(timeout, timeUnit) != true) {
+                LOGGER.warn("Waiting of {} events timed out, after receiving {} events in {} ms",
+                        numberOfEvents, numberOfEvents - countDownLatch.getCount(), TimeUnit.MILLISECONDS.convert(timeout, timeUnit));
+            }
+        } catch (InterruptedException exception) {
+            LOGGER.warn("Waiting of {} events was interrupted, after receiving {} events in {} ms",
+                    numberOfEvents, numberOfEvents - countDownLatch.getCount(), TimeUnit.MILLISECONDS.convert(timeout, timeUnit));
         } finally {
             unsubscribeForEvents();
 
@@ -69,7 +78,7 @@ public class BPMEngineEventSubscriptionImpl implements BPMEngineEventSubscriptio
     void cacheEvent(BPMEngineEvent engineEvent) {
         try {
             this.cacheLock.lock();
-            if(this.cachedEvents != null) {
+            if (this.cachedEvents != null) {
                 this.cachedEvents.add(engineEvent);
                 LOGGER.trace("Added event {} for process instance {}", engineEvent.getEventType(), engineEvent.getProcessInstanceId());
 
