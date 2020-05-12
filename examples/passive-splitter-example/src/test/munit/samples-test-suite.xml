@@ -84,7 +84,7 @@ output application/json
 
             <bpm:wait-events-and-unsubscribe
                     config-ref="engineConfig" subscription="#[vars.eventSubscription]"
-                    numberOfEvents="3" target="events"
+                    numberOfEvents="3" timeout="15" target="events"
                     doc:name="Wait events and unsubscribe"
                     doc:id="ce91e15b-18f6-4471-a356-e31737e23cb3"/>
         </munit:execution>
