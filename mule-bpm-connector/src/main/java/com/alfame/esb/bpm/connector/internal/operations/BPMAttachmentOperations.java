@@ -56,6 +56,10 @@ public class BPMAttachmentOperations {
             @Config BPMExtension config,
             @Connection BPMConnection connection,
             @Optional @Alias("attachment-filters") List<BPMAttachmentFilter> attachmentFilters) {
+        if (connection == null || connection.getTask() == null) {
+            throw new IllegalStateException("Get attachment operation must join to task listener transaction");
+        }
+
         Result.Builder<InputStream, BPMAttachmentAttributes> resultBuilder = Result.builder();
 
         BPMAttachmentFinder attachmentFinder = new BPMAttachmentFinderImpl(config.getTaskService())

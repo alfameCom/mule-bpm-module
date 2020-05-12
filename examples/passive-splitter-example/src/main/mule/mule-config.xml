@@ -43,7 +43,7 @@
                     resourceClasspath="processes/sampleSubmitter.bpmn20.xml"/>
         </bpm:definitions>
         <bpm:async-executor>
-        	<bpm:default-async-executor/>
+            <bpm:default-async-executor/>
         </bpm:async-executor>
     </bpm:config>
     <flow name="main-api">
@@ -167,8 +167,7 @@ write(payload, "application/json")]'
 
         <bpm:get-variable doc:name="Get variable"
                           doc:id="f3f47365-7952-4d3d-b95b-dd7266f763bb"
-                          config-ref="engineConfig" variableName="samplesJson"
-                          transactionalAction="ALWAYS_JOIN"/>
+                          config-ref="engineConfig" variableName="samplesJson"/>
         <set-payload
                 value='#[%dw 2.0
 output application/json
@@ -201,8 +200,7 @@ write(payload, "application/json")]'
                            transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN"/>
         <bpm:get-variable doc:name="Get variable"
                           doc:id="51f1e51f-62ca-4ed0-a393-edfac1208be1"
-                          config-ref="engineConfig" variableName="sampleJson"
-                          transactionalAction="ALWAYS_JOIN"/>
+                          config-ref="engineConfig" variableName="sampleJson"/>
         <set-payload
                 value='#[%dw 2.0
 var jsonSample = read(payload as String, "application/json")
@@ -223,8 +221,7 @@ write(payload, "application/xml")]'
                 doc:name="Set Payload" doc:id="0755ebe0-83e0-423c-b149-94e6f288f9a8"/>
         <bpm:set-variable doc:name="Set variable"
                           doc:id="15beda4f-4054-4f7c-884e-c3a2b6c2a8c4"
-                          config-ref="engineConfig" variableName="sampleXml"
-                          transactionalAction="ALWAYS_JOIN">
+                          config-ref="engineConfig" variableName="sampleXml">
             <bpm:variable-content>#[payload]</bpm:variable-content>
         </bpm:set-variable>
     </flow>
@@ -237,8 +234,7 @@ write(payload, "application/xml")]'
 
         <bpm:get-variable doc:name="Get variable"
                           doc:id="3e8eb59a-0c1f-41c4-83ed-791af774812a"
-                          config-ref="engineConfig" variableName="sampleXml"
-                          transactionalAction="ALWAYS_JOIN"/>
+                          config-ref="engineConfig" variableName="sampleXml"/>
         <set-variable variableName="filename"
                       value='#[%dw 2.0
 var xmlSample = read(payload as String, "application/xml")

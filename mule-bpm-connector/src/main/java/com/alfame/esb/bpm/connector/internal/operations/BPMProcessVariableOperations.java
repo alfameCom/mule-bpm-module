@@ -33,8 +33,11 @@ public class BPMProcessVariableOperations {
     public Result<Object, BPMVariableAttributes> getVariable(
             @Config BPMExtension config,
             @Connection BPMConnection connection,
-            @DisplayName("Variable name") String variableName
-    ) {
+            @DisplayName("Variable name") String variableName) {
+        if (connection == null || connection.getTask() == null) {
+            throw new IllegalStateException("Variable operations must join to task listener transaction");
+        }
+
         Builder<Object, BPMVariableAttributes> resultBuilder = Result.builder();
 
         BPMVariableInstance variableInstance = config.getVariableInstance(
@@ -58,6 +61,9 @@ public class BPMProcessVariableOperations {
             @Connection BPMConnection connection,
             @DisplayName("Variable name") String variableName,
             @Alias("variable-content") @Content @Summary("Content for variable") TypedValue<Serializable> variableContent) throws IOException {
+        if (connection == null || connection.getTask() == null) {
+            throw new IllegalStateException("Variable operations must join to task listener transaction");
+        }
 
         connection.getVariablesToUpdate().put(variableName, variableContent.getValue());
 
@@ -70,6 +76,9 @@ public class BPMProcessVariableOperations {
             @Config BPMExtension config,
             @Connection BPMConnection connection,
             @DisplayName("Variable name") String variableName) {
+        if (connection == null || connection.getTask() == null) {
+            throw new IllegalStateException("Variable operations must join to task listener transaction");
+        }
 
         connection.getVariablesToRemove().add(variableName);
 
