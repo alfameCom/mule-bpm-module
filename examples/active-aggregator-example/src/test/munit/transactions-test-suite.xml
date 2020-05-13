@@ -17,6 +17,7 @@
     <munit:config name="transactions-test-suite.xml"/>
     <munit:dynamic-port propertyName="invoice.sftp.port"/>
     <munit:dynamic-port propertyName="payment.sftp.port"/>
+    <munit:dynamic-port propertyName="transaction.http.port"/>
     <ftpserver:config
             name="MUnit_Invoice_SFTP_Server_Config"
             doc:name="MUnit Invoice SFTP Server Config"
@@ -45,6 +46,7 @@
                          port="${payment.sftp.port}" username="${payment.sftp.user}"
                          password="${payment.sftp.password}" workingDir="${payment.sftp.path}"/>
     </sftp:config>
+    <import doc:name="Import" doc:id="c912dc46-fe55-4a00-93c1-65ec9345b6e5" file="transaction-api-config.xml"/>
     <munit:test name="transactions-test-suite"
                 description="Transactions Test"
                 doc:id="e1db564b-50f5-46d3-abfc-9e66b840ae63">
@@ -55,6 +57,8 @@
                     value="retrievePaymentsTaskFlow"/>
             <munit:enable-flow-source
                     value="fileTransactionTaskFlow"/>
+            <munit:enable-flow-source value="api-main"/>
+            <munit:enable-flow-source value="SendTransaction:\soapkit-config"/>
         </munit:enable-flow-sources>
         <munit:execution>
             <sftp:write config-ref="MUnit_Invoice_SFTP_Config"

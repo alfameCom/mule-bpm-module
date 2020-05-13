@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
       xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 			http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 			http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
-			http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+			http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+            http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <configuration-properties
             file="mule-artifact.properties"/>
@@ -31,6 +32,12 @@
         <sftp:connection workingDir="${payment.sftp.path}" host="${payment.sftp.host}" port="${payment.sftp.port}"
                          username="${payment.sftp.user}" password="${payment.sftp.password}"/>
     </sftp:config>
+    <wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config"
+                doc:id="af3ffda3-5ab0-4999-9c69-748f3082fd93">
+        <wsc:connection wsdlLocation="api/TransactionService.wsdl" service="TransactionContract"
+                        port="TransactionServiceSOAP"
+                        address="http://localhost:${transaction.http.port}/TransactionContract/TransactionServiceSOAP"/>
+    </wsc:config>
     <flow name="retrieveInvoicesTaskFlow" doc:id="88668ff9-6faf-4e8b-a765-c04b8919e024">
         <bpm:task-listener config-ref="BPM_Config" doc:name="Task listener"
                            doc:id="e867459a-7f86-4402-a8a9-6122d241ff51" endpointUrl="bpm://retrieve.invoices"/>
@@ -126,18 +133,25 @@ write(payload, "application/json")]'
                 <bpm:attachment-name-filter attachmentName="payment"/>
             </bpm:attachment-filters>
         </bpm:get-latest-attachment>
-        <set-payload value='#[%dw 2.0
-var invoice = read(vars.invoice, "application/xml")
-var payment = read(vars.payment, "application/json")
+        <wsc:consume doc:name="Consume" doc:id="b3af37e3-03c5-483e-b355-7086be683d22"
+                     config-ref="Web_Service_Consumer_Config" operation="SendTransaction">
+            <wsc:message>
+                <wsc:body>
+                    #[%dw 2.0
+                    var invoice = read(vars.invoice, "application/xml")
+                    var payment = read(vars.payment, "application/json")
 
-output application/xml
----
-transaction : {
-	transactionId: payment.transactionId,
-	payee: invoice.invoice.payee,
-	payer: payment.payer,
-	amount: payment.amount
-}]' doc:name="Set Payload" doc:id="1b2925d3-6873-45be-93d5-d408d8fabb65"/>
-        <logger level="INFO" doc:name="Logger" doc:id="5aa174da-8fdc-4ef1-a620-c4ccd2d35a9a" message="#[payload]"/>
+                    output application/xml
+                    ns ns0 http://www.alfame.com/esb/bpm/examples/TransactionService
+                    ---
+                    Transaction : {
+                    TransactionId: payment.transactionId,
+                    Payee: invoice.invoice.payee,
+                    Payer: payment.payer,
+                    Amount: payment.amount
+                    }]
+                </wsc:body>
+            </wsc:message>
+        </wsc:consume>
     </flow>
 </mule>

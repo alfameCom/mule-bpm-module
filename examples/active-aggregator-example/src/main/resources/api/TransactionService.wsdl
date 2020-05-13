@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:tns="http://www.alfame.com/esb/bpm/examples/TransactionService"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  name="TransactionService" targetNamespace="http://www.alfame.com/esb/bpm/examples/TransactionService">
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://www.alfame.com/esb/bpm/examples/TransactionService">
+            <xsd:complexType name="TransactionType">
+                <xsd:sequence>
+                    <xsd:element name="TransactionId" type="xsd:string"></xsd:element>
+                    <xsd:element name="Payee" type="xsd:string"></xsd:element>
+                    <xsd:element name="Payer" type="xsd:string"></xsd:element>
+                    <xsd:element name="Amount" type="xsd:float"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:simpleType name="TransactionServiceResultType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="OK"/>
+                    <xsd:enumeration value="ERROR_DUPLICATE_TRANSACTION"/>
+                    <xsd:enumeration value="ERROR_AUTHENTICATION_FAILED"/>
+                    <xsd:enumeration value="ERROR_GENERIC"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:complexType name="TransactionResultType">
+                <xsd:sequence>
+                    <xsd:element name="ResultType" type="tns:TransactionServiceResultType"></xsd:element>
+                    <xsd:element name="ResultMessage" type="xsd:string"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="Transaction" type="tns:TransactionType"/>
+            <xsd:element name="TransactionResponse" type="tns:TransactionResultType"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="SendTransactionRequest">
+        <wsdl:part name="Transaction" element="tns:Transaction"/>
+    </wsdl:message>
+    <wsdl:message name="SendTransactionResponse">
+        <wsdl:part name="Result" element="tns:TransactionResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="TransactionService">
+        <wsdl:operation name="SendTransaction">
+            <wsdl:input message="tns:SendTransactionRequest"/>
+            <wsdl:output message="tns:SendTransactionResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="TransactionServiceSOAP" type="tns:TransactionService">
+        <soap:binding style="document"
+                      transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="SendTransaction">
+            <soap:operation
+                    soapAction="http://www.alfame.com/esb/bpm/examples/TransactionService/SendTransaction"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="TransactionContract">
+        <wsdl:port binding="tns:TransactionServiceSOAP" name="TransactionServiceSOAP">
+            <soap:address location="http://localhost:8081/TransactionService"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
