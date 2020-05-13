@@ -1,34 +1,49 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
       xmlns:apikit-soap="http://www.mulesoft.org/schema/mule/apikit-soap"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="
-            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+
+			http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
             http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
             http://www.mulesoft.org/schema/mule/apikit-soap http://www.mulesoft.org/schema/mule/apikit-soap/current/mule-apikit-soap.xsd">
-    <apikit:config api="api/TransactionService.wsdl" doc:id="5a7489cd-f6b4-493b-a418-84473c843599" doc:name="Router"
-                   httpStatusVarName="httpStatus" name="Router" outboundHeadersMapName="outboundHeadersMapName"/>
-    <http:listener-config doc:id="f07bb538-869a-43c6-b9e4-fc4cf16a516f" doc:name="HTTP Listener config"
-                          name="HTTP_Listener_config">
-        <http:listener-connection host="0.0.0.0" port="${transaction.http.port}"/>
+    <apikit:config api="api/TransactionService.wsdl"
+                   doc:id="5a7489cd-f6b4-493b-a418-84473c843599" doc:name="Router"
+                   httpStatusVarName="httpStatus" name="Router"
+                   outboundHeadersMapName="outboundHeadersMapName"/>
+    <http:listener-config
+            doc:id="f07bb538-869a-43c6-b9e4-fc4cf16a516f"
+            doc:name="HTTP Listener config" name="HTTP_Listener_config">
+        <http:listener-connection host="0.0.0.0"
+                                  port="${transaction.http.port}"/>
     </http:listener-config>
-    <flow doc:id="fd34b720-7cb3-4b10-8b1d-43a1eea4b7d6" name="transaction-api-configFlow">
-        <http:listener config-ref="HTTP_Listener_config" doc:id="6951413c-23c7-40c2-889f-4d80d3bb3158"
-                       doc:name="Listener" path="/"/>
-        <apikit:router config-ref="Router" doc:id="6e02ddac-e877-4cd2-9ca1-dd3a46c0ac89" doc:name="APIkit Router"/>
+    <flow doc:id="fd34b720-7cb3-4b10-8b1d-43a1eea4b7d6"
+          name="transaction-api-configFlow">
+        <http:listener config-ref="HTTP_Listener_config"
+                       doc:id="6951413c-23c7-40c2-889f-4d80d3bb3158" doc:name="Listener"
+                       path="/"/>
+        <apikit:router config-ref="Router"
+                       doc:id="6e02ddac-e877-4cd2-9ca1-dd3a46c0ac89"
+                       doc:name="APIkit Router"/>
     </flow>
-    <apikit-soap:config httpStatusVarName="httpStatus" name="soapkit-config" port="TransactionServiceSOAP"
+    <apikit-soap:config httpStatusVarName="httpStatus"
+                        name="soapkit-config" port="TransactionServiceSOAP"
                         service="TransactionContract" wsdlLocation="TransactionService.wsdl"/>
     <flow name="api-main">
-        <http:listener config-ref="HTTP_Listener_config" path="/TransactionContract/TransactionServiceSOAP">
-            <http:response statusCode="#[attributes.protocolHeaders.httpStatus default 200]">
+        <http:listener config-ref="HTTP_Listener_config"
+                       path="/TransactionContract/TransactionServiceSOAP">
+            <http:response
+                    statusCode="#[attributes.protocolHeaders.httpStatus default 200]">
                 <http:body>#[payload]</http:body>
                 <http:headers>#[attributes.protocolHeaders default {}]</http:headers>
             </http:response>
-            <http:error-response statusCode="#[attributes.protocolHeaders.httpStatus default 500]">
+            <http:error-response
+                    statusCode="#[attributes.protocolHeaders.httpStatus default 500]">
                 <http:body>#[payload]</http:body>
                 <http:headers>#[attributes.protocolHeaders default {}]</http:headers>
             </http:error-response>
@@ -40,34 +55,47 @@
                 output application/java
                 ---
                 {
-                headers: attributes.headers,
+                headers:
+                attributes.headers,
                 method: attributes.method,
-                queryString: attributes.queryString
+                queryString:
+                attributes.queryString
                 }]
             </apikit-soap:attributes>
         </apikit-soap:router>
     </flow>
     <flow name="SendTransaction:\soapkit-config">
-        <logger level="INFO" doc:name="Logger" doc:id="c4b4348f-2aa0-4dee-98d6-2e7cabf713e9"/>
-        <set-variable value="#[%dw 2.0
+        <logger level="INFO" doc:name="Logger"
+                doc:id="c4b4348f-2aa0-4dee-98d6-2e7cabf713e9"/>
+        <set-variable
+                value="#[%dw 2.0
 output application/java
 ns ns0 http://www.alfame.com/esb/bpm/examples/TransactionService
 ---
-payload.body.Transaction.TransactionId]" doc:name="Set Variable" doc:id="f545f9e9-3054-4765-915f-3a7a08240fae"
-                      variableName="transactionId"/>
-        <logger level="INFO" doc:name="Logger" doc:id="d1bc066e-b99a-4c28-aeef-bf18e4d33cea"
+payload.body.Transaction.TransactionId]"
+                doc:name="Set Variable" doc:id="f545f9e9-3054-4765-915f-3a7a08240fae"
+                variableName="transactionId"/>
+        <logger level="INFO" doc:name="Logger"
+                doc:id="d1bc066e-b99a-4c28-aeef-bf18e4d33cea"
                 message="#[vars.transactionId]"/>
-        <set-payload value='#[%dw 2.0
+        <munit-tools:queue
+                doc:name="Queue transaction if for Munit assertion"
+                doc:id="074dacd9-7025-4577-9a2f-b98f2c46c3eb">
+            <munit-tools:value>#[vars.transactionId]</munit-tools:value>
+        </munit-tools:queue>
+        <set-payload
+                value="#[%dw 2.0
 output application/java
 ns soap http://schemas.xmlsoap.org/soap/envelope
 ---
 {
     body: {
         Result: {
-            ResultType: "OK",
-            ResultMessage: "Transaction " ++ vars.transactionId ++ " filed successfully!"
+            ResultType: 'OK',
+            ResultMessage: 'Transaction ' ++ vars.transactionId ++ ' filed successfully!'
         }
-    } write "application/xml"
-}]' doc:name="Set Payload" doc:id="8acae424-4484-48ae-8161-d663bc3f6232"/>
+    } write 'application/xml'
+}]"
+                doc:name="Set Payload" doc:id="8acae424-4484-48ae-8161-d663bc3f6232"/>
     </flow>
 </mule>

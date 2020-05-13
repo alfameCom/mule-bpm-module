@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule
+        xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
         xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
         xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
         xmlns:ftpserver="http://www.mulesoft.org/schema/mule/ftpserver"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
         xmlns="http://www.mulesoft.org/schema/mule/core"
-        xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-        xsi:schemaLocation="
+        xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
 			http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 			http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+			http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
 			http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
 			http://www.mulesoft.org/schema/mule/ftpserver http://www.mulesoft.org/schema/mule/ftpserver/current/mule-ftpserver.xsd
 			http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
@@ -152,9 +153,15 @@ output application/json
                             key="transactionFiler"/>
                 </bpm:event-filters>
             </bpm:get-unique-event>
-            <!-- munit-tools:assert-that expression="#[payload]" is="#[MunitTools::notNullValue()]"
-                message="Transaction process ending must be found" doc:name="Assert that"
-                doc:id="dd4efc83-3f9b-4e55-a912-d8a01786defd"/ -->
+            <logger message="" level="INFO"/>
+            <munit-tools:assert-that doc:name="Assert that" doc:id="58ddc36a-e0fd-46c0-8384-598617e8b946"
+                                     expression="#[payload]" is="#[MunitTools::notNullValue()]"
+                                     message="Transactipn process ending event must be found"/>
+            <munit-tools:dequeue doc:name="Dequeue transaction if from APIkit SOAP service"
+                                 doc:id="60b36499-7f66-48e8-8762-515bd4c0b96e"/>
+            <munit-tools:assert-equals doc:name="Assert equals" doc:id="c4062134-cad1-45c1-a659-a72c60ad49d9"
+                                       actual="#[payload]" expected='2514-234x-df23-35fa'
+                                       message="Assert that transaction id from APIkit SOAP Service matches original transaction id"/>
         </munit:validation>
     </munit:test>
 </mule>
