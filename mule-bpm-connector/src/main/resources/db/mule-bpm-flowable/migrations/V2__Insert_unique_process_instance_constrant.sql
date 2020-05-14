@@ -1,0 +1,1 @@
+alter table ACT_HI_PROCINST add constraint MULE_UNIQ_BUSINESS_KEY unique (BUSINESS_KEY_);
