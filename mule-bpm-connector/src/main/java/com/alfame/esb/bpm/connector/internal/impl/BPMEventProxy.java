@@ -5,11 +5,11 @@ import com.alfame.esb.bpm.api.BPMEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
 
-public class BPMProcessEngineEventProxy extends BPMEngineEvent {
+public class BPMEventProxy extends BPMEngineEvent {
 
     private final FlowableProcessEngineEvent processEngineEvent;
 
-    public BPMProcessEngineEventProxy(FlowableProcessEngineEvent processEngineEvent) {
+    public BPMEventProxy(FlowableProcessEngineEvent processEngineEvent) {
         this.processEngineEvent = processEngineEvent;
     }
 

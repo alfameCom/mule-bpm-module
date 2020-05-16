@@ -5,11 +5,11 @@ import org.flowable.engine.history.HistoricProcessInstance;
 
 import java.util.Date;
 
-public class BPMProcessHistoricInstanceProxy implements BPMProcessInstance {
+public class BPMHistoricProcessInstanceProxy implements BPMProcessInstance {
 
     private final HistoricProcessInstance historicProcessInstance;
 
-    public BPMProcessHistoricInstanceProxy(HistoricProcessInstance historicProcessInstance) {
+    public BPMHistoricProcessInstanceProxy(HistoricProcessInstance historicProcessInstance) {
         this.historicProcessInstance = historicProcessInstance;
     }
 

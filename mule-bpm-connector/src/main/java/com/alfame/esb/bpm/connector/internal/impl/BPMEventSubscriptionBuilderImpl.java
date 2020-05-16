@@ -11,17 +11,17 @@ import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionBuilder implements FlowableEventListener, BPMEngineEventSubscriptionConnection {
+public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionBuilder implements FlowableEventListener, BPMEventSubscriptionConnection {
 
-    private static final Logger LOGGER = getLogger(BPMEngineEventSubscriptionBuilderImpl.class);
+    private static final Logger LOGGER = getLogger(BPMEventSubscriptionBuilderImpl.class);
 
     private final BPMEngine engine;
     private final RuntimeService runtimeService;
     private BPMEngineEventListener engineEventListener;
     private boolean subscribedForEvents = false;
-    private BPMEngineEventSubscriptionImpl eventSubscription;
+    private BPMEventSubscriptionImpl eventSubscription;
 
-    public BPMEngineEventSubscriptionBuilderImpl(BPMEngine engine, RuntimeService runtimeService) {
+    public BPMEventSubscriptionBuilderImpl(BPMEngine engine, RuntimeService runtimeService) {
         this.engine = engine;
         this.runtimeService = runtimeService;
     }
@@ -46,7 +46,7 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
         if (this.subscribedForEvents != true) {
             this.engineEventListener = engineEventListener;
             this.runtimeService.addEventListener(this);
-            this.eventSubscription = new BPMEngineEventSubscriptionImpl(this.engine, this);
+            this.eventSubscription = new BPMEventSubscriptionImpl(this.engine, this);
             this.subscribedForEvents = true;
         }
 
@@ -71,17 +71,17 @@ public class BPMEngineEventSubscriptionBuilderImpl extends BPMEngineEventSubscri
                 if (flowableVariableEvent.getType().equals(FlowableEngineEventType.VARIABLE_CREATED)
                         || flowableVariableEvent.getType().equals(FlowableEngineEventType.VARIABLE_UPDATED)
                         || flowableVariableEvent.getType().equals(FlowableEngineEventType.VARIABLE_DELETED)) {
-                    engineEvent = new BPMProcessVariableEventProxy(flowableVariableEvent);
+                    engineEvent = new BPMVariableEventProxy(flowableVariableEvent);
                 }
             } else if (flowableEvent instanceof FlowableProcessEngineEvent) {
                 FlowableProcessEngineEvent flowableEngineEntityEvent = (FlowableProcessEngineEvent) flowableEvent;
                 if (flowableEngineEntityEvent.getType().equals(FlowableEngineEventType.PROCESS_CREATED)
                         || flowableEngineEntityEvent.getType().equals(FlowableEngineEventType.PROCESS_COMPLETED)) {
-                    engineEvent = new BPMProcessEngineEventProxy(flowableEngineEntityEvent);
+                    engineEvent = new BPMEventProxy(flowableEngineEntityEvent);
                 }
             }
 
-            if(isUnfilteredEvent(engineEvent)) {
+            if (isUnfilteredEvent(engineEvent)) {
                 if (this.engineEventListener != null) {
                     this.engineEventListener.handleEngineEvent(engineEvent);
                 }

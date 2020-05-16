@@ -9,13 +9,13 @@ import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BPMEngineEventSubscriptionEventFinder extends BPMEngineEventFinder {
+public class BPMEventSubscriptionEventFinder extends BPMEngineEventFinder {
 
-    private static final Logger LOGGER = getLogger(BPMEngineEventSubscriptionEventFinder.class);
+    private static final Logger LOGGER = getLogger(BPMEventSubscriptionEventFinder.class);
 
     private final List<BPMEngineEvent> cachedEvents;
 
-    public BPMEngineEventSubscriptionEventFinder(List<BPMEngineEvent> cachedEvents) {
+    public BPMEventSubscriptionEventFinder(List<BPMEngineEvent> cachedEvents) {
         this.cachedEvents = cachedEvents;
     }
 

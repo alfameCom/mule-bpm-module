@@ -3,11 +3,11 @@ package com.alfame.esb.bpm.connector.internal.impl;
 import com.alfame.esb.bpm.api.BPMVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
-public class BPMProcessVariableInstanceProxy implements BPMVariableInstance {
+public class BPMVariableInstanceProxy implements BPMVariableInstance {
 
     private final VariableInstance variableInstance;
 
-    public BPMProcessVariableInstanceProxy(VariableInstance variableInstance) {
+    public BPMVariableInstanceProxy(VariableInstance variableInstance) {
         this.variableInstance = variableInstance;
     }
 

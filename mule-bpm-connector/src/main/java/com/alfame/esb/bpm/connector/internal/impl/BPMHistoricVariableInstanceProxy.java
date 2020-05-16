@@ -3,11 +3,11 @@ package com.alfame.esb.bpm.connector.internal.impl;
 import com.alfame.esb.bpm.api.BPMVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
-public class BPMProcessHistoricVariableInstanceProxy implements BPMVariableInstance {
+public class BPMHistoricVariableInstanceProxy implements BPMVariableInstance {
 
     private final HistoricVariableInstance historicVariableInstance;
 
-    public BPMProcessHistoricVariableInstanceProxy(HistoricVariableInstance historicVariableInstance) {
+    public BPMHistoricVariableInstanceProxy(HistoricVariableInstance historicVariableInstance) {
         this.historicVariableInstance = historicVariableInstance;
     }
 

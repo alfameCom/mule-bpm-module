@@ -132,7 +132,7 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
     @Override
     public void initialise() throws InitialisationException {
-        this.processEngineConfiguration = new BPMProcessEngineMultiTenantSchemaConfiguration(this);
+        this.processEngineConfiguration = new BPMMultiTenantSchemaConfiguration(this);
 
         this.processEngineConfiguration.setDisableIdmEngine(true);
 
@@ -239,29 +239,29 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
     @Override
     public BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder() {
-        return new BPMEngineEventSubscriptionBuilderImpl(this, this.getRuntimeService());
+        return new BPMEventSubscriptionBuilderImpl(this, this.getRuntimeService());
     }
 
     @Override
     public BPMVariableInstance getVariableInstance(String executionId, String variableName) {
-        BPMProcessVariableInstanceProxy variableInstanceProxy = null;
+        BPMVariableInstanceProxy variableInstanceProxy = null;
 
         VariableInstance variableInstance = this.getRuntimeService().getVariableInstance(executionId, variableName);
         if (variableInstance != null) {
-            variableInstanceProxy = new BPMProcessVariableInstanceProxy(variableInstance);
+            variableInstanceProxy = new BPMVariableInstanceProxy(variableInstance);
         }
         return variableInstanceProxy;
     }
 
     @Override
     public BPMVariableInstance getHistoricVariableInstance(String executionId, String variableName) {
-        BPMProcessHistoricVariableInstanceProxy historicVariableInstanceProxy = null;
+        BPMHistoricVariableInstanceProxy historicVariableInstanceProxy = null;
         HistoricVariableInstanceQuery variableQuery = this.getHistoryService().createHistoricVariableInstanceQuery()
                 .executionId(executionId).variableName(variableName);
 
         HistoricVariableInstance historicVariableInstance = variableQuery.singleResult();
         if (historicVariableInstance != null) {
-            historicVariableInstanceProxy = new BPMProcessHistoricVariableInstanceProxy(historicVariableInstance);
+            historicVariableInstanceProxy = new BPMHistoricVariableInstanceProxy(historicVariableInstance);
         }
 
         return historicVariableInstanceProxy;

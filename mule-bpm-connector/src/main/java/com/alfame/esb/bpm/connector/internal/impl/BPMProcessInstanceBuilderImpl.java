@@ -75,17 +75,17 @@ public class BPMProcessInstanceBuilderImpl extends BPMProcessInstanceBuilder {
                             this.historyService.createHistoricProcessInstanceQuery()
                                     .processInstanceBusinessKey(this.uniqueBusinessKey).singleResult();
                     if (historicProcessInstance != null) {
-                        builtProcessInstance = new BPMProcessHistoricInstanceProxy(historicProcessInstance);
+                        builtProcessInstance = new BPMHistoricProcessInstanceProxy(historicProcessInstance);
                     } else {
-                        LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId(): null, exception, System.currentTimeMillis() - startTime);
+                        LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId() : null, exception, System.currentTimeMillis() - startTime);
                         throw exception;
                     }
                 } else {
-                    LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId(): null, exception, System.currentTimeMillis() - startTime);
+                    LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId() : null, exception, System.currentTimeMillis() - startTime);
                     throw exception;
                 }
             } catch (Exception historyException) {
-                LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId(): null, historyException, System.currentTimeMillis() - startTime);
+                LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId() : null, historyException, System.currentTimeMillis() - startTime);
                 throw historyException;
             }
         }

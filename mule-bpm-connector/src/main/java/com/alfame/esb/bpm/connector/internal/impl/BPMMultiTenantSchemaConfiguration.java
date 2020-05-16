@@ -15,11 +15,11 @@ import java.sql.SQLException;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BPMProcessEngineMultiTenantSchemaConfiguration extends MultiSchemaMultiTenantProcessEngineConfiguration {
+public class BPMMultiTenantSchemaConfiguration extends MultiSchemaMultiTenantProcessEngineConfiguration {
 
-    private static final Logger LOGGER = getLogger(BPMProcessEngineMultiTenantSchemaConfiguration.class);
+    private static final Logger LOGGER = getLogger(BPMMultiTenantSchemaConfiguration.class);
 
-    public BPMProcessEngineMultiTenantSchemaConfiguration(TenantInfoHolder tenantInfoHolder) {
+    public BPMMultiTenantSchemaConfiguration(TenantInfoHolder tenantInfoHolder) {
         super(tenantInfoHolder);
     }
 

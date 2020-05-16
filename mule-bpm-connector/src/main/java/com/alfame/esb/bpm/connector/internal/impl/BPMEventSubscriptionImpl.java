@@ -14,17 +14,17 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BPMEngineEventSubscriptionImpl implements BPMEngineEventSubscription {
+public class BPMEventSubscriptionImpl implements BPMEngineEventSubscription {
 
-    private static final Logger LOGGER = getLogger(BPMEngineEventSubscriptionImpl.class);
+    private static final Logger LOGGER = getLogger(BPMEventSubscriptionImpl.class);
 
     private final BPMEngine engine;
-    private final BPMEngineEventSubscriptionConnection connection;
+    private final BPMEventSubscriptionConnection connection;
     private CountDownLatch countDownLatch;
     private List<BPMEngineEvent> cachedEvents = new ArrayList<>();
     private ReentrantLock cacheLock = new ReentrantLock();
 
-    public BPMEngineEventSubscriptionImpl(BPMEngine engine, BPMEngineEventSubscriptionConnection connection) {
+    public BPMEventSubscriptionImpl(BPMEngine engine, BPMEventSubscriptionConnection connection) {
         this.engine = engine;
         this.connection = connection;
     }
@@ -70,7 +70,7 @@ public class BPMEngineEventSubscriptionImpl implements BPMEngineEventSubscriptio
 
     @Override
     public BPMEngineEventFinder eventFinder() {
-        return new BPMEngineEventSubscriptionEventFinder(this.cachedEvents);
+        return new BPMEventSubscriptionEventFinder(this.cachedEvents);
     }
 
     void cacheEvent(BPMEngineEvent engineEvent) {
