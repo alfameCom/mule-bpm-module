@@ -1,4 +1,4 @@
-package com.alfame.esb.bpm.connector.internal;
+package com.alfame.esb.bpm.connector.internal.impl;
 
 import com.alfame.esb.bpm.api.BPMEngine;
 import com.alfame.esb.bpm.api.BPMEngineEvent;

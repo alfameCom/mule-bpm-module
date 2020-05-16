@@ -1,4 +1,4 @@
-package com.alfame.esb.bpm.connector.internal.proxies;
+package com.alfame.esb.bpm.connector.internal.impl;
 
 import com.alfame.esb.bpm.api.BPMVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;

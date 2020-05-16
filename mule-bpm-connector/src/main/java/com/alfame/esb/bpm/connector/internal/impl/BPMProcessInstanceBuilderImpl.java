@@ -1,10 +1,8 @@
-package com.alfame.esb.bpm.connector.internal;
+package com.alfame.esb.bpm.connector.internal.impl;
 
 import com.alfame.esb.bpm.api.BPMEngine;
 import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.api.BPMProcessInstanceBuilder;
-import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessHistoricInstanceProxy;
-import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessInstanceProxy;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.history.HistoricProcessInstance;

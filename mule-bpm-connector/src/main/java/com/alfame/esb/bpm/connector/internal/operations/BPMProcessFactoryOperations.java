@@ -3,7 +3,7 @@ package com.alfame.esb.bpm.connector.internal.operations;
 import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.connector.api.config.BPMProcessVariable;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
-import com.alfame.esb.bpm.connector.internal.BPMProcessInstanceBuilderImpl;
+import com.alfame.esb.bpm.connector.internal.impl.BPMProcessInstanceBuilderImpl;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;

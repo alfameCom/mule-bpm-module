@@ -1,8 +1,6 @@
-package com.alfame.esb.bpm.connector.internal;
+package com.alfame.esb.bpm.connector.internal.impl;
 
 import com.alfame.esb.bpm.api.*;
-import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessEngineEventProxy;
-import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessVariableEventProxy;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;

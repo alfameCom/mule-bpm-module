@@ -3,20 +3,15 @@ package com.alfame.esb.bpm.connector.internal;
 import com.alfame.esb.bpm.api.*;
 import com.alfame.esb.bpm.connector.api.config.*;
 import com.alfame.esb.bpm.connector.internal.connection.BPMConnectionProvider;
+import com.alfame.esb.bpm.connector.internal.impl.*;
 import com.alfame.esb.bpm.connector.internal.listener.BPMTaskListener;
 import com.alfame.esb.bpm.connector.internal.operations.BPMAttachmentOperations;
 import com.alfame.esb.bpm.connector.internal.operations.BPMEventSubscriptionOperations;
 import com.alfame.esb.bpm.connector.internal.operations.BPMProcessFactoryOperations;
 import com.alfame.esb.bpm.connector.internal.operations.BPMProcessVariableOperations;
-import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessHistoricVariableInstanceProxy;
-import com.alfame.esb.bpm.connector.internal.proxies.BPMProcessVariableInstanceProxy;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.cfg.multitenant.TenantAwareDataSource;
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
-import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.engine.*;
-import org.flowable.engine.impl.cfg.multitenant.ExecuteSchemaOperationCommand;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.Execution;
@@ -24,7 +19,6 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flywaydb.core.Flyway;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -44,8 +38,6 @@ import org.slf4j.Logger;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -140,7 +132,7 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
     @Override
     public void initialise() throws InitialisationException {
-        this.processEngineConfiguration = new CustomMultiSchemaMultiTenantProcessEngineConfiguration(this);
+        this.processEngineConfiguration = new BPMProcessEngineMultiTenantSchemaConfiguration(this);
 
         this.processEngineConfiguration.setDisableIdmEngine(true);
 
@@ -161,74 +153,6 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
             this.processEngineConfiguration.setAsyncExecutor(asyncExecutor);
         }
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
-    }
-
-    public class CustomMultiSchemaMultiTenantProcessEngineConfiguration extends MultiSchemaMultiTenantProcessEngineConfiguration {
-
-        public CustomMultiSchemaMultiTenantProcessEngineConfiguration(TenantInfoHolder tenantInfoHolder) {
-            super(tenantInfoHolder);
-        }
-
-        @Override
-        protected void createTenantSchema(String tenantId) {
-            boolean schemaNeedsUpdate = false;
-
-            SchemaManager processSchemaManager = null;
-            try {
-                tenantInfoHolder.setCurrentTenantId(tenantId);
-                processSchemaManager = this.getProcessEngineConfiguration().getSchemaManager();
-                getCommandExecutor().execute(getSchemaCommandConfig(),
-                        new ExecuteSchemaOperationCommand(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE));
-            } catch (FlowableException exception) {
-                LOGGER.debug("Flowable database needs an update: {}", exception.getMessage());
-                schemaNeedsUpdate = true;
-            } finally {
-                tenantInfoHolder.clearCurrentTenantId();
-            }
-
-            TenantAwareDataSource dataSource = ((TenantAwareDataSource) super.getDataSource());
-            if (dataSource != null) {
-                DataSource tenantDataSource = dataSource.getDataSources().get(tenantId);
-                Connection connection = null;
-                if (tenantDataSource != null) {
-                    try {
-                        connection = tenantDataSource.getConnection();
-                        if (connection != null) {
-                            String schema = connection.getSchema();
-                            LOGGER.info("Database schema {}", schema);
-                            Flyway flyway = Flyway.configure()
-                                    .locations("db/mule-bpm-flowable/migrations")
-                                    .dataSource(tenantDataSource)
-                                    .schemas(schema)
-                                    .load();
-
-                            if (schemaNeedsUpdate) {
-                                super.createTenantSchema(tenantId);
-                                flyway.baseline();
-                            }
-
-                            flyway.migrate();
-                        } else {
-                            LOGGER.error("Cannot establish database connection for tenant {}", tenantId);
-                        }
-                    } catch (Exception exception) {
-                        LOGGER.error("Error on Flyway migration", exception);
-                    } finally {
-                        if (connection != null) {
-                            try {
-                                connection.close();
-                            } catch (SQLException sqlException) {
-                                LOGGER.error("Error while closing database connection", sqlException);
-                            }
-                        }
-                    }
-                } else {
-                    LOGGER.warn("No data source defined for tenant {}", tenantId);
-                }
-            } else {
-                LOGGER.error("No data source defined for process engine");
-            }
-        }
     }
 
     @Override

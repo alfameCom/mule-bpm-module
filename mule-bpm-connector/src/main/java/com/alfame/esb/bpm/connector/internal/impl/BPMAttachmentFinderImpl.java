@@ -1,8 +1,8 @@
-package com.alfame.esb.bpm.connector.internal;
+package com.alfame.esb.bpm.connector.internal.impl;
 
 import com.alfame.esb.bpm.api.BPMAttachmentFinder;
 import com.alfame.esb.bpm.api.BPMAttachmentInstance;
-import com.alfame.esb.bpm.connector.internal.proxies.BPMAttachmentInstanceProxy;
+import com.alfame.esb.bpm.connector.internal.impl.BPMAttachmentInstanceProxy;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.task.Attachment;
 

@@ -1,4 +1,4 @@
-package com.alfame.esb.bpm.connector.internal;
+package com.alfame.esb.bpm.connector.internal.impl;
 
 public interface BPMEngineEventSubscriptionConnection {
 

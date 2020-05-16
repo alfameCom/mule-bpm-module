@@ -1,11 +1,9 @@
-package com.alfame.esb.bpm.connector.internal.proxies;
+package com.alfame.esb.bpm.connector.internal.impl;
 
 import com.alfame.esb.bpm.api.BPMEngineEvent;
 import com.alfame.esb.bpm.api.BPMEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
-
-import java.text.MessageFormat;
 
 public class BPMProcessEngineEventProxy extends BPMEngineEvent {
 

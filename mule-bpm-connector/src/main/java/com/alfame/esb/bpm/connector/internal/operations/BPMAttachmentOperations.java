@@ -5,7 +5,7 @@ import com.alfame.esb.bpm.api.BPMAttachmentFinder;
 import com.alfame.esb.bpm.api.BPMAttachmentInstance;
 import com.alfame.esb.bpm.connector.api.config.BPMAttachmentFilter;
 import com.alfame.esb.bpm.connector.api.config.BPMAttachmentNameFilter;
-import com.alfame.esb.bpm.connector.internal.BPMAttachmentFinderImpl;
+import com.alfame.esb.bpm.connector.internal.impl.BPMAttachmentFinderImpl;
 import com.alfame.esb.bpm.connector.internal.BPMExtension;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
