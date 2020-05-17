@@ -33,6 +33,15 @@
         <module>mule-bpm-module</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>examples</id>
+            <modules>
+                <module>examples</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
