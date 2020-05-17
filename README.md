@@ -1,5 +1,8 @@
 # Mule BPM Module
 
+[![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/alfameCom/mule-bpm-module/blob/master/LICENSE.txt)
+![Java CI with Maven](https://github.com/alfameCom/mule-bpm-module/workflows/Java%20CI%20with%20Maven/badge.svg)
+
 Mule BPM Module extends Mule 4 by adding support for process-oriented integrations.
 
 The actual Business Process Management (BPM) support is based on [Flowable Engine](https://github.com/flowable/flowable-engine) and is not currently interchangeable to other engines.
