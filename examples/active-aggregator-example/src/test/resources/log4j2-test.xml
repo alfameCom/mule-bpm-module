@@ -22,10 +22,10 @@
         <AsyncLogger name="org.flowable.common.engine.impl.interceptor.CommandContext" level="FATAL"/>
 
         <!--  BPM extension -->
-        <AsyncLogger name="com.alfame.esb.bpm.connector" level="DEBUG"/>
+        <AsyncLogger name="com.alfame.esb.bpm.module" level="DEBUG"/>
         <AsyncLogger name="org.flowable.mule" level="DEBUG"/>
-        <AsyncLogger name="com.alfame.esb.bpm.connector.internal.impl.BPMEventSubscriptionBuilderImpl" level="TRACE"/>
-        <AsyncLogger name="com.alfame.esb.bpm.connector.internal.impl.BPMEventSubscriptionImpl" level="TRACE"/>
+        <AsyncLogger name="com.alfame.esb.bpm.module.internal.impl.BPMEventSubscriptionBuilderImpl" level="TRACE"/>
+        <AsyncLogger name="com.alfame.esb.bpm.module.internal.impl.BPMEventSubscriptionImpl" level="TRACE"/>
 
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>

@@ -61,7 +61,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.alfame.esb.bpm</groupId>
-			<artifactId>mule-bpm-connector</artifactId>
+			<artifactId>mule-bpm-module</artifactId>
 			<version>2.1.1-SNAPSHOT</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>

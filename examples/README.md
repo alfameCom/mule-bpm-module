@@ -1,4 +1,4 @@
-# Example Mule applications using BPM Connector
+# Example Mule applications using BPM Module
 
 ## Installation
 ```bash
