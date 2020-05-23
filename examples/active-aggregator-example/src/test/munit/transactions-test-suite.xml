@@ -16,36 +16,36 @@
 			http://www.mulesoft.org/schema/mule/ftpserver http://www.mulesoft.org/schema/mule/ftpserver/current/mule-ftpserver.xsd
 			http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
     <munit:config name="transactions-test-suite.xml"/>
-    <munit:dynamic-port propertyName="invoice.sftp.port"/>
-    <munit:dynamic-port propertyName="payment.sftp.port"/>
-    <munit:dynamic-port propertyName="transaction.http.port"/>
+    <munit:dynamic-port propertyName="SOURCE_INVOICE_SFTP_PORT"/>
+    <munit:dynamic-port propertyName="SOURCE_PAYMENT_SFTP_PORT"/>
+    <munit:dynamic-port propertyName="TARGET_TRANSACTION_HTTP_PORT"/>
     <ftpserver:config
             name="MUnit_Invoice_SFTP_Server_Config"
             doc:name="MUnit Invoice SFTP Server Config"
             doc:id="a6754d65-368a-4ccc-bf73-48848e8f5668">
-        <ftpserver:connection port="${invoice.sftp.port}"
-                              username="${invoice.sftp.user}" password="${invoice.sftp.password}"
+        <ftpserver:connection port="${SOURCE_INVOICE_SFTP_PORT}"
+                              username="${SOURCE_INVOICE_SFTP_USER}" password="${SOURCE_INVOICE_SFTP_PASS}"
                               secure="true" homeDir="${app.home}"/>
     </ftpserver:config>
     <ftpserver:config
             name="MUnit_Payment_SFTP_Server_Config"
             doc:name="MUnit Payment SFTP Server Config"
             doc:id="8f435fd9-f1ed-4b3f-a3f6-2c24b36b0dc1">
-        <ftpserver:connection port="${payment.sftp.port}"
-                              username="${payment.sftp.user}" password="${payment.sftp.password}"
+        <ftpserver:connection port="${SOURCE_PAYMENT_SFTP_PORT}"
+                              username="${SOURCE_PAYMENT_SFTP_USER}" password="${SOURCE_PAYMENT_SFTP_PASS}"
                               secure="true" homeDir="${app.home}"/>
     </ftpserver:config>
     <sftp:config name="MUnit_Invoice_SFTP_Config"
                  doc:name="SFTP Config" doc:id="ec381f6a-57bc-4adf-9d94-827c1237223a">
-        <sftp:connection host="${invoice.sftp.host}"
-                         port="${invoice.sftp.port}" username="${invoice.sftp.user}"
-                         password="${invoice.sftp.password}" workingDir="${invoice.sftp.path}"/>
+        <sftp:connection host="${SOURCE_INVOICE_SFTP_HOST}"
+                         port="${SOURCE_INVOICE_SFTP_PORT}" username="${SOURCE_INVOICE_SFTP_USER}"
+                         password="${SOURCE_INVOICE_SFTP_PASS}" workingDir="${SOURCE_INVOICE_SFTP_PATH}"/>
     </sftp:config>
     <sftp:config name="MUnit_Payment_SFTP_Config"
                  doc:name="SFTP Config" doc:id="47439702-6df3-4a0c-af4f-78bf6fc450ec">
-        <sftp:connection host="${payment.sftp.host}"
-                         port="${payment.sftp.port}" username="${payment.sftp.user}"
-                         password="${payment.sftp.password}" workingDir="${payment.sftp.path}"/>
+        <sftp:connection host="${SOURCE_PAYMENT_SFTP_HOST}"
+                         port="${SOURCE_PAYMENT_SFTP_PORT}" username="${SOURCE_PAYMENT_SFTP_USER}"
+                         password="${SOURCE_PAYMENT_SFTP_PASS}" workingDir="${SOURCE_PAYMENT_SFTP_PATH}"/>
     </sftp:config>
     <import doc:name="Import" doc:id="c912dc46-fe55-4a00-93c1-65ec9345b6e5" file="transaction-api-config.xml"/>
     <munit:test name="transactions-test-suite"

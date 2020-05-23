@@ -20,12 +20,12 @@
     <http:listener-config
             name="httpListenerConfigDefault">
         <http:listener-connection host="0.0.0.0"
-                                  port="${http.port}"/>
+                                  port="${SOURCE_HTTP_PORT}"/>
     </http:listener-config>
     <ftp:config name="ftpConfig">
-        <ftp:connection host="0.0.0.0" port="${ftp.port}"
-                        username="${ftp.user}" password="${ftp.password}"
-                        workingDir="${ftp.path}"/>
+        <ftp:connection host="${TARGET_FTP_HOST}" port="${TARGET_FTP_PORT}"
+                        username="${TARGET_FTP_USER}" password="${TARGET_FTP_PASS}"
+                        workingDir="${TARGET_FTP_PATH}"/>
     </ftp:config>
     <bpm:config name="engineConfig"
                 defaultTenantId="com.alfame.esb.bpm.examples">

@@ -24,19 +24,21 @@
     </bpm:config>
     <sftp:config name="Invoice_SFTP_Config" doc:name="Invoice SFTP Config"
                  doc:id="e7f31a7a-e791-4548-a8d5-6ad25e668ac0">
-        <sftp:connection workingDir="${invoice.sftp.path}" host="${invoice.sftp.host}" port="${invoice.sftp.port}"
-                         username="${invoice.sftp.user}" password="${invoice.sftp.password}"/>
+        <sftp:connection workingDir="${SOURCE_INVOICE_SFTP_PATH}" host="${SOURCE_INVOICE_SFTP_HOST}"
+                         port="${SOURCE_INVOICE_SFTP_PORT}"
+                         username="${SOURCE_INVOICE_SFTP_USER}" password="${SOURCE_INVOICE_SFTP_PASS}"/>
     </sftp:config>
     <sftp:config name="Payment_SFTP_Config" doc:name="Payment SFTP Config"
                  doc:id="884c176c-de9d-44cc-8ef2-ab0958f4951c">
-        <sftp:connection workingDir="${payment.sftp.path}" host="${payment.sftp.host}" port="${payment.sftp.port}"
-                         username="${payment.sftp.user}" password="${payment.sftp.password}"/>
+        <sftp:connection workingDir="${SOURCE_PAYMENT_SFTP_PATH}" host="${SOURCE_PAYMENT_SFTP_HOST}"
+                         port="${SOURCE_PAYMENT_SFTP_PORT}"
+                         username="${SOURCE_PAYMENT_SFTP_USER}" password="${SOURCE_PAYMENT_SFTP_PASS}"/>
     </sftp:config>
     <wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config"
                 doc:id="af3ffda3-5ab0-4999-9c69-748f3082fd93">
         <wsc:connection wsdlLocation="api/TransactionService.wsdl" service="TransactionContract"
                         port="TransactionServiceSOAP"
-                        address="http://localhost:${transaction.http.port}/TransactionContract/TransactionServiceSOAP"/>
+                        address="http://localhost:${TARGET_TRANSACTION_HTTP_PORT}/TransactionContract/TransactionServiceSOAP"/>
     </wsc:config>
     <flow name="retrieveInvoicesTaskFlow" doc:id="88668ff9-6faf-4e8b-a765-c04b8919e024">
         <bpm:task-listener config-ref="BPM_Config" doc:name="Task listener"

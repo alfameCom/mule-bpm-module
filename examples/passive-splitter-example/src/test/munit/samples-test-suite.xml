@@ -16,19 +16,19 @@
             http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
             http://www.mulesoft.org/schema/mule/ftpserver http://www.mulesoft.org/schema/mule/ftpserver/current/mule-ftpserver.xsd">
     <munit:config name="samples-test-suite.xml"/>
-    <munit:dynamic-port propertyName="http.port"/>
-    <munit:dynamic-port propertyName="ftp.port"/>
+    <munit:dynamic-port propertyName="SOURCE_HTTP_PORT"/>
+    <munit:dynamic-port propertyName="TARGET_FTP_PORT"/>
     <http:request-config name="samplesApiRequestConfig"
                          doc:name="HTTP Request configuration"
                          doc:id="16c74cb9-30f7-4c4c-8beb-7a76dbbf8d49" basePath="/api">
         <http:request-connection host="0.0.0.0"
-                                 port="${http.port}"/>
+                                 port="${SOURCE_HTTP_PORT}"/>
     </http:request-config>
     <ftpserver:config name="MUnit_FTP_Server_Config"
                       doc:name="MUnit FTP Server Config"
                       doc:id="d7ef8f82-71e1-45ce-a5f9-a4a15bf6520b">
-        <ftpserver:connection port="${ftp.port}"
-                              username="${ftp.user}" password="${ftp.password}" secure="false"
+        <ftpserver:connection port="${TARGET_FTP_PORT}"
+                              username="${TARGET_FTP_USER}" password="${TARGET_FTP_PASS}" secure="false"
                               homeDir="${app.home}"/>
     </ftpserver:config>
     <munit:test name="samples-test-suite" description="Samples Test"
@@ -147,7 +147,7 @@ output application/java
 ]]">
                 <ftpserver:contains-files
                         config-ref="MUnit_FTP_Server_Config" file="#[payload]"
-                        path="${ftp.path}" doc:name="Contains files"
+                        path="${TARGET_FTP_PATH}" doc:name="Contains files"
                         doc:id="f88b4ee7-7aa0-4ab7-81f8-75e06407656a"/>
             </foreach>
         </munit:validation>

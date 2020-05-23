@@ -20,7 +20,7 @@
             doc:id="f07bb538-869a-43c6-b9e4-fc4cf16a516f"
             doc:name="HTTP Listener config" name="HTTP_Listener_config">
         <http:listener-connection host="0.0.0.0"
-                                  port="${transaction.http.port}"/>
+                                  port="${TARGET_TRANSACTION_HTTP_PORT}"/>
     </http:listener-config>
     <flow doc:id="fd34b720-7cb3-4b10-8b1d-43a1eea4b7d6"
           name="transaction-api-configFlow">
