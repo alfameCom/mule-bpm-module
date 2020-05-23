@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<beans>
+		<bean name="bpmDataSource"
+			class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+			<property name="driverClassName" value="${BPM_DB_DRIVER}" />
+			<property name="username" value="${BPM_DB_USER}" />
+			<property name="password" value="${BPM_DB_PASS}" />
+			<property name="jdbcUrl" value="${BPM_DB_URL}" />
+			<property name="minimumIdle" value="1" />
+			<property name="maximumPoolSize" value="10" />
+			<property name="connectionTimeout" value="300" />
+		</bean>
+	</beans>
+
+</beans>

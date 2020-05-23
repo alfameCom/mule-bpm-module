@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+<mule xmlns:spring="http://www.mulesoft.org/schema/mule/spring"
+      xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
       xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
             http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
             http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+            http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
+http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd">
     <configuration-properties
             file="mule-artifact.properties"/>
+    <configuration-properties
+            file="mule-bpm.properties"/>
+    <spring:config name="Spring_Config" doc:name="Spring Config" doc:id="06c59304-5932-4bbc-a481-d83730350896" files="beans.xml" />
     <apikit:config name="router-config" api="api.raml"
                    raml="api.raml" outboundHeadersMapName="outboundHeaders"
                    httpStatusVarName="httpStatus"/>
@@ -31,10 +35,7 @@
                 defaultTenantId="com.alfame.esb.bpm.examples">
         <bpm:task-listener-connection/>
         <bpm:default-data-source>
-            <bpm:generic-data-source
-                    driverClassName="org.h2.Driver"
-                    jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1" username="sa"
-                    password="sa" type="h2"/>
+            <bpm:data-source-reference type="${BPM_DB_TYPE}" dataSourceRef="bpmDataSource"  />
         </bpm:default-data-source>
         <bpm:definitions>
             <bpm:classpath-definition
@@ -46,7 +47,7 @@
             <bpm:default-async-executor/>
         </bpm:async-executor>
     </bpm:config>
-    <flow name="main-api">
+	<flow name="main-api">
         <http:listener config-ref="httpListenerConfigDefault"
                        path="/api/*">
             <http:response
@@ -175,7 +176,8 @@ output application/json
 read(payload as String, "application/json")]'
                 doc:name="Set Payload" doc:id="3d0b87cd-921c-4c25-9d32-cd7affa2a8ab"/>
         <foreach collection="#[payload.samples]">
-            <set-payload
+            <set-variable value="#[payload.id]" doc:name="Set Variable" doc:id="7101c9c3-a9ce-4c47-a842-36d57f6f5186" variableName="sampleId"/>
+			<set-payload
                     value='#[%dw 2.0
 output application/java
 ---
@@ -184,7 +186,8 @@ write(payload, "application/json")]'
             <bpm:process-factory doc:name="Process factory"
                                  doc:id="9a132271-921c-82b6-a4d3-74560b68" config-ref="engineConfig"
                                  processDefinitionKey="sampleSubmitter"
-                                 tenantId="com.alfame.esb.bpm.examples">
+                                 tenantId="com.alfame.esb.bpm.examples"
+                                 uniqueBusinessKey="#[vars.sampleId]">
                 <bpm:process-variables>
                     <bpm:process-variable
                             variableName="sampleJson" value="#[payload]"/>

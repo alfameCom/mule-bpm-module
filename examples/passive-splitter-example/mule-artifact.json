@@ -6,9 +6,12 @@
     "id": "mule",
     "attributes": {
       "exportedPackages": [
-      	"org.h2"
+      	"org.h2",
+      	"com.microsoft.sqlserver.jdbc",
+      	"com.zaxxer.hikari"
       ],
       "exportedResources": [
+        "beans.xml",
         "api/api.raml",
         "processes/sampleSplitter.bpmn20.xml",
         "processes/sampleSubmitter.bpmn20.xml"
