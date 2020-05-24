@@ -144,6 +144,59 @@ sequenceDiagram
 
 ### Attachments
 
+Attachments are larger binary type content for processes.
+
+Applications can currently `<bpm:create-attachment />` and `<bpm:get-latest-attachment />` of matching type and name:
+
+[![
+sequenceDiagram
+    autonumber
+    participant Mule BPM App
+    participant Mule BPM Module
+    participant BPMN 2.0
+    activate Mule BPM App
+    rect rgb(200, 200, 240)
+    Mule BPM Module->>BPMN 2.0: <serviceTask flowable:type="mule" flowable:async="true" />
+    activate Mule BPM Module
+    activate BPMN 2.0
+    BPMN 2.0->>Mule BPM Module: org.flowable.mule.MuleSendActivityBehavior
+    activate Mule BPM Module
+    Mule BPM Module->>Mule BPM App: <bpm:task-listener />
+    activate Mule BPM App
+    rect rgb(180, 180, 230)
+    Mule BPM App->>Mule BPM Module: <bpm:get-latest-attachment />
+    activate Mule BPM Module
+    Mule BPM Module->>BPMN 2.0: get attachment
+    activate BPMN 2.0
+    BPMN 2.0-->>Mule BPM Module: content
+    deactivate BPMN 2.0
+    Mule BPM Module-->>Mule BPM App: content
+    deactivate Mule BPM Module
+    end
+    Mule BPM App->>Mule BPM App: modify content
+    rect rgb(180, 180, 230)
+    Mule BPM App->>Mule BPM Module: <bpm:create-attachment />
+    activate Mule BPM Module
+    Mule BPM Module->>BPMN 2.0: create attachment
+    activate BPMN 2.0
+    BPMN 2.0-->>Mule BPM Module: done
+    deactivate BPMN 2.0
+    Mule BPM Module-->>Mule BPM App: done
+    deactivate Mule BPM Module
+    end
+    Mule BPM App-->>Mule BPM Module: resultVariable
+    deactivate Mule BPM App
+    Mule BPM Module-->>BPMN 2.0: resultVariable
+    BPMN 2.0-->>Mule BPM Module: done
+    deactivate BPMN 2.0
+    deactivate Mule BPM Module
+    deactivate Mule BPM Module
+    end
+    deactivate Mule BPM App
+](https://mermaid.ink/img/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgYXV0b251bWJlclxuICAgIHBhcnRpY2lwYW50IE11bGUgQlBNIEFwcFxuICAgIHBhcnRpY2lwYW50IE11bGUgQlBNIE1vZHVsZVxuICAgIHBhcnRpY2lwYW50IEJQTU4gMi4wXG4gICAgYWN0aXZhdGUgTXVsZSBCUE0gQXBwXG4gICAgcmVjdCByZ2IoMjAwLCAyMDAsIDI0MClcbiAgICBNdWxlIEJQTSBNb2R1bGUtPj5CUE1OIDIuMDogPHNlcnZpY2VUYXNrIGZsb3dhYmxlOnR5cGU9XCJtdWxlXCIgZmxvd2FibGU6YXN5bmM9XCJ0cnVlXCIgLz5cbiAgICBhY3RpdmF0ZSBNdWxlIEJQTSBNb2R1bGVcbiAgICBhY3RpdmF0ZSBCUE1OIDIuMFxuICAgIEJQTU4gMi4wLT4-TXVsZSBCUE0gTW9kdWxlOiBvcmcuZmxvd2FibGUubXVsZS5NdWxlU2VuZEFjdGl2aXR5QmVoYXZpb3JcbiAgICBhY3RpdmF0ZSBNdWxlIEJQTSBNb2R1bGVcbiAgICBNdWxlIEJQTSBNb2R1bGUtPj5NdWxlIEJQTSBBcHA6IDxicG06dGFzay1saXN0ZW5lciAvPlxuICAgIGFjdGl2YXRlIE11bGUgQlBNIEFwcFxuICAgIHJlY3QgcmdiKDE4MCwgMTgwLCAyMzApXG4gICAgTXVsZSBCUE0gQXBwLT4-TXVsZSBCUE0gTW9kdWxlOiA8YnBtOmdldC1sYXRlc3QtYXR0YWNobWVudCAvPlxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIE11bGUgQlBNIE1vZHVsZS0-PkJQTU4gMi4wOiBnZXQgYXR0YWNobWVudFxuICAgIGFjdGl2YXRlIEJQTU4gMi4wXG4gICAgQlBNTiAyLjAtLT4-TXVsZSBCUE0gTW9kdWxlOiBjb250ZW50XG4gICAgZGVhY3RpdmF0ZSBCUE1OIDIuMFxuICAgIE11bGUgQlBNIE1vZHVsZS0tPj5NdWxlIEJQTSBBcHA6IGNvbnRlbnRcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIGVuZFxuICAgIE11bGUgQlBNIEFwcC0-Pk11bGUgQlBNIEFwcDogbW9kaWZ5IGNvbnRlbnRcbiAgICByZWN0IHJnYigxODAsIDE4MCwgMjMwKVxuICAgIE11bGUgQlBNIEFwcC0-Pk11bGUgQlBNIE1vZHVsZTogPGJwbTpjcmVhdGUtYXR0YWNobWVudCAvPlxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIE11bGUgQlBNIE1vZHVsZS0-PkJQTU4gMi4wOiBjcmVhdGUgYXR0YWNobWVudFxuICAgIGFjdGl2YXRlIEJQTU4gMi4wXG4gICAgQlBNTiAyLjAtLT4-TXVsZSBCUE0gTW9kdWxlOiBkb25lXG4gICAgZGVhY3RpdmF0ZSBCUE1OIDIuMFxuICAgIE11bGUgQlBNIE1vZHVsZS0tPj5NdWxlIEJQTSBBcHA6IGRvbmVcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIGVuZFxuICAgIE11bGUgQlBNIEFwcC0tPj5NdWxlIEJQTSBNb2R1bGU6IHJlc3VsdFZhcmlhYmxlXG4gICAgZGVhY3RpdmF0ZSBNdWxlIEJQTSBBcHBcbiAgICBNdWxlIEJQTSBNb2R1bGUtLT4-QlBNTiAyLjA6IHJlc3VsdFZhcmlhYmxlXG4gICAgQlBNTiAyLjAtLT4-TXVsZSBCUE0gTW9kdWxlOiBkb25lXG4gICAgZGVhY3RpdmF0ZSBCUE1OIDIuMFxuICAgIGRlYWN0aXZhdGUgTXVsZSBCUE0gTW9kdWxlXG4gICAgZGVhY3RpdmF0ZSBNdWxlIEJQTSBNb2R1bGVcbiAgICBlbmRcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIEFwcCIsIm1lcm1haWQiOnsidGhlbWUiOiJkZWZhdWx0In0sInVwZGF0ZUVkaXRvciI6ZmFsc2V9)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgYXV0b251bWJlclxuICAgIHBhcnRpY2lwYW50IE11bGUgQlBNIEFwcFxuICAgIHBhcnRpY2lwYW50IE11bGUgQlBNIE1vZHVsZVxuICAgIHBhcnRpY2lwYW50IEJQTU4gMi4wXG4gICAgYWN0aXZhdGUgTXVsZSBCUE0gQXBwXG4gICAgcmVjdCByZ2IoMjAwLCAyMDAsIDI0MClcbiAgICBNdWxlIEJQTSBNb2R1bGUtPj5CUE1OIDIuMDogPHNlcnZpY2VUYXNrIGZsb3dhYmxlOnR5cGU9XCJtdWxlXCIgZmxvd2FibGU6YXN5bmM9XCJ0cnVlXCIgLz5cbiAgICBhY3RpdmF0ZSBNdWxlIEJQTSBNb2R1bGVcbiAgICBhY3RpdmF0ZSBCUE1OIDIuMFxuICAgIEJQTU4gMi4wLT4-TXVsZSBCUE0gTW9kdWxlOiBvcmcuZmxvd2FibGUubXVsZS5NdWxlU2VuZEFjdGl2aXR5QmVoYXZpb3JcbiAgICBhY3RpdmF0ZSBNdWxlIEJQTSBNb2R1bGVcbiAgICBNdWxlIEJQTSBNb2R1bGUtPj5NdWxlIEJQTSBBcHA6IDxicG06dGFzay1saXN0ZW5lciAvPlxuICAgIGFjdGl2YXRlIE11bGUgQlBNIEFwcFxuICAgIHJlY3QgcmdiKDE4MCwgMTgwLCAyMzApXG4gICAgTXVsZSBCUE0gQXBwLT4-TXVsZSBCUE0gTW9kdWxlOiA8YnBtOmdldC1sYXRlc3QtYXR0YWNobWVudCAvPlxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIE11bGUgQlBNIE1vZHVsZS0-PkJQTU4gMi4wOiBnZXQgYXR0YWNobWVudFxuICAgIGFjdGl2YXRlIEJQTU4gMi4wXG4gICAgQlBNTiAyLjAtLT4-TXVsZSBCUE0gTW9kdWxlOiBjb250ZW50XG4gICAgZGVhY3RpdmF0ZSBCUE1OIDIuMFxuICAgIE11bGUgQlBNIE1vZHVsZS0tPj5NdWxlIEJQTSBBcHA6IGNvbnRlbnRcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIGVuZFxuICAgIE11bGUgQlBNIEFwcC0-Pk11bGUgQlBNIEFwcDogbW9kaWZ5IGNvbnRlbnRcbiAgICByZWN0IHJnYigxODAsIDE4MCwgMjMwKVxuICAgIE11bGUgQlBNIEFwcC0-Pk11bGUgQlBNIE1vZHVsZTogPGJwbTpjcmVhdGUtYXR0YWNobWVudCAvPlxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIE11bGUgQlBNIE1vZHVsZS0-PkJQTU4gMi4wOiBjcmVhdGUgYXR0YWNobWVudFxuICAgIGFjdGl2YXRlIEJQTU4gMi4wXG4gICAgQlBNTiAyLjAtLT4-TXVsZSBCUE0gTW9kdWxlOiBkb25lXG4gICAgZGVhY3RpdmF0ZSBCUE1OIDIuMFxuICAgIE11bGUgQlBNIE1vZHVsZS0tPj5NdWxlIEJQTSBBcHA6IGRvbmVcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIGVuZFxuICAgIE11bGUgQlBNIEFwcC0tPj5NdWxlIEJQTSBNb2R1bGU6IHJlc3VsdFZhcmlhYmxlXG4gICAgZGVhY3RpdmF0ZSBNdWxlIEJQTSBBcHBcbiAgICBNdWxlIEJQTSBNb2R1bGUtLT4-QlBNTiAyLjA6IHJlc3VsdFZhcmlhYmxlXG4gICAgQlBNTiAyLjAtLT4-TXVsZSBCUE0gTW9kdWxlOiBkb25lXG4gICAgZGVhY3RpdmF0ZSBCUE1OIDIuMFxuICAgIGRlYWN0aXZhdGUgTXVsZSBCUE0gTW9kdWxlXG4gICAgZGVhY3RpdmF0ZSBNdWxlIEJQTSBNb2R1bGVcbiAgICBlbmRcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIEFwcCIsIm1lcm1haWQiOnsidGhlbWUiOiJkZWZhdWx0In0sInVwZGF0ZUVkaXRvciI6ZmFsc2V9)
+
+Attachment operations are not limited to Mule task contex, but [Signalling](#signalling) should be utilized to synchronize execution.
+
 ### Signalling
 
 ### Event subscription
