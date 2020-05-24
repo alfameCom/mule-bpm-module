@@ -47,7 +47,9 @@ To model BPMN 2.0 processes use [Flowable Modeler](http://localhost:8080/flowabl
 docker run -p8080:8080 flowable/all-in-one
 ```
 
-Hint: default credentials are admin/test.
+> Hint from Flowable: default credentials are admin/test.
+
+More details about usage and implementation of Mule BPM Module can be found from [mule-bpm-module/README.md](mule-bpm-module/README.md).
 
 ## Contributing to Mule BPM Module
 To contribute to Mule BPM Module, follow these steps:
