@@ -9,7 +9,7 @@ mvn archetype:generate -DarchetypeGroupId=org.mule.extensions -DarchetypeArtifac
 
 ### Process factory
 
-Process factory can be used to instantiate new processes:
+`<bpm:process-factory />` can be used to instantiate new processes:
 
 [![
 sequenceDiagram
