@@ -93,7 +93,7 @@ sequenceDiagram
 
 ### Variable operations
 
-Variable operations are available inside Mule tasks:
+Variable operations `<bpm:get-variable />`, `<bpm:set-variable />` and `<bpm:remove-variable />` are available inside Mule tasks:
 
 [![
 sequenceDiagram
