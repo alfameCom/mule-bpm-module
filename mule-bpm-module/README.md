@@ -39,6 +39,10 @@ By setting `uniqueBusinessKey` attribute, the instance is guaranteed to be the o
 
 ### Mule task listener
 
+Mule tasks are Mule flows using `<bpm:task-listener />` as an endpoint.
+
+Execution of Mule task can be either synchronous or asynchronous: synchronous Mule tasks are executed on calling thread, while asynchronous Mule tasks are always executed on background.
+
 [![
 sequenceDiagram
     autonumber
