@@ -176,7 +176,6 @@ output application/json
 read(payload as String, "application/json")]'
                 doc:name="Set Payload" doc:id="3d0b87cd-921c-4c25-9d32-cd7affa2a8ab"/>
         <foreach collection="#[payload.samples]">
-            <set-variable value="#[payload.id]" doc:name="Set Variable" doc:id="7101c9c3-a9ce-4c47-a842-36d57f6f5186" variableName="sampleId"/>
 			<set-payload
                     value='#[%dw 2.0
 output application/java
@@ -186,8 +185,7 @@ write(payload, "application/json")]'
             <bpm:process-factory doc:name="Process factory"
                                  doc:id="9a132271-921c-82b6-a4d3-74560b68" config-ref="engineConfig"
                                  processDefinitionKey="sampleSubmitter"
-                                 tenantId="com.alfame.esb.bpm.examples"
-                                 uniqueBusinessKey="#[vars.sampleId]">
+                                 tenantId="com.alfame.esb.bpm.examples">
                 <bpm:process-variables>
                     <bpm:process-variable
                             variableName="sampleJson" value="#[payload]"/>
