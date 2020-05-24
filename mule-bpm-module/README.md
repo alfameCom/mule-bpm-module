@@ -5,6 +5,39 @@ This extension was initially created by:
 mvn archetype:generate -DarchetypeGroupId=org.mule.extensions -DarchetypeArtifactId=mule-extensions-archetype -DgroupId=com.alfame.esb.bpm -DartifactId=mule-bpm-module -Dversion=1.0.0-SNAPSHOT -Dpackage=com.alfame.esb.bpm.module -DextensionName=BPM
 ```
 
+## Components
+
+[![
+classDiagram
+    class Mule BPM App {
+        <<application>>
+    }
+    class Mule BPM Module {
+        <<component>>
+    }
+    class Mule BPM Flowable Activity {
+        <<component>>
+    }
+    class Flowable Engine {
+        <<component>>
+    }
+    class Mule BPM Task Queue {
+        <<component>>
+    }
+    class Mule BPM API {
+        <<component>>
+    }
+	Mule BPM App..>Mule BPM Module
+	Mule BPM App..>Mule BPM API
+	Mule BPM Module..>Flowable Engine
+	Mule BPM Module..>Mule BPM Flowable Activity
+	Mule BPM Flowable Activity..>Mule BPM Task Queue
+	Mule BPM Flowable Activity..>Flowable Engine
+	Mule BPM Module..>Mule BPM Task Queue
+	Mule BPM Module..>Mule BPM API
+	Mule BPM Task Queue..>Mule BPM API
+](https://mermaid.ink/img/eyJjb2RlIjoiY2xhc3NEaWFncmFtXG4gICAgY2xhc3MgTXVsZSBCUE0gQXBwIHtcbiAgICAgICAgPDxhcHBsaWNhdGlvbj4-XG4gICAgfVxuICAgIGNsYXNzIE11bGUgQlBNIE1vZHVsZSB7XG4gICAgICAgIDw8Y29tcG9uZW50Pj5cbiAgICB9XG4gICAgY2xhc3MgTXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHkge1xuICAgICAgICA8PGNvbXBvbmVudD4-XG4gICAgfVxuICAgIGNsYXNzIEZsb3dhYmxlIEVuZ2luZSB7XG4gICAgICAgIDw8Y29tcG9uZW50Pj5cbiAgICB9XG4gICAgY2xhc3MgTXVsZSBCUE0gVGFzayBRdWV1ZSB7XG4gICAgICAgIDw8Y29tcG9uZW50Pj5cbiAgICB9XG4gICAgY2xhc3MgTXVsZSBCUE0gQVBJIHtcbiAgICAgICAgPDxjb21wb25lbnQ-PlxuICAgIH1cblx0TXVsZSBCUE0gQXBwLi4-TXVsZSBCUE0gTW9kdWxlXG5cdE11bGUgQlBNIEFwcC4uPk11bGUgQlBNIEFQSVxuXHRNdWxlIEJQTSBNb2R1bGUuLj5GbG93YWJsZSBFbmdpbmVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHlcblx0TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHkuLj5NdWxlIEJQTSBUYXNrIFF1ZXVlXG5cdE11bGUgQlBNIEZsb3dhYmxlIEFjdGl2aXR5Li4-Rmxvd2FibGUgRW5naW5lXG5cdE11bGUgQlBNIE1vZHVsZS4uPk11bGUgQlBNIFRhc2sgUXVldWVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gQVBJXG5cdE11bGUgQlBNIFRhc2sgUXVldWUuLj5NdWxlIEJQTSBBUEkiLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoiY2xhc3NEaWFncmFtXG4gICAgY2xhc3MgTXVsZSBCUE0gQXBwIHtcbiAgICAgICAgPDxhcHBsaWNhdGlvbj4-XG4gICAgfVxuICAgIGNsYXNzIE11bGUgQlBNIE1vZHVsZSB7XG4gICAgICAgIDw8Y29tcG9uZW50Pj5cbiAgICB9XG4gICAgY2xhc3MgTXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHkge1xuICAgICAgICA8PGNvbXBvbmVudD4-XG4gICAgfVxuICAgIGNsYXNzIEZsb3dhYmxlIEVuZ2luZSB7XG4gICAgICAgIDw8Y29tcG9uZW50Pj5cbiAgICB9XG4gICAgY2xhc3MgTXVsZSBCUE0gVGFzayBRdWV1ZSB7XG4gICAgICAgIDw8Y29tcG9uZW50Pj5cbiAgICB9XG4gICAgY2xhc3MgTXVsZSBCUE0gQVBJIHtcbiAgICAgICAgPDxjb21wb25lbnQ-PlxuICAgIH1cblx0TXVsZSBCUE0gQXBwLi4-TXVsZSBCUE0gTW9kdWxlXG5cdE11bGUgQlBNIEFwcC4uPk11bGUgQlBNIEFQSVxuXHRNdWxlIEJQTSBNb2R1bGUuLj5GbG93YWJsZSBFbmdpbmVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHlcblx0TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHkuLj5NdWxlIEJQTSBUYXNrIFF1ZXVlXG5cdE11bGUgQlBNIEZsb3dhYmxlIEFjdGl2aXR5Li4-Rmxvd2FibGUgRW5naW5lXG5cdE11bGUgQlBNIE1vZHVsZS4uPk11bGUgQlBNIFRhc2sgUXVldWVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gQVBJXG5cdE11bGUgQlBNIFRhc2sgUXVldWUuLj5NdWxlIEJQTSBBUEkiLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)
+
 ## Features
 
 ### Process factory
