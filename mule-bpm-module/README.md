@@ -52,7 +52,7 @@ Mule BPM Apps are Mule applications utilizing this Mule BPM Module. Examples of 
 
 ### Mule BPM Module
 
-This component, which realizes Mule Module and implements Mule BPM Module XML API.
+This component, which realizes Mule Module and implements Mule BPM Module XML API [features](#features).
 
 ### Mule BPM API
 
