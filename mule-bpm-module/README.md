@@ -1,4 +1,4 @@
-# Implementation of Mule BPM Module, using [Mule SDK for Java](https://docs.mulesoft.com/mule-sdk/1.1/getting-started)
+# Implementation of Mule BPM Module
 
 This extension was initially created by:
 ```
@@ -10,25 +10,29 @@ mvn archetype:generate -DarchetypeGroupId=org.mule.extensions -DarchetypeArtifac
 [![
 classDiagram
 	class Mule BPM App {
-		<<application>>
+		<<Application>>
 	}
 	class Mule BPM Module {
-		<<component>>
+		<<Component>>
+	}
+	class Mule Module {
+		<<SDK>>
 	}
 	class Mule BPM Flowable Activity {
-		<<component>>
+		<<Component>>
 	}
 	class Flowable Engine {
-		<<component>>
+		<<Component>>
 	}
 	class Mule BPM Task Queue {
-		<<component>>
+		<<Component>>
 	}
 	class Mule BPM API {
-		<<component>>
+		<<Component>>
 	}
 	Mule BPM App..>Mule BPM Module
 	Mule BPM App..>Mule BPM API
+	Mule BPM Module..|>Mule Module
 	Mule BPM Module..>Flowable Engine
 	Mule BPM Module..>Mule BPM Flowable Activity
 	Mule BPM Flowable Activity..>Mule BPM Task Queue
@@ -36,15 +40,19 @@ classDiagram
 	Mule BPM Module..>Mule BPM Task Queue
 	Mule BPM Module..>Mule BPM API
 	Mule BPM Task Queue..>Mule BPM API
-](https://mermaid.ink/img/eyJjb2RlIjoiY2xhc3NEaWFncmFtXG5cdGNsYXNzIE11bGUgQlBNIEFwcCB7XG5cdFx0PDxhcHBsaWNhdGlvbj4-XG5cdH1cblx0Y2xhc3MgTXVsZSBCUE0gTW9kdWxlIHtcblx0XHQ8PGNvbXBvbmVudD4-XG5cdH1cblx0Y2xhc3MgTXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHkge1xuXHRcdDw8Y29tcG9uZW50Pj5cblx0fVxuXHRjbGFzcyBGbG93YWJsZSBFbmdpbmUge1xuXHRcdDw8Y29tcG9uZW50Pj5cblx0fVxuXHRjbGFzcyBNdWxlIEJQTSBUYXNrIFF1ZXVlIHtcblx0XHQ8PGNvbXBvbmVudD4-XG5cdH1cblx0Y2xhc3MgTXVsZSBCUE0gQVBJIHtcblx0XHQ8PGNvbXBvbmVudD4-XG5cdH1cblx0TXVsZSBCUE0gQXBwLi4-TXVsZSBCUE0gTW9kdWxlXG5cdE11bGUgQlBNIEFwcC4uPk11bGUgQlBNIEFQSVxuXHRNdWxlIEJQTSBNb2R1bGUuLj5GbG93YWJsZSBFbmdpbmVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHlcblx0TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHkuLj5NdWxlIEJQTSBUYXNrIFF1ZXVlXG5cdE11bGUgQlBNIEZsb3dhYmxlIEFjdGl2aXR5Li4-Rmxvd2FibGUgRW5naW5lXG5cdE11bGUgQlBNIE1vZHVsZS4uPk11bGUgQlBNIFRhc2sgUXVldWVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gQVBJXG5cdE11bGUgQlBNIFRhc2sgUXVldWUuLj5NdWxlIEJQTSBBUEkiLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoiY2xhc3NEaWFncmFtXG5cdGNsYXNzIE11bGUgQlBNIEFwcCB7XG5cdFx0PDxhcHBsaWNhdGlvbj4-XG5cdH1cblx0Y2xhc3MgTXVsZSBCUE0gTW9kdWxlIHtcblx0XHQ8PGNvbXBvbmVudD4-XG5cdH1cblx0Y2xhc3MgTXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHkge1xuXHRcdDw8Y29tcG9uZW50Pj5cblx0fVxuXHRjbGFzcyBGbG93YWJsZSBFbmdpbmUge1xuXHRcdDw8Y29tcG9uZW50Pj5cblx0fVxuXHRjbGFzcyBNdWxlIEJQTSBUYXNrIFF1ZXVlIHtcblx0XHQ8PGNvbXBvbmVudD4-XG5cdH1cblx0Y2xhc3MgTXVsZSBCUE0gQVBJIHtcblx0XHQ8PGNvbXBvbmVudD4-XG5cdH1cblx0TXVsZSBCUE0gQXBwLi4-TXVsZSBCUE0gTW9kdWxlXG5cdE11bGUgQlBNIEFwcC4uPk11bGUgQlBNIEFQSVxuXHRNdWxlIEJQTSBNb2R1bGUuLj5GbG93YWJsZSBFbmdpbmVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHlcblx0TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHkuLj5NdWxlIEJQTSBUYXNrIFF1ZXVlXG5cdE11bGUgQlBNIEZsb3dhYmxlIEFjdGl2aXR5Li4-Rmxvd2FibGUgRW5naW5lXG5cdE11bGUgQlBNIE1vZHVsZS4uPk11bGUgQlBNIFRhc2sgUXVldWVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gQVBJXG5cdE11bGUgQlBNIFRhc2sgUXVldWUuLj5NdWxlIEJQTSBBUEkiLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)
+](https://mermaid.ink/img/eyJjb2RlIjoiY2xhc3NEaWFncmFtXG5cdGNsYXNzIE11bGUgQlBNIEFwcCB7XG5cdFx0PDxBcHBsaWNhdGlvbj4-XG5cdH1cblx0Y2xhc3MgTXVsZSBCUE0gTW9kdWxlIHtcblx0XHQ8PENvbXBvbmVudD4-XG5cdH1cblx0Y2xhc3MgTXVsZSBNb2R1bGUge1xuXHRcdDw8U0RLPj5cblx0fVxuXHRjbGFzcyBNdWxlIEJQTSBGbG93YWJsZSBBY3Rpdml0eSB7XG5cdFx0PDxDb21wb25lbnQ-PlxuXHR9XG5cdGNsYXNzIEZsb3dhYmxlIEVuZ2luZSB7XG5cdFx0PDxDb21wb25lbnQ-PlxuXHR9XG5cdGNsYXNzIE11bGUgQlBNIFRhc2sgUXVldWUge1xuXHRcdDw8Q29tcG9uZW50Pj5cblx0fVxuXHRjbGFzcyBNdWxlIEJQTSBBUEkge1xuXHRcdDw8Q29tcG9uZW50Pj5cblx0fVxuXHRNdWxlIEJQTSBBcHAuLj5NdWxlIEJQTSBNb2R1bGVcblx0TXVsZSBCUE0gQXBwLi4-TXVsZSBCUE0gQVBJXG5cdE11bGUgQlBNIE1vZHVsZS4ufD5NdWxlIE1vZHVsZVxuXHRNdWxlIEJQTSBNb2R1bGUuLj5GbG93YWJsZSBFbmdpbmVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHlcblx0TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHkuLj5NdWxlIEJQTSBUYXNrIFF1ZXVlXG5cdE11bGUgQlBNIEZsb3dhYmxlIEFjdGl2aXR5Li4-Rmxvd2FibGUgRW5naW5lXG5cdE11bGUgQlBNIE1vZHVsZS4uPk11bGUgQlBNIFRhc2sgUXVldWVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gQVBJXG5cdE11bGUgQlBNIFRhc2sgUXVldWUuLj5NdWxlIEJQTSBBUEkiLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoiY2xhc3NEaWFncmFtXG5cdGNsYXNzIE11bGUgQlBNIEFwcCB7XG5cdFx0PDxBcHBsaWNhdGlvbj4-XG5cdH1cblx0Y2xhc3MgTXVsZSBCUE0gTW9kdWxlIHtcblx0XHQ8PENvbXBvbmVudD4-XG5cdH1cblx0Y2xhc3MgTXVsZSBNb2R1bGUge1xuXHRcdDw8U0RLPj5cblx0fVxuXHRjbGFzcyBNdWxlIEJQTSBGbG93YWJsZSBBY3Rpdml0eSB7XG5cdFx0PDxDb21wb25lbnQ-PlxuXHR9XG5cdGNsYXNzIEZsb3dhYmxlIEVuZ2luZSB7XG5cdFx0PDxDb21wb25lbnQ-PlxuXHR9XG5cdGNsYXNzIE11bGUgQlBNIFRhc2sgUXVldWUge1xuXHRcdDw8Q29tcG9uZW50Pj5cblx0fVxuXHRjbGFzcyBNdWxlIEJQTSBBUEkge1xuXHRcdDw8Q29tcG9uZW50Pj5cblx0fVxuXHRNdWxlIEJQTSBBcHAuLj5NdWxlIEJQTSBNb2R1bGVcblx0TXVsZSBCUE0gQXBwLi4-TXVsZSBCUE0gQVBJXG5cdE11bGUgQlBNIE1vZHVsZS4ufD5NdWxlIE1vZHVsZVxuXHRNdWxlIEJQTSBNb2R1bGUuLj5GbG93YWJsZSBFbmdpbmVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHlcblx0TXVsZSBCUE0gRmxvd2FibGUgQWN0aXZpdHkuLj5NdWxlIEJQTSBUYXNrIFF1ZXVlXG5cdE11bGUgQlBNIEZsb3dhYmxlIEFjdGl2aXR5Li4-Rmxvd2FibGUgRW5naW5lXG5cdE11bGUgQlBNIE1vZHVsZS4uPk11bGUgQlBNIFRhc2sgUXVldWVcblx0TXVsZSBCUE0gTW9kdWxlLi4-TXVsZSBCUE0gQVBJXG5cdE11bGUgQlBNIFRhc2sgUXVldWUuLj5NdWxlIEJQTSBBUEkiLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)
 
 ### Mule BPM App
 
 Mule BPM Apps are Mule applications utilizing this Mule BPM Module. Examples of such applications can be found from [/examples](/examples).
 
+### Mule Module
+
+[Mule SDK](https://docs.mulesoft.com/mule-sdk/1.1/getting-started) defines a framework for Mule Modules.
+
 ### Mule BPM Module
 
-This component, which defines and implements Mule BPM Module XML API.
+This component, which realizes Mule Module and implementing Mule BPM Module XML API.
 
 ### Mule BPM API
 
