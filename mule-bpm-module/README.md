@@ -40,7 +40,7 @@ classDiagram
 
 ### Mule BPM App
 
-Mule BPM Apps are Mule applications utilizing this Mule BPM Module. Examples of such applications can be found from [examples](examples).
+Mule BPM Apps are Mule applications utilizing this Mule BPM Module. Examples of such applications can be found from [/examples](/examples).
 
 ### Mule BPM Module
 
