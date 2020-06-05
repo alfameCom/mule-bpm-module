@@ -64,7 +64,7 @@ Implementation of Flowable Engine's Mule task. The same Java interface is also b
 
 ### Mule BPM Task Queue
 
-A Java library implementing JVM level queueing for Mule Tasks.
+A Java library implementing JVM level queueing for Mule tasks.
 
 ### Flowable Engine
 
