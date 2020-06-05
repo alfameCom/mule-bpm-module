@@ -12,8 +12,8 @@ This module provides standard Mule XML API and [Java API](mule-bpm-api), which i
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
-* You have installed the latest version of [OpenJDK 8](https://adoptopenjdk.net).
-* You have installed the latest version of [Maven 3](http://maven.apache.org).
+* You have installed the latest version of [OpenJDK 8](https://adoptopenjdk.net)
+* You have installed the latest version of [Maven 3](http://maven.apache.org)
 * You have installed IDE for Mule 4 development
   * [Mulesoft Anypoint Studion version 7](https://www.mulesoft.com/lp/dl/studio)
   * [Intelli/J IDEA](https://www.jetbrains.com/idea/) with [Mule 4 Runtime plugin](https://plugins.jetbrains.com/plugin/10822-mule-4-runtime-)
