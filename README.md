@@ -65,3 +65,9 @@ Alternatively see the GitHub documentation on [creating a pull request](https://
 ## License
 
 This project uses the following license: [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+## Contact us
+
+If you’re experiencing problems or need help, please create a Github Issue.
+
+Regarding consulting or commercial requests, email us at [mule-bpm-module@alfame.com](mule-bpm-module@alfame.com).
