@@ -29,6 +29,7 @@ public class BPMTaskQueueFactory {
             semaphore.release();
         } catch (InterruptedException e) {
             logger.info(e);
+            Thread.currentThread().interrupt();
         }
 
         logger.trace("Returning instance for queueName " + queueName);

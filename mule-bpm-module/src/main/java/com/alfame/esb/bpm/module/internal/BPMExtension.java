@@ -10,6 +10,7 @@ import com.alfame.esb.bpm.module.internal.operations.BPMEventSubscriptionOperati
 import com.alfame.esb.bpm.module.internal.operations.BPMProcessFactoryOperations;
 import com.alfame.esb.bpm.module.internal.operations.BPMProcessVariableOperations;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.*;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
@@ -139,7 +140,7 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
         this.processEngineConfiguration.setEngineName(this.engineName);
 
         this.processEngineConfiguration.setDatabaseType(this.defaultDataSource.getType().getValue());
-        this.processEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        this.processEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
         this.registerTenant(this.defaultTenantId);
         if (this.additionalTenants != null) {

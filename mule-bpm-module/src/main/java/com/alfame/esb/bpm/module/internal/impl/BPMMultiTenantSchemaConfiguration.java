@@ -32,7 +32,7 @@ public class BPMMultiTenantSchemaConfiguration extends MultiSchemaMultiTenantPro
                 Connection connection = null;
                 try {
                     connection = tenantDataSource.getConnection();
-                    if (connection != null) {
+                    if (connection != null && connection.isValid(5)) {
                         String schema = connection.getSchema();
                         LOGGER.info("managing database schema {} on {}", schema, connection.getMetaData().getURL());
                         Flyway flyway = Flyway.configure()
@@ -51,7 +51,7 @@ public class BPMMultiTenantSchemaConfiguration extends MultiSchemaMultiTenantPro
                                 getCommandExecutor().execute(getSchemaCommandConfig(),
                                         new ExecuteSchemaOperationCommand(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE));
                             } catch (FlowableWrongDbException flowableWrongDbException) {
-                                LOGGER.info("flowable database needs an update: {}", flowableWrongDbException);
+                                LOGGER.info("flowable database needs an update: {}", flowableWrongDbException.getMessage());
                                 super.createTenantSchema(tenantId);
                                 flyway.baseline();
                             } finally {

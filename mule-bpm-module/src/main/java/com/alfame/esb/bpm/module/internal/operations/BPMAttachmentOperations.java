@@ -77,8 +77,8 @@ public class BPMAttachmentOperations {
             resultBuilder.output(config.getAttachmentContent(attachmentInstance.getId()));
             resultBuilder.attributes(attachmentInstance);
         } else {
-            LOGGER.debug("Attachment {} not found for process instance {} and task {}",
-                    attachmentInstance.getId(), properties.getProcessInstanceId(), properties.getTaskId());
+            LOGGER.debug("No attachment(s) found for process instance {} and task {}",
+                    properties.getProcessInstanceId(), properties.getTaskId());
         }
 
         return resultBuilder.build();

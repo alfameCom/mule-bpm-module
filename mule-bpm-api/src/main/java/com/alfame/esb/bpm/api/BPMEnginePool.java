@@ -12,9 +12,6 @@ public class BPMEnginePool {
 
     private static Map<String, BPMEngine> engines = new ConcurrentHashMap<>();
 
-    public BPMEnginePool() {
-    }
-
     public static void registerInstance(String configName, BPMEngine engine) {
         logger.debug("Adding to pool " + configName);
         engines.put(configName, engine);

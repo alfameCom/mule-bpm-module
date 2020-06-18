@@ -51,7 +51,7 @@ public class BPMAttachmentFinderImpl extends BPMAttachmentFinder {
         for (BPMAttachmentInstance filteredAttachment : filteredAttachments) {
             if (latestAttachment != null && latestAttachment.getTime().before(filteredAttachment.getTime())) {
                 latestAttachment = filteredAttachment;
-            } else {
+            } else if (latestAttachment == null) {
                 latestAttachment = filteredAttachment;
             }
         }

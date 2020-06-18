@@ -56,6 +56,7 @@ public class BPMEventSubscriptionImpl implements BPMEngineEventSubscription {
         } catch (InterruptedException exception) {
             LOGGER.warn("Waiting of {} events was interrupted, after receiving {} events in {} ms",
                     numberOfEvents, numberOfEvents - countDownLatch.getCount(), TimeUnit.MILLISECONDS.convert(timeout, timeUnit));
+            Thread.currentThread().interrupt();
         } finally {
             try {
                 this.cacheLock.lock();
