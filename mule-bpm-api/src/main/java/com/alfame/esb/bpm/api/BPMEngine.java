@@ -2,22 +2,22 @@ package com.alfame.esb.bpm.api;
 
 import java.io.InputStream;
 
-public abstract class BPMEngine {
+public interface BPMEngine {
 
-    public abstract String getName();
-    public abstract String getDefaultTenantId();
+    String getName();
+    String getDefaultTenantId();
 
-    public abstract BPMProcessInstanceBuilder processInstanceBuilder();
+    BPMProcessInstanceBuilder processInstanceBuilder();
 
-    public abstract BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder();
+    BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder();
 
-    public abstract BPMVariableInstance getVariableInstance(String executionId, String variableName);
-    public abstract BPMVariableInstance getHistoricVariableInstance(String executionId, String variableName);
-    public abstract void setVariable(String executionId, String variableName, Object content);
+    BPMVariableInstance getVariableInstance(String executionId, String variableName);
+    BPMVariableInstance getHistoricVariableInstance(String executionId, String variableName);
+    void setVariable(String executionId, String variableName, Object content);
 
-    public abstract BPMAttachmentBuilder attachmentBuilder();
-    public abstract InputStream getAttachmentContent(String attachmentId);
+    BPMAttachmentBuilder attachmentBuilder();
+    InputStream getAttachmentContent(String attachmentId);
 
-    public abstract void triggerSignal(String executionId, String signalName);
+    void triggerSignal(String executionId, String signalName);
 
 }

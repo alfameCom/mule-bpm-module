@@ -1,6 +1,7 @@
 package com.alfame.esb.bpm.module.internal.impl;
 
 import org.flowable.common.engine.api.FlowableWrongDbException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.multitenant.TenantAwareDataSource;
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -49,7 +50,7 @@ public class BPMMultiTenantSchemaConfiguration extends MultiSchemaMultiTenantPro
                             try {
                                 tenantInfoHolder.setCurrentTenantId(tenantId);
                                 getCommandExecutor().execute(getSchemaCommandConfig(),
-                                        new ExecuteSchemaOperationCommand(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE));
+                                        new ExecuteSchemaOperationCommand(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_FALSE));
                             } catch (FlowableWrongDbException flowableWrongDbException) {
                                 LOGGER.info("flowable database needs an update: {}", flowableWrongDbException.getMessage());
                                 super.createTenantSchema(tenantId);

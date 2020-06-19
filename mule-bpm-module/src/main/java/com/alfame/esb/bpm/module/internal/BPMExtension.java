@@ -17,6 +17,7 @@ import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEng
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -71,7 +72,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @ExternalLib(name = "BPM Flowable Activity", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-flowable-activity:2.1.1-SNAPSHOT", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 @ExternalLib(name = "BPM Task Queue", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-task-queue:2.1.1-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory")
 @ExternalLib(name = "BPM API", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-api:2.1.1-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
-public class BPMExtension extends BPMEngine implements Initialisable, Startable, Stoppable, TenantInfoHolder {
+public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEngine, TenantInfoHolder {
 
     private static final Logger LOGGER = getLogger(BPMExtension.class);
 
@@ -128,8 +129,8 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
     private MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration;
     private ProcessEngine processEngine;
-    private Collection<String> registeredTenantIds = new ArrayList<>();
-    private String currentTenantId;
+    private final Collection<String> registeredTenantIds = new ArrayList<>();
+    private final ThreadLocal<String> currentTenantId = new ThreadLocal<>();
 
     @Override
     public void initialise() throws InitialisationException {
@@ -142,7 +143,12 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
         this.processEngineConfiguration.setDatabaseType(this.defaultDataSource.getType().getValue());
         this.processEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
-        this.registerTenant(this.defaultTenantId);
+        if(this.defaultTenantId != null) {
+            this.registerTenant(null);
+            this.registerTenant(this.defaultTenantId);
+        } else {
+            this.registerTenant(null);
+        }
         if (this.additionalTenants != null) {
             for (BPMTenant additionalTenant : this.additionalTenants) {
                 this.registerTenant(additionalTenant.getTenantId());
@@ -173,12 +179,12 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
         BPMEnginePool.registerInstance(this.name, this);
 
-        LOGGER.info(this.name + " has been started");
+        LOGGER.info("{} has been started", this.name);
     }
 
     @Override
     public void stop() throws MuleException {
-        LOGGER.info(this.name + " is going to shutdown");
+        LOGGER.info("{} is going to shutdown", this.name);
 
         BPMEnginePool.unregisterInstance(this.name);
 
@@ -190,6 +196,7 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
     @Override
     public void clearCurrentTenantId() {
+        this.currentTenantId.remove();
     }
 
     @Override
@@ -199,16 +206,23 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
 
     @Override
     public String getCurrentTenantId() {
-        return this.currentTenantId;
+        String tenantId = this.currentTenantId.get();
+        return tenantId;
     }
 
     @Override
-    public void setCurrentTenantId(String currentTenantId) {
-        this.currentTenantId = currentTenantId;
+    public void setCurrentTenantId(String tenantId) {
+        if(this.registeredTenantIds.contains(tenantId)) {
+            this.currentTenantId.set(tenantId);
+        } else {
+            this.currentTenantId.remove();
+        }
     }
 
     public AsyncExecutor getAsyncExecutor(String tenantId) {
-        return this.processEngineConfiguration.getAsyncExecutor();
+        TenantAwareAsyncExecutor asyncExecutor =
+                (TenantAwareAsyncExecutor) this.processEngineConfiguration.getAsyncExecutor();
+        return asyncExecutor.getTenantAsyncExecutor(tenantId != null ? tenantId : this.defaultTenantId);
     }
 
     public RuntimeService getRuntimeService() {
@@ -297,7 +311,7 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
     private DataSource buildDataSource(String tenantId) {
         DataSource dataSource = null;
 
-        if (this.defaultTenantId.equals(tenantId)) {
+        if (this.defaultTenantId.equals(tenantId) || tenantId == null) {
             dataSource = this.defaultDataSource.getDataSource();
         } else {
             for (BPMTenant tenant : this.additionalTenants) {
@@ -321,7 +335,7 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
     private void registerTenant(String tenantId) {
         this.registeredTenantIds.add(tenantId);
         this.processEngineConfiguration.registerTenant(tenantId, this.buildDataSource(tenantId));
-        LOGGER.info(this.name + " has registered tenant " + tenantId);
+        LOGGER.info("{} has registered tenant {}", this.name, tenantId);
     }
 
     private void deployDefinitions(Collection<BPMDefinition> definitions, String tenantId) {
@@ -330,17 +344,17 @@ public class BPMExtension extends BPMEngine implements Initialisable, Startable,
         if (definitions != null) {
             for (BPMDefinition definition : definitions) {
                 try {
-                    LOGGER.debug(this.name + " adding " + definition.getType() + " resource " + definition.getResourceName() + " for tenant " + tenantId);
+                    LOGGER.debug("{} adding {} resource {} for tenant {}", this.name, definition.getType(), definition.getResourceName(), tenantId);
                     definition.addToDeploymentBuilder(deploymentBuilder);
-                    LOGGER.debug(this.name + " added " + definition.getType() + " resource " + definition.getResourceName() + " for tenant " + tenantId);
+                    LOGGER.debug("{} added {} resource {} for tenant {}", this.name, definition.getType(), definition.getResourceName(), tenantId);
                 } catch (FlowableIllegalArgumentException exception) {
-                    LOGGER.warn(this.name + " failed to add " + definition.getType() + " resource " + definition.getResourceName() + " for tenant " + tenantId);
+                    LOGGER.warn("{} failed to add {} resource {} for tenant {}", this.name, definition.getType(), definition.getResourceName(), tenantId);
                 }
             }
         }
 
         deploymentBuilder.tenantId(tenantId).deploy();
-        LOGGER.debug(this.name + " made deployment for tenant " + tenantId);
+        LOGGER.debug("{} made deployment for tenant {}", this.name, tenantId);
     }
 
 }

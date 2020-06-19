@@ -2,7 +2,7 @@ package com.alfame.esb.bpm.api;
 
 import java.io.InputStream;
 
-abstract public class BPMAttachmentBuilder {
+public abstract class BPMAttachmentBuilder {
 
     protected String processInstanceId;
     protected String taskId;

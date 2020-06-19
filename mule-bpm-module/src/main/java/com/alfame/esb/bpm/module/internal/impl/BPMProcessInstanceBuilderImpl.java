@@ -77,7 +77,7 @@ public class BPMProcessInstanceBuilderImpl extends BPMProcessInstanceBuilder {
                     if (historicProcessInstance != null) {
                         builtProcessInstance = new BPMHistoricProcessInstanceProxy(historicProcessInstance);
                     } else {
-                        LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId() : null, exception, System.currentTimeMillis() - startTime);
+                        LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms: cannot find historic instance", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId() : null, exception, System.currentTimeMillis() - startTime);
                         throw exception;
                     }
                 } else {
@@ -85,7 +85,7 @@ public class BPMProcessInstanceBuilderImpl extends BPMProcessInstanceBuilder {
                     throw exception;
                 }
             } catch (Exception historyException) {
-                LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId() : null, historyException, System.currentTimeMillis() - startTime);
+                LOGGER.error("<<<<< process definition {}: instance {} caught exception {} in {} ms: while finding historic instance", this.processDefinitionKey, processInstance != null ? processInstance.getProcessInstanceId() : null, historyException, System.currentTimeMillis() - startTime);
                 throw historyException;
             }
         }

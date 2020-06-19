@@ -2,7 +2,7 @@ package com.alfame.esb.bpm.api;
 
 import java.util.List;
 
-abstract public class BPMAttachmentFinder {
+public abstract class BPMAttachmentFinder {
 
     protected String processInstanceId;
     protected String taskId;
