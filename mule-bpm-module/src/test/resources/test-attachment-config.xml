@@ -1,0 +1,64 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+
+    <bpm:config name="engineConfig" defaultTenantId="com.alfame.esb">
+        <bpm:default-data-source>
+            <bpm:generic-data-source driverClassName="org.h2.Driver"
+                                     jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1"
+                                     username="sa"
+                                     password="sa"
+                                     type="h2"/>
+        </bpm:default-data-source>
+        <bpm:definitions>
+            <bpm:classpath-definition resourceClasspath="processes/AttachmentHandler.bpmn20.xml"/>
+        </bpm:definitions>
+        <bpm:async-executor>
+            <bpm:default-async-executor/>
+        </bpm:async-executor>
+    </bpm:config>
+
+    <flow name="startAttachmentHandlerProcessFlow">
+
+        <set-payload value='#[%dw 2.0
+output application/xml
+---
+attachment: {
+	id: 6,
+	description: "Important attachment stuff"
+}]'/>
+
+        <bpm:process-factory config-ref="engineConfig" processDefinitionKey="attachmentHandler" tenantId="com.alfame.esb" target="processInstance"/>
+
+        <logger level="INFO" message="#[vars.processInstance]"/>
+
+        <bpm:create-attachment processInstanceId="#[vars.processInstance.processInstanceId]"
+                               attachmentName="theAttachment" type="application/xml" config-ref="engineConfig"
+                               target="invoiceAttachment">
+            <bpm:attachment-content>#[payload]</bpm:attachment-content>
+        </bpm:create-attachment>
+
+        <bpm:trigger-signal signalName="receiveAttachment"
+                            processInstanceId="#[vars.processInstance.processInstanceId]"
+                            config-ref="engineConfig"/>
+
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="handleAttachmentTaskFlow">
+        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://handle.attachment"/>
+
+        <bpm:get-latest-attachment config-ref="engineConfig" processInstanceId="#[attributes.processInstanceId]">
+            <bpm:attachment-filters>
+                <bpm:attachment-name-filter attachmentName="theAttachment"/>
+            </bpm:attachment-filters>
+        </bpm:get-latest-attachment>
+
+        <logger level="INFO" message="#[%dw 2.0 var attachment = read(payload, 'application/xml') output application/java --- attachment.attachment.description]"/>
+
+        <set-payload value="true"/>
+    </flow>
+
+</mule>
