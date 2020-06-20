@@ -21,7 +21,9 @@ public class BPMProcessInstanceTestCase extends BPMAbstractTestCase {
         Assert.assertNotNull("Engine should not be NULL", engine);
 
         BPMProcessInstanceBuilder processInstanceBuilder = engine.processInstanceBuilder()
-                .processDefinitionKey("testProcess").tenantId("com.alfame.esb");
+                .processDefinitionKey("testProcess")
+                .uniqueBusinessKey("theone")
+                .processInstanceName("theone");
         Assert.assertNotNull("Process instance builder should not be NULL", processInstanceBuilder);
 
         BPMProcessInstance processInstance = processInstanceBuilder.startProcessInstance();
