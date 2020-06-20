@@ -61,4 +61,49 @@ public class BPMProcessInstanceTestCase extends BPMAbstractTestCase {
         Assert.assertEquals("Result variable should be set to true", "true", resultVariable.getValue());
     }
 
+    @Test(expected = java.lang.RuntimeException.class)
+    public void testUniqueBusinessKeysFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMProcessInstanceBuilder processInstanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("testProcess")
+                .uniqueBusinessKey("uniqueone");
+        Assert.assertNotNull("Process instance builder should not be NULL", processInstanceBuilder);
+        BPMProcessInstanceBuilder otherProcessInstanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("testProcess")
+                .uniqueBusinessKey("uniqueone");
+        Assert.assertNotNull("Other process instance builder should not be NULL", otherProcessInstanceBuilder);
+
+
+        BPMProcessInstance processInstance = processInstanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
+
+        otherProcessInstanceBuilder.startProcessInstance();
+    }
+
+    @Test
+    public void testReturningUniqueBusinessKeysFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMProcessInstanceBuilder processInstanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("testProcess")
+                .uniqueBusinessKey("uniquereturnone");
+        Assert.assertNotNull("Process instance builder should not be NULL", processInstanceBuilder);
+        BPMProcessInstanceBuilder otherProcessInstanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("testProcess")
+                .uniqueBusinessKey("uniquereturnone")
+                .returnCollidedInstance(true);
+        Assert.assertNotNull("Other process instance builder should not be NULL", otherProcessInstanceBuilder);
+
+
+        BPMProcessInstance processInstance = processInstanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
+
+        BPMProcessInstance otherProcessInstance = otherProcessInstanceBuilder.startProcessInstance();
+        Assert.assertEquals("Other process instance must be the same as original one",
+                processInstance.getProcessInstanceId(), otherProcessInstance.getProcessInstanceId());
+    }
+
 }
