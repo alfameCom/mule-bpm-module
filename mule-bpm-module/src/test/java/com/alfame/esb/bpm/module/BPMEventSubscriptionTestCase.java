@@ -61,4 +61,21 @@ public class BPMEventSubscriptionTestCase extends BPMAbstractTestCase {
                 processInstance.getProcessInstanceId(), processVariableCreatedEvent.getProcessInstanceId());
     }
 
+    @Test
+    public void testProcessBuilderProcessWithTimeoutingEventsFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMEngineEventSubscription eventSubscription = engine.eventSubscriptionBuilder()
+                .processDefinitionKey("testProcess")
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .eventType(BPMEngineEventType.VARIABLE_CREATED)
+                .variableWithValue("result", "true")
+                .subscribeForEvents();
+        Assert.assertNotNull("Engine subscription should not be NULL", eventSubscription);
+
+        List<BPMEngineEvent> engineEvents = eventSubscription
+                .waitForEvents(2, 1, TimeUnit.SECONDS);
+        Assert.assertEquals("No events should be received withing timeout",0, engineEvents.size());
+    }
 }
