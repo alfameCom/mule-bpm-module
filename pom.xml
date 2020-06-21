@@ -5,6 +5,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>Mule BPM Root</name>
+    <description>Root POM for Mule BPM Module.</description>
+    <url>https://github.com/alfameCom/mule-bpm-module</url>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git://github.com/alfameCom/mule-bpm-module.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:alfameCom/mule-bpm-module.git</developerConnection>
+        <url>https://github.com/alfameCom/mule-bpm-module/tree/master</url>
+    </scm>
 
     <groupId>com.alfame.esb.bpm</groupId>
     <artifactId>mule-bpm-root</artifactId>
