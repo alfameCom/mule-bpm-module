@@ -34,7 +34,7 @@
             <bpm:generic-data-source
                     driverClassName="org.h2.Driver"
                     jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1" username="sa"
-                    password="sa" type="h2"/>
+                    password="sa" type="H2"/>
         </bpm:default-data-source>
         <bpm:definitions>
             <bpm:classpath-definition

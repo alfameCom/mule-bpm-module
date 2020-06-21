@@ -98,7 +98,7 @@ output application/json
                     <bpm:process-definition-filter
                             key="invoiceRetriever"/>
                     <bpm:event-type-filter
-                            eventType="processInstanceEnded"/>
+                            eventType="PROCESS_INSTANCE_ENDED"/>
                 </bpm:event-filters>
             </bpm:event-subscription-builder>
             <bpm:event-subscription-builder
@@ -109,7 +109,7 @@ output application/json
                     <bpm:process-definition-filter
                             key="paymentRetriever"/>
                     <bpm:event-type-filter
-                            eventType="processInstanceEnded"/>
+                            eventType="PROCESS_INSTANCE_ENDED"/>
                 </bpm:event-filters>
             </bpm:event-subscription-builder>
             <bpm:event-subscription-builder
@@ -120,7 +120,7 @@ output application/json
                     <bpm:process-definition-filter
                             key="transactionFiler"/>
                     <bpm:event-type-filter
-                            eventType="processInstanceEnded"/>
+                            eventType="PROCESS_INSTANCE_ENDED"/>
                 </bpm:event-filters>
             </bpm:event-subscription-builder>
             <bpm:wait-for-events
@@ -148,7 +148,7 @@ output application/json
                     subscription="#[vars.transactionEventSubscription]">
                 <bpm:event-filters>
                     <bpm:event-type-filter
-                            eventType="processInstanceEnded"/>
+                            eventType="PROCESS_INSTANCE_ENDED"/>
                     <bpm:process-definition-filter
                             key="transactionFiler"/>
                 </bpm:event-filters>

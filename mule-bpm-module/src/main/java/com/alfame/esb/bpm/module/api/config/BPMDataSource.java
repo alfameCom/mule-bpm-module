@@ -17,7 +17,7 @@ public abstract class BPMDataSource {
     @Expression(NOT_SUPPORTED)
     @Placement(order = 1)
     @Parameter
-    @Optional(defaultValue = "h2")
+    @Optional(defaultValue = "H2")
     public BPMDatabaseType type;
 
     public BPMDatabaseType getType() {

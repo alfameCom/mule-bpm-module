@@ -176,15 +176,15 @@ public class BPMEventSubscriptionOperations {
     protected BPMEngineEventType mapEventType(BPMEventType eventType) {
         BPMEngineEventType engineEventType;
 
-        if (eventType == BPMEventType.processInstanceCreated) {
+        if (eventType == BPMEventType.PROCESS_INSTANCE_CREATED) {
             engineEventType = BPMEngineEventType.PROCESS_INSTANCE_CREATED;
-        } else if (eventType == BPMEventType.processInstanceEnded) {
+        } else if (eventType == BPMEventType.PROCESS_INSTANCE_ENDED) {
             engineEventType = BPMEngineEventType.PROCESS_INSTANCE_ENDED;
-        } else if (eventType == BPMEventType.variableCreated) {
+        } else if (eventType == BPMEventType.VARIABLE_CREATED) {
             engineEventType = BPMEngineEventType.VARIABLE_CREATED;
-        } else if (eventType == BPMEventType.variableUpdated) {
+        } else if (eventType == BPMEventType.VARIABLE_UPDATED) {
             engineEventType = BPMEngineEventType.VARIABLE_UPDATED;
-        } else if (eventType == BPMEventType.variableRemoved) {
+        } else if (eventType == BPMEventType.VARIABLE_REMOVED) {
             engineEventType = BPMEngineEventType.VARIABLE_REMOVED;
         } else {
             engineEventType = BPMEngineEventType.UNKNOWN;

@@ -10,7 +10,7 @@
                                      jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1"
                                      username="sa"
                                      password="sa"
-                                     type="h2"/>
+                                     type="H2"/>
         </bpm:default-data-source>
         <bpm:definitions>
             <bpm:classpath-definition resourceClasspath="processes/AttachmentHandler.bpmn20.xml"/>

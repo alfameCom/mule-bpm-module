@@ -10,7 +10,7 @@
                                      jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1"
                                      username="sa"
                                      password="sa"
-                                     type="h2"/>
+                                     type="H2"/>
         </bpm:default-data-source>
         <bpm:definitions>
             <bpm:classpath-definition resourceClasspath="processes/TestProcess.bpmn20.xml"/>
@@ -55,7 +55,7 @@
         <bpm:get-unique-event config-ref="engineConfig" subscription="#[vars.eventSubscription]" target="event">
             <bpm:event-filters>
                 <bpm:process-definition-filter key="testProcess"/>
-                <bpm:event-type-filter eventType="processInstanceEnded"/>
+                <bpm:event-type-filter eventType="PROCESS_INSTANCE_ENDED"/>
             </bpm:event-filters>
         </bpm:get-unique-event>
         <logger level="INFO" message="Event #[vars.event]"/>

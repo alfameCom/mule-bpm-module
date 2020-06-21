@@ -37,7 +37,7 @@ Add this dependency to your application pom.xml:
 <dependency>
 	<groupId>com.alfame.esb.bpm</groupId>
 	<artifactId>mule-bpm-module</artifactId>
-	<version>2.1.1-SNAPSHOT</version>
+	<version>2.1.2-SNAPSHOT</version>
 	<classifier>mule-plugin</classifier>
 </dependency>
 ```

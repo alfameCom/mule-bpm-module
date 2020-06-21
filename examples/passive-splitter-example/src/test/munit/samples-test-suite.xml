@@ -51,7 +51,7 @@
                     config-ref="engineConfig" target="eventSubscription">
                 <bpm:event-filters>
                     <bpm:event-type-filter
-                            eventType="processInstanceEnded"/>
+                            eventType="PROCESS_INSTANCE_ENDED"/>
                     <bpm:process-definition-filter
                             key="sampleSplitter"/>
                     <bpm:process-definition-filter
