@@ -48,7 +48,7 @@ attachment: {
     </flow>
 
     <flow name="handleAttachmentTaskFlow">
-        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://handle.attachment"/>
+        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://handle.attachment" transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN"/>
 
         <bpm:get-latest-attachment config-ref="engineConfig" processInstanceId="#[attributes.processInstanceId]">
             <bpm:attachment-filters>
@@ -57,7 +57,9 @@ attachment: {
         </bpm:get-latest-attachment>
 
         <logger level="INFO" message="#[%dw 2.0 var attachment = read(payload, 'application/xml') output application/java --- attachment.attachment.description]"/>
-
+        <bpm:set-variable config-ref="engineConfig" variableName="kokeilempaVaa">
+            <bpm:variable-content>#['heihei']</bpm:variable-content>
+        </bpm:set-variable>
         <set-payload value="true"/>
     </flow>
 

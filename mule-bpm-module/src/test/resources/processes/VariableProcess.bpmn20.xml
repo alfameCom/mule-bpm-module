@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="variableProcess" name="Variable Process" isExecutable="true">
+    <startEvent id="startEvent1" flowable:formFieldValidation="true"></startEvent>
+    <serviceTask id="sid-1A7695B1-C2F7-494A-A7FD-482325E00C2E" name="Modify variables" flowable:async="true" flowable:exclusive="false" flowable:type="mule">
+      <extensionElements>
+        <flowable:field name="endpointUrl">
+          <flowable:string><![CDATA[bpm://modify.variables]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="language">
+          <flowable:string><![CDATA[javascript]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="payloadExpression">
+          <flowable:string><![CDATA[execution]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="resultVariable">
+          <flowable:string><![CDATA[isModified]]></flowable:string>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="sid-7088B640-2185-4B52-B767-CEB6EA040FF8" sourceRef="startEvent1" targetRef="sid-1A7695B1-C2F7-494A-A7FD-482325E00C2E"></sequenceFlow>
+    <exclusiveGateway id="sid-A25DD50A-C39A-4E8A-B4D1-24C90BAD3C94"></exclusiveGateway>
+    <userTask id="sid-7B57B411-B90B-4B3D-952E-25270D0AF07B" name="Try again?" flowable:formKey="tryAgain" flowable:formFieldValidation="true">
+      <extensionElements>
+        <flowable:formProperty id="tryAgain" name="Try again?" type="enum">
+          <flowable:value id="true" name="Try again"></flowable:value>
+          <flowable:value id="false" name="Give up"></flowable:value>
+        </flowable:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-E68DE8AE-5BC5-49C8-961C-6A746ECD369D" sourceRef="sid-1A7695B1-C2F7-494A-A7FD-482325E00C2E" targetRef="sid-A25DD50A-C39A-4E8A-B4D1-24C90BAD3C94"></sequenceFlow>
+    <exclusiveGateway id="sid-3EC7D5A9-D90B-483D-960F-2C49B3401002"></exclusiveGateway>
+    <sequenceFlow id="sid-7D781627-DF61-42E6-8CAC-3E3D6C7ED9D5" sourceRef="sid-7B57B411-B90B-4B3D-952E-25270D0AF07B" targetRef="sid-3EC7D5A9-D90B-483D-960F-2C49B3401002"></sequenceFlow>
+    <endEvent id="sid-DC379203-1009-47E0-B98D-B0911B56FE5D"></endEvent>
+    <endEvent id="sid-401494E8-072D-4792-9912-5207F966CB5F"></endEvent>
+    <sequenceFlow id="sid-56192F8A-A85A-4BFD-89F6-36D4223329BC" sourceRef="sid-A25DD50A-C39A-4E8A-B4D1-24C90BAD3C94" targetRef="sid-401494E8-072D-4792-9912-5207F966CB5F">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isModified == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-6D6DBFC0-7343-4250-9910-1AE8D4BFB4AC" sourceRef="sid-A25DD50A-C39A-4E8A-B4D1-24C90BAD3C94" targetRef="sid-7B57B411-B90B-4B3D-952E-25270D0AF07B">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isModified != true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-936CB0DF-9030-4AEB-B3A3-091C12B38E8D" sourceRef="sid-3EC7D5A9-D90B-483D-960F-2C49B3401002" targetRef="sid-1A7695B1-C2F7-494A-A7FD-482325E00C2E">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tryAgain == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-0E323867-AECA-4EA6-A9FC-947F9CB45E30" sourceRef="sid-3EC7D5A9-D90B-483D-960F-2C49B3401002" targetRef="sid-DC379203-1009-47E0-B98D-B0911B56FE5D">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tryAgain != true}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_variableProcess">
+    <bpmndi:BPMNPlane bpmnElement="variableProcess" id="BPMNPlane_variableProcess">
+      <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="75.0" y="271.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-1A7695B1-C2F7-494A-A7FD-482325E00C2E" id="BPMNShape_sid-1A7695B1-C2F7-494A-A7FD-482325E00C2E">
+        <omgdc:Bounds height="80.0" width="100.0" x="195.0" y="246.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-A25DD50A-C39A-4E8A-B4D1-24C90BAD3C94" id="BPMNShape_sid-A25DD50A-C39A-4E8A-B4D1-24C90BAD3C94">
+        <omgdc:Bounds height="40.0" width="40.0" x="390.0" y="266.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-7B57B411-B90B-4B3D-952E-25270D0AF07B" id="BPMNShape_sid-7B57B411-B90B-4B3D-952E-25270D0AF07B">
+        <omgdc:Bounds height="80.0" width="100.0" x="360.0" y="105.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-3EC7D5A9-D90B-483D-960F-2C49B3401002" id="BPMNShape_sid-3EC7D5A9-D90B-483D-960F-2C49B3401002">
+        <omgdc:Bounds height="40.0" width="40.0" x="225.0" y="125.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-DC379203-1009-47E0-B98D-B0911B56FE5D" id="BPMNShape_sid-DC379203-1009-47E0-B98D-B0911B56FE5D">
+        <omgdc:Bounds height="28.0" width="28.0" x="231.0" y="28.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-401494E8-072D-4792-9912-5207F966CB5F" id="BPMNShape_sid-401494E8-072D-4792-9912-5207F966CB5F">
+        <omgdc:Bounds height="28.0" width="28.0" x="510.0" y="272.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-0E323867-AECA-4EA6-A9FC-947F9CB45E30" id="BPMNEdge_sid-0E323867-AECA-4EA6-A9FC-947F9CB45E30">
+        <omgdi:waypoint x="245.40291262135923" y="125.40291262135922"></omgdi:waypoint>
+        <omgdi:waypoint x="245.06739051006508" y="55.94957177989827"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-E68DE8AE-5BC5-49C8-961C-6A746ECD369D" id="BPMNEdge_sid-E68DE8AE-5BC5-49C8-961C-6A746ECD369D">
+        <omgdi:waypoint x="294.9499999998897" y="286.0"></omgdi:waypoint>
+        <omgdi:waypoint x="390.0" y="286.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-7088B640-2185-4B52-B767-CEB6EA040FF8" id="BPMNEdge_sid-7088B640-2185-4B52-B767-CEB6EA040FF8">
+        <omgdi:waypoint x="104.94999923927439" y="286.0"></omgdi:waypoint>
+        <omgdi:waypoint x="195.0" y="286.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-6D6DBFC0-7343-4250-9910-1AE8D4BFB4AC" id="BPMNEdge_sid-6D6DBFC0-7343-4250-9910-1AE8D4BFB4AC">
+        <omgdi:waypoint x="410.42907801418437" y="266.42907801418437"></omgdi:waypoint>
+        <omgdi:waypoint x="410.1411660777385" y="184.95"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-7D781627-DF61-42E6-8CAC-3E3D6C7ED9D5" id="BPMNEdge_sid-7D781627-DF61-42E6-8CAC-3E3D6C7ED9D5">
+        <omgdi:waypoint x="360.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="264.9060187991637" y="145.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-936CB0DF-9030-4AEB-B3A3-091C12B38E8D" id="BPMNEdge_sid-936CB0DF-9030-4AEB-B3A3-091C12B38E8D">
+        <omgdi:waypoint x="245.43214285714285" y="164.5108672376874"></omgdi:waypoint>
+        <omgdi:waypoint x="245.14217081850535" y="246.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-56192F8A-A85A-4BFD-89F6-36D4223329BC" id="BPMNEdge_sid-56192F8A-A85A-4BFD-89F6-36D4223329BC">
+        <omgdi:waypoint x="429.52539787796735" y="286.4159292035398"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0001302857386" y="286.0614532822133"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
