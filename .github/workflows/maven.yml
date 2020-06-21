@@ -20,7 +20,9 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Build and verify with Maven
+    - name: Build, verify and deploy with Maven
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install verify org.jacoco:jacoco-maven-plugin:merge org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file pom.xml
+        MAVEN_REPO_USER: ${{ secrets.MAVEN_REPO_USER }}
+        MAVEN_REPO_PASS: ${{ secrets.MAVEN_REPO_PASS }}
+      run: mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install verify org.jacoco:jacoco-maven-plugin:merge org.jacoco:jacoco-maven-plugin:report sonar:sonar deploy -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file pom.xml
