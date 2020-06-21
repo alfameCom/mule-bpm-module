@@ -32,33 +32,6 @@ import java.util.concurrent.TimeoutException;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * <?xml version="1.0" encoding="UTF-8"?>
- * <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
- * <process id="exampleProcess" name="ExampleProcess" isExecutable="true">
- * ...
- * <serviceTask id="exampleMuleTask" name="Test Mule Task" flowable:async="true" flowable:exclusive="false" flowable:type="mule">
- * <extensionElements>
- * <!-- Mandatory -->
- * <flowable:field name="endpointUrl">
- * <flowable:string><![CDATA[bpm://example.task]]></flowable:string>
- * </flowable:field>
- * <!-- Defaults javascript -->
- * <flowable:field name="language">
- * <flowable:string><![CDATA[javascript]]></flowable:string>
- * </flowable:field>
- * <!-- Optional -->
- * <flowable:field name="payloadExpression">
- * <flowable:string><![CDATA[execution]]></flowable:string>
- * </flowable:field>
- * <!-- Optional -->
- * <flowable:field name="resultVariable">
- * <flowable:string><![CDATA[result]]></flowable:string>
- * </flowable:field>
- * </extensionElements>
- * </serviceTask>
- * ...
- * </definitions>
- *
  * @author Esteban Robles Luna
  * @author Jani Haglund
  * @author Toni Harju
