@@ -18,18 +18,24 @@ Before you begin, ensure you have met the following requirements:
   * [Mulesoft Anypoint Studion version 7](https://www.mulesoft.com/lp/dl/studio)
   * [Intelli/J IDEA](https://www.jetbrains.com/idea/) with [Mule 4 Runtime plugin](https://plugins.jetbrains.com/plugin/10822-mule-4-runtime-)
 
-## Installing Mule BPM Module
-
-To install Mule BPM Module, follow these steps:
-```
-git clone git@github.com:alfameCom/mule-bpm-module.git
-cd mule-bpm-module
-mvn clean install
-```
-
 ## Using Mule BPM Module
 
 To use Mule BPM Module, follow these steps:
+
+Add Maven Central's snapshot repository to your application pom.xml.
+```
+<repository>
+	<id>snapshots-repo</id>
+	<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	<releases>
+		<enabled>false</enabled>
+	</releases>
+	<snapshots>
+		<enabled>true</enabled>
+	</snapshots>
+</repository>
+```
+
 
 Add this dependency to your application pom.xml:
 
@@ -50,6 +56,15 @@ docker run -p8080:8080 flowable/all-in-one
 > Hint from Flowable: default credentials are admin/test.
 
 More details about usage and implementation of Mule BPM Module can be found from [mule-bpm-module/README.md](mule-bpm-module/README.md).
+
+## Building Mule BPM Module yourself
+
+To install Mule BPM Module, follow these steps:
+```
+git clone git@github.com:alfameCom/mule-bpm-module.git
+cd mule-bpm-module
+mvn clean install
+```
 
 ## Contributing to Mule BPM Module
 To contribute to Mule BPM Module, follow these steps:
