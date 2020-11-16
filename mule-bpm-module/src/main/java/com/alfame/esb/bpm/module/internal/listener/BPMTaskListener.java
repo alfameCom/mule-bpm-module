@@ -206,10 +206,6 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                             LOGGER.error("Consumer for <bpm:task-listener> on flow '{}' uses longer timeout than async executor supports. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
                             cancel(ctx);
                             continue;
-                        } else if (taskTimeoutMillis > TimeUnit.MILLISECONDS.convert(endpointDescription.getTimeout(), endpointDescription.getTimeoutUnit())) {
-                            LOGGER.error("Consumer for <bpm:task-listener> on flow '{}' uses longer timeout than endpoint supports. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                            cancel(ctx);
-                            continue;
                         }
 
                         String correlationId = task.getCorrelationId().orElse(null);
