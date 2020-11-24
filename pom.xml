@@ -107,7 +107,7 @@
     <modules>
         <module>mule-bpm-api</module>
         <module>mule-bpm-task-queue</module>
-        <module>mule-bpm-dummy-activity</module>
+        <module>mule-bpm-dummy-flowable-activity</module>
         <module>mule-bpm-flowable-activity</module>
         <module>mule-bpm-module</module>
     </modules>
