@@ -120,8 +120,6 @@ public class BPMDefaultAsyncExecutor extends BPMAsyncExecutor implements TenantA
         DefaultAsyncJobExecutor tenantExecutor = null;
 
         tenantExecutor = new DefaultAsyncJobExecutor();
-        tenantExecutor.setCorePoolSize(this.getMinThreads());
-        tenantExecutor.setMaxPoolSize(this.getMaxThreads());
 
         return tenantExecutor;
     }

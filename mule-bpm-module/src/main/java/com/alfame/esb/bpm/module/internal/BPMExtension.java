@@ -158,6 +158,8 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
 
         if (this.asyncExecutor != null) {
             AsyncExecutor asyncExecutor = this.asyncExecutor.createAsyncExecutor(this, this);
+            this.processEngineConfiguration.setAsyncExecutorCorePoolSize(this.asyncExecutor.getMinThreads());
+            this.processEngineConfiguration.setAsyncExecutorMaxPoolSize(this.asyncExecutor.getMaxThreads());
             this.processEngineConfiguration.setAsyncExecutor(asyncExecutor);
         }
         this.processEngineConfiguration.setAsyncExecutorActivate(false);

@@ -9,4 +9,8 @@ abstract public class BPMAsyncExecutor {
 
     abstract public AsyncExecutor createAsyncExecutor(Initialisable initialisable, TenantInfoHolder tenantInfoHolder) throws InitialisationException;
 
+    abstract public int getMinThreads();
+
+    abstract public int getMaxThreads();
+
 }
