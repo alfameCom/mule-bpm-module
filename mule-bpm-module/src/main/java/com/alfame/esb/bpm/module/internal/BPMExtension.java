@@ -137,6 +137,7 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         this.processEngineConfiguration = new BPMMultiTenantSchemaConfiguration(this);
 
         this.processEngineConfiguration.setDisableIdmEngine(true);
+        this.processEngineConfiguration.setDisableEventRegistry(true);
 
         this.processEngineConfiguration.setEngineName(this.engineName);
 
