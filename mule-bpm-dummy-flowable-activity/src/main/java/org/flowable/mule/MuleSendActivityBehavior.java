@@ -12,6 +12,8 @@
  */
 package org.flowable.mule;
 
+import java.util.concurrent.RejectedExecutionException;
+
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
@@ -42,7 +44,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
 
         LOGGER.warn(">>>>> process definition {}: instance {}: activity {}: entered dummy activity",
                 processDefinitionKey, processInstanceId, currentActivityId);
-        throw new RuntimeException("Dummy implementation cannot execute activities");
+        throw new RejectedExecutionException("Dummy implementation cannot execute activities");
     }
 
     public void setEndpointUrl(Expression endpointUrl) {
