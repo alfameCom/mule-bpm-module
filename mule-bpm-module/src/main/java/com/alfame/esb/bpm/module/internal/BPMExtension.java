@@ -81,6 +81,7 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
 
     @Parameter
     @Expression(NOT_SUPPORTED)
+    @Optional(defaultValue = "default")
     @Example("com.alfame.esb")
     @Placement(tab = "General", order = 1)
     @DisplayName("Default Tenant ID")
