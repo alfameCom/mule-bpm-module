@@ -128,24 +128,27 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     @DisplayName("Additional tenants")
     private List<BPMTenant> additionalTenants;
 
-    private MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration;
+    private ProcessEngineConfiguration processEngineConfiguration;
     private ProcessEngine processEngine;
     private final Collection<String> registeredTenantIds = new ArrayList<>();
     private final ThreadLocal<String> currentTenantId = new ThreadLocal<>();
 
     @Override
     public void initialise() throws InitialisationException {
-        this.processEngineConfiguration = new BPMMultiTenantSchemaConfiguration(this);
+        this.processEngineConfiguration = new BPMStandaloneProcessEngineSchemaConfiguration();
 
-        this.processEngineConfiguration.setDisableIdmEngine(true);
-        this.processEngineConfiguration.setDisableEventRegistry(true);
+        //this.processEngineConfiguration.setDisableIdmEngine(true);
+        //this.processEngineConfiguration.setDisableEventRegistry(true);
 
         this.processEngineConfiguration.setEngineName(this.engineName);
 
+        this.processEngineConfiguration.setDefaultTenantValue(this.defaultTenantId);
+
         this.processEngineConfiguration.setDatabaseType(this.defaultDataSource.getType().getFlowableTypeValue());
+        this.processEngineConfiguration.setDataSource(buildDataSource(this.defaultTenantId));
         this.processEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
-        if(this.defaultTenantId != null) {
+        /*if(this.defaultTenantId != null) {
             this.registerTenant(null);
             this.registerTenant(this.defaultTenantId);
         } else {
@@ -155,15 +158,16 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
             for (BPMTenant additionalTenant : this.additionalTenants) {
                 this.registerTenant(additionalTenant.getTenantId());
             }
-        }
+        }*/
 
-        if (this.asyncExecutor != null) {
+        /*if (this.asyncExecutor != null) {
             AsyncExecutor asyncExecutor = this.asyncExecutor.createAsyncExecutor(this, this);
             this.processEngineConfiguration.setAsyncExecutorCorePoolSize(this.asyncExecutor.getMinThreads());
             this.processEngineConfiguration.setAsyncExecutorMaxPoolSize(this.asyncExecutor.getMaxThreads());
             this.processEngineConfiguration.setAsyncExecutor(asyncExecutor);
-        }
+        }*/
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
+
     }
 
     @Override
@@ -224,9 +228,7 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     }
 
     public AsyncExecutor getAsyncExecutor(String tenantId) {
-        TenantAwareAsyncExecutor asyncExecutor =
-                (TenantAwareAsyncExecutor) this.processEngineConfiguration.getAsyncExecutor();
-        return asyncExecutor.getTenantAsyncExecutor(tenantId != null ? tenantId : this.defaultTenantId);
+        return this.processEngineConfiguration.getAsyncExecutor();
     }
 
     public RuntimeService getRuntimeService() {
@@ -335,13 +337,13 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         return dataSource;
 
     }
-
+/*
     private void registerTenant(String tenantId) {
         this.registeredTenantIds.add(tenantId);
         this.processEngineConfiguration.registerTenant(tenantId, this.buildDataSource(tenantId));
         LOGGER.info("{} has registered tenant {}", this.name, tenantId);
     }
-
+*/
     private void deployDefinitions(Collection<BPMDefinition> definitions, String tenantId) {
         DeploymentBuilder deploymentBuilder = this.processEngine.getRepositoryService().createDeployment();
 
