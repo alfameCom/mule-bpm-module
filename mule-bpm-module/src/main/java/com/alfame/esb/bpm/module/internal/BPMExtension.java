@@ -11,13 +11,10 @@ import com.alfame.esb.bpm.module.internal.operations.BPMProcessFactoryOperations
 import com.alfame.esb.bpm.module.internal.operations.BPMProcessVariableOperations;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.*;
-import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -72,7 +69,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @ExternalLib(name = "BPM Flowable Activity", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-flowable-activity:2.1.2-SNAPSHOT", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 @ExternalLib(name = "BPM Task Queue", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-task-queue:2.1.2-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory")
 @ExternalLib(name = "BPM API", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-api:2.1.2-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
-public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEngine, TenantInfoHolder {
+public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEngine {
 
     private static final Logger LOGGER = getLogger(BPMExtension.class);
 
@@ -200,31 +197,6 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
             this.processEngineConfiguration.getAsyncExecutor().shutdown();
         }
         this.processEngine.close();
-    }
-
-    @Override
-    public void clearCurrentTenantId() {
-        this.currentTenantId.remove();
-    }
-
-    @Override
-    public Collection<String> getAllTenants() {
-        return this.registeredTenantIds;
-    }
-
-    @Override
-    public String getCurrentTenantId() {
-        String tenantId = this.currentTenantId.get();
-        return tenantId;
-    }
-
-    @Override
-    public void setCurrentTenantId(String tenantId) {
-        if(this.registeredTenantIds.contains(tenantId)) {
-            this.currentTenantId.set(tenantId);
-        } else {
-            this.currentTenantId.remove();
-        }
     }
 
     public AsyncExecutor getAsyncExecutor(String tenantId) {
