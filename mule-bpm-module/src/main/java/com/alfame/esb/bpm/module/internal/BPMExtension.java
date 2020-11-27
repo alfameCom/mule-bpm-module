@@ -82,8 +82,8 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     @Optional(defaultValue = "default")
     @Example("com.alfame.esb")
     @Placement(tab = "General", order = 1)
-    @DisplayName("Default Tenant ID")
-    private String defaultTenantId;
+    @DisplayName("Tenant ID")
+    private String tenantId;
 
     @Parameter
     @Expression(NOT_SUPPORTED)
@@ -98,8 +98,8 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     @Optional
     @NullSafe(defaultImplementingType = com.alfame.esb.bpm.module.api.config.BPMGenericDataSource.class)
     @Placement(tab = "General", order = 3)
-    @DisplayName("Default data source")
-    private BPMDataSource defaultDataSource;
+    @DisplayName("Data source")
+    private BPMDataSource dataSource;
 
     @Parameter
     @Optional
@@ -107,7 +107,7 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     @Alias("definitions")
     @Placement(tab = "General", order = 4)
     @DisplayName("Process definitions")
-    private List<BPMDefinition> defaultDefinitions;
+    private List<BPMDefinition> definitions;
 
     @Parameter
     @Optional
@@ -118,14 +118,6 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     @DisplayName("BPM Async executor")
     private BPMAsyncExecutorFactory asyncExecutorFactory;
 
-    @Parameter
-    @Optional
-    @Expression(NOT_SUPPORTED)
-    @Alias("additional-tenants")
-    @Placement(tab = "Additional tenants", order = 1)
-    @DisplayName("Additional tenants")
-    private List<BPMTenant> additionalTenants;
-
     private BPMStandaloneProcessEngineSchemaConfiguration processEngineConfiguration;
     private ProcessEngine processEngine;
 
@@ -135,16 +127,16 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
 
         this.processEngineConfiguration.setEngineName(this.engineName);
 
-        this.processEngineConfiguration.setDefaultTenantValue(this.defaultTenantId);
+        this.processEngineConfiguration.setDefaultTenantValue(this.tenantId);
 
-        this.processEngineConfiguration.setDatabaseType(this.defaultDataSource.getType().getFlowableTypeValue());
-        this.processEngineConfiguration.setDataSource(this.defaultDataSource.getDataSource());
+        this.processEngineConfiguration.setDatabaseType(this.dataSource.getType().getFlowableTypeValue());
+        this.processEngineConfiguration.setDataSource(this.dataSource.getDataSource());
         this.processEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
         if (this.asyncExecutorFactory instanceof BPMDefaultAsyncExecutorFactory) {
             BPMDefaultAsyncExecutorFactory defaultAsyncExecutorFactory = (BPMDefaultAsyncExecutorFactory) this.asyncExecutorFactory;
-            this.processEngineConfiguration.setAsyncExecutorTenantId(this.defaultTenantId);
+            this.processEngineConfiguration.setAsyncExecutorTenantId(this.tenantId);
             this.processEngineConfiguration.setAsyncExecutorCorePoolSize(defaultAsyncExecutorFactory.getMinThreads());
             this.processEngineConfiguration.setAsyncExecutorMaxPoolSize(defaultAsyncExecutorFactory.getMaxThreads());
             this.processEngineConfiguration.setAsyncExecutorDefaultAsyncJobAcquireWaitTime(defaultAsyncExecutorFactory.getDefaultAsyncJobAcquireWaitTimeInMillis());
@@ -161,12 +153,7 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     public void start() throws MuleException {
         this.processEngine = this.processEngineConfiguration.buildProcessEngine();
 
-        this.deployDefinitions(this.defaultDefinitions, this.defaultTenantId);
-        if (this.additionalTenants != null) {
-            for (BPMTenant additionalTenant : this.additionalTenants) {
-                this.deployDefinitions(additionalTenant.getDefinitions(), additionalTenant.getTenantId());
-            }
-        }
+        this.deployDefinitions(this.definitions, this.tenantId);
 
         if (this.processEngineConfiguration.getAsyncExecutor() != null) {
             this.processEngineConfiguration.getAsyncExecutor().start();
@@ -211,8 +198,8 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     }
 
     @Override
-    public String getDefaultTenantId() {
-        return this.defaultTenantId;
+    public String getTenantId() {
+        return this.tenantId;
     }
 
     @Override

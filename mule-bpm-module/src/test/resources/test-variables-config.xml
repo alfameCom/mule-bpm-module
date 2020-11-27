@@ -4,14 +4,14 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
           http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
 
-    <bpm:config name="engineConfig" defaultTenantId="com.alfame.esb">
-        <bpm:default-data-source>
+    <bpm:config name="engineConfig" tenantId="com.alfame.esb">
+        <bpm:data-source>
             <bpm:generic-data-source driverClassName="org.h2.Driver"
                                      jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1"
                                      username="sa"
                                      password="sa"
                                      type="H2"/>
-        </bpm:default-data-source>
+        </bpm:data-source>
         <bpm:definitions>
             <bpm:classpath-definition resourceClasspath="processes/VariableProcess.bpmn20.xml"/>
         </bpm:definitions>
