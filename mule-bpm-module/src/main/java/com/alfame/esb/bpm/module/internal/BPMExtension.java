@@ -11,7 +11,10 @@ import com.alfame.esb.bpm.module.internal.operations.BPMProcessFactoryOperations
 import com.alfame.esb.bpm.module.internal.operations.BPMProcessVariableOperations;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.engine.*;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -35,9 +38,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
 
-import javax.sql.DataSource;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -59,8 +60,8 @@ import static org.slf4j.LoggerFactory.getLogger;
         subTypes = {BPMClasspathDefinition.class, BPMStreamDefinition.class})
 @SubTypeMapping(baseType = BPMDataSource.class,
         subTypes = {BPMDataSourceReference.class, BPMGenericDataSource.class})
-@SubTypeMapping(baseType = BPMAsyncExecutor.class,
-        subTypes = {BPMDefaultAsyncExecutor.class})
+@SubTypeMapping(baseType = BPMAsyncExecutorFactory.class,
+        subTypes = {BPMDefaultAsyncExecutorFactory.class})
 @SubTypeMapping(baseType = BPMEventSubscriptionFilter.class,
         subTypes = {BPMEventSubscriptionProcessDefinitionFilter.class, BPMEventSubscriptionProcessInstanceFilter.class, BPMEventSubscriptionEventTypeFilter.class, BPMEventSubscriptionVariableFilter.class})
 @SubTypeMapping(baseType = BPMAttachmentFilter.class,
@@ -110,12 +111,12 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
 
     @Parameter
     @Optional
-    @NullSafe(defaultImplementingType = BPMDefaultAsyncExecutor.class)
+    @NullSafe(defaultImplementingType = BPMDefaultAsyncExecutorFactory.class)
     @Expression(NOT_SUPPORTED)
     @Alias("async-executor")
     @Placement(tab = "General", order = 5)
     @DisplayName("BPM Async executor")
-    private BPMAsyncExecutor asyncExecutor;
+    private BPMAsyncExecutorFactory asyncExecutorFactory;
 
     @Parameter
     @Optional
@@ -125,46 +126,35 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     @DisplayName("Additional tenants")
     private List<BPMTenant> additionalTenants;
 
-    private ProcessEngineConfiguration processEngineConfiguration;
+    private BPMStandaloneProcessEngineSchemaConfiguration processEngineConfiguration;
     private ProcessEngine processEngine;
-    private final Collection<String> registeredTenantIds = new ArrayList<>();
-    private final ThreadLocal<String> currentTenantId = new ThreadLocal<>();
 
     @Override
     public void initialise() throws InitialisationException {
         this.processEngineConfiguration = new BPMStandaloneProcessEngineSchemaConfiguration();
-
-        //this.processEngineConfiguration.setDisableIdmEngine(true);
-        //this.processEngineConfiguration.setDisableEventRegistry(true);
 
         this.processEngineConfiguration.setEngineName(this.engineName);
 
         this.processEngineConfiguration.setDefaultTenantValue(this.defaultTenantId);
 
         this.processEngineConfiguration.setDatabaseType(this.defaultDataSource.getType().getFlowableTypeValue());
-        this.processEngineConfiguration.setDataSource(buildDataSource(this.defaultTenantId));
+        this.processEngineConfiguration.setDataSource(this.defaultDataSource.getDataSource());
         this.processEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
-        /*if(this.defaultTenantId != null) {
-            this.registerTenant(null);
-            this.registerTenant(this.defaultTenantId);
-        } else {
-            this.registerTenant(null);
-        }
-        if (this.additionalTenants != null) {
-            for (BPMTenant additionalTenant : this.additionalTenants) {
-                this.registerTenant(additionalTenant.getTenantId());
-            }
-        }*/
-
-        /*if (this.asyncExecutor != null) {
-            AsyncExecutor asyncExecutor = this.asyncExecutor.createAsyncExecutor(this, this);
-            this.processEngineConfiguration.setAsyncExecutorCorePoolSize(this.asyncExecutor.getMinThreads());
-            this.processEngineConfiguration.setAsyncExecutorMaxPoolSize(this.asyncExecutor.getMaxThreads());
-            this.processEngineConfiguration.setAsyncExecutor(asyncExecutor);
-        }*/
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
-
+        if (this.asyncExecutorFactory instanceof BPMDefaultAsyncExecutorFactory) {
+            BPMDefaultAsyncExecutorFactory defaultAsyncExecutorFactory = (BPMDefaultAsyncExecutorFactory) this.asyncExecutorFactory;
+            this.processEngineConfiguration.setAsyncExecutorTenantId(this.defaultTenantId);
+            this.processEngineConfiguration.setAsyncExecutorCorePoolSize(defaultAsyncExecutorFactory.getMinThreads());
+            this.processEngineConfiguration.setAsyncExecutorMaxPoolSize(defaultAsyncExecutorFactory.getMaxThreads());
+            this.processEngineConfiguration.setAsyncExecutorDefaultAsyncJobAcquireWaitTime(defaultAsyncExecutorFactory.getDefaultAsyncJobAcquireWaitTimeInMillis());
+            this.processEngineConfiguration.setAsyncExecutorDefaultTimerJobAcquireWaitTime(defaultAsyncExecutorFactory.getDefaultTimerJobAcquireWaitTimeInMillis());
+            this.processEngineConfiguration.setAsyncExecutorMaxAsyncJobsDuePerAcquisition(defaultAsyncExecutorFactory.getMaxAsyncJobsDuePerAcquisition());
+            this.processEngineConfiguration.setAsyncExecutorMaxTimerJobsPerAcquisition(defaultAsyncExecutorFactory.getMaxTimerJobsPerAcquisition());
+            this.processEngineConfiguration.setAsyncExecutor(this.asyncExecutorFactory.createAsyncExecutor());
+        } else if (this.asyncExecutorFactory != null) {
+            this.processEngineConfiguration.setAsyncExecutor(this.asyncExecutorFactory.createAsyncExecutor());
+        }
     }
 
     @Override
@@ -286,36 +276,6 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         }
     }
 
-    private DataSource buildDataSource(String tenantId) {
-        DataSource dataSource = null;
-
-        if (this.defaultTenantId.equals(tenantId) || tenantId == null) {
-            dataSource = this.defaultDataSource.getDataSource();
-        } else {
-            for (BPMTenant tenant : this.additionalTenants) {
-                if (this.defaultTenantId.equals(tenant.getTenantId())) {
-                    if (tenant.getDataSource() != null) {
-                        dataSource = this.defaultDataSource.getDataSource();
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (dataSource == null) {
-            dataSource = this.defaultDataSource.getDataSource();
-        }
-
-        return dataSource;
-
-    }
-/*
-    private void registerTenant(String tenantId) {
-        this.registeredTenantIds.add(tenantId);
-        this.processEngineConfiguration.registerTenant(tenantId, this.buildDataSource(tenantId));
-        LOGGER.info("{} has registered tenant {}", this.name, tenantId);
-    }
-*/
     private void deployDefinitions(Collection<BPMDefinition> definitions, String tenantId) {
         DeploymentBuilder deploymentBuilder = this.processEngine.getRepositoryService().createDeployment();
 
