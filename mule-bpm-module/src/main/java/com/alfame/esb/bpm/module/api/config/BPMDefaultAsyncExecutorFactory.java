@@ -9,7 +9,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 
-@Alias("default-async-executor")
+@Alias("default-async-executor-factory")
 public class BPMDefaultAsyncExecutorFactory extends BPMAsyncExecutorFactory {
 
     @Parameter

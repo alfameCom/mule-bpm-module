@@ -28,25 +28,21 @@
                         workingDir="${TARGET_FTP_PATH}"/>
     </ftp:config>
     <bpm:config name="engineConfig"
-                defaultTenantId="com.alfame.esb.bpm.examples">
+                tenantId="com.alfame.esb.bpm.examples" async-executor-factory="loggingAsyncExecutorFactory">
         <bpm:task-listener-connection/>
-        <bpm:default-data-source>
+        <bpm:data-source>
             <bpm:generic-data-source
-                    driverClassName="org.h2.Driver"
-                    jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1" username="sa"
-                    password="sa" type="H2"/>
-        </bpm:default-data-source>
+                    password="sa"/>
+        </bpm:data-source>
         <bpm:definitions>
             <bpm:classpath-definition
                     resourceClasspath="processes/sampleSplitter.bpmn20.xml"/>
             <bpm:classpath-definition
                     resourceClasspath="processes/sampleSubmitter.bpmn20.xml"/>
         </bpm:definitions>
-        <bpm:async-executor>
-            <bpm:default-async-executor/>
-        </bpm:async-executor>
     </bpm:config>
-    <flow name="main-api">
+    <object doc:name="Object" doc:id="0aa7fcbf-7e42-405b-9e70-3b2c9a869de2" name="loggingAsyncExecutorFactory" class="com.alfame.esb.bpm.examples.LoggingAsyncExecutorFactory" />
+	<flow name="main-api">
         <http:listener config-ref="httpListenerConfigDefault"
                        path="/api/*">
             <http:response

@@ -113,9 +113,9 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     @Optional
     @NullSafe(defaultImplementingType = BPMDefaultAsyncExecutorFactory.class)
     @Expression(NOT_SUPPORTED)
-    @Alias("async-executor")
+    @Alias("async-executor-factory")
     @Placement(tab = "General", order = 5)
-    @DisplayName("BPM Async executor")
+    @DisplayName("Async executor factory")
     private BPMAsyncExecutorFactory asyncExecutorFactory;
 
     private BPMStandaloneProcessEngineSchemaConfiguration processEngineConfiguration;
