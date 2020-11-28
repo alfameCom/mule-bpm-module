@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Mule BPM Module</name>
+    <name>mule-bpm-module</name>
     <description>Mule BPM Module extends Mule 4 by adding support for process-oriented integrations.</description>
     <url>https://github.com/alfameCom/mule-bpm-module</url>
 

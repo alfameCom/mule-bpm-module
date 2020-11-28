@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Mule BPM Root</name>
+    <name>mule-bpm-root</name>
     <description>Root POM for Mule BPM Module.</description>
     <url>https://github.com/alfameCom/mule-bpm-module</url>
 

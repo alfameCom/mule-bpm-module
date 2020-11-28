@@ -13,7 +13,7 @@
 	<artifactId>passive-splitter-example</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>mule-application</packaging>
-	<name>Mule BPM Passive Splitter Example Application</name>
+	<name>mule-bpm-passive-splitter-example-application</name>
 
 	<properties>
 		<mule.maven.plugin.version>3.3.5</mule.maven.plugin.version>
