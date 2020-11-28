@@ -9,6 +9,7 @@
       	"org.h2"
       ],
       "exportedResources": [
+      	"api/TransactionService.wsdl",
       	"processes/invoiceRetriever.bpmn20.xml",
       	"processes/paymentRetriever.bpmn20.xml",
       	"processes/transactionFiler.bpmn20.xml"

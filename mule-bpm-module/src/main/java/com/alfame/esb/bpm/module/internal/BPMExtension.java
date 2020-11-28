@@ -67,9 +67,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 @SubTypeMapping(baseType = BPMAttachmentFilter.class,
         subTypes = {BPMAttachmentNameFilter.class})
 @ExternalLib(name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.6.0", requiredClassName = "org.flowable.engine.RuntimeService")
-@ExternalLib(name = "BPM Flowable Activity", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-flowable-activity:2.1.2-SNAPSHOT", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
-@ExternalLib(name = "BPM Task Queue", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-task-queue:2.1.2-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory")
-@ExternalLib(name = "BPM API", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-api:2.1.2-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
+@ExternalLib(name = "BPM Flowable Activity", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-flowable-activity:2.2.0-SNAPSHOT", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
+@ExternalLib(name = "BPM Task Queue", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-task-queue:2.2.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory")
+@ExternalLib(name = "BPM API", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-api:2.2.0-SNAPSHOT", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
 public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEngine {
 
     private static final Logger LOGGER = getLogger(BPMExtension.class);
