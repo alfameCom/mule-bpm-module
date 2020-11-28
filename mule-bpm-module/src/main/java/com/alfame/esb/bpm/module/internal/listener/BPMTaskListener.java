@@ -13,6 +13,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -33,6 +34,7 @@ import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -102,11 +104,8 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
     @OnSuccess
     public void onSuccess(@ParameterGroup(name = "Response", showInDsl = true) BPMTaskListenerSuccessResponseBuilder responseBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx) {
 
-        LOGGER.debug(responseBuilder.getValue() != null ?
-                responseBuilder.getValue().getValue() != null ?
-                        responseBuilder.getValue().getValue().toString() : null : null);
-        BPMTaskResponse response = new BPMTaskResponse(
-                responseBuilder.getValue() != null ? responseBuilder.getValue().getValue() : null);
+        LOGGER.debug("Submitting response after successful execution: " + responseValueAsString(responseBuilder.getValue()));
+        BPMTaskResponse response = new BPMTaskResponse(responseValue(responseBuilder.getValue()));
 
         BPMConnection connection = ctx.getConnection();
 
@@ -127,11 +126,8 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
         String msg = "" + namespace + ": " + identifier + ": " + description;
         LOGGER.error(msg);
 
-        LOGGER.debug(errorResponseBuilder.getValue() != null ?
-                errorResponseBuilder.getValue().getValue() != null ?
-                        errorResponseBuilder.getValue().getValue().toString() : null : null);
-        BPMTaskResponse response = new BPMTaskResponse(
-                errorResponseBuilder.getValue() != null ? errorResponseBuilder.getValue().getValue() : null,
+        LOGGER.debug("Submitting response after erroneous execution: " + responseValueAsString(errorResponseBuilder.getValue()));
+        BPMTaskResponse response = new BPMTaskResponse(responseValue(errorResponseBuilder.getValue()),
                 error != null ? error.getCause() : null);
 
         BPMConnection connection = ctx.getConnection();
@@ -160,6 +156,14 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                 .withName("bpm-listener-flow" + location.getRootContainerName())
                 .withWaitAllowed(true)
                 .withShutdownTimeout(endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit()));
+    }
+
+    private Serializable responseValue(TypedValue<Serializable> responseValue) {
+        return responseValue != null ? responseValue.getValue() : null;
+    }
+    private String responseValueAsString(TypedValue<Serializable> responseValue) {
+        Serializable vaue = responseValue(responseValue);
+        return vaue != null ? vaue.toString() : null;
     }
 
     private class Consumer {

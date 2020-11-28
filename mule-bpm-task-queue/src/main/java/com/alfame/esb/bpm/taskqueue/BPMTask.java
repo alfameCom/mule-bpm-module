@@ -36,7 +36,15 @@ public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallbac
     }
 
     public void submitResponse(BPMTaskResponse response) {
-        completableFuture.complete(response);
+        if (!completableFuture.isCancelled()) {
+            completableFuture.complete(response);
+        } else {
+            throw new IllegalStateException("Task has been already completed: instance " + this.getProcessInstanceId() + ": activity " + this.getActivityId());
+        }
+    }
+
+    public void cancel() {
+        completableFuture.cancel(true);
     }
 
 }
