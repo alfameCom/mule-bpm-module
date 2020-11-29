@@ -5,22 +5,22 @@ import com.alfame.esb.bpm.api.BPMEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
 
-public class BPMEventProxy extends BPMEngineEvent {
+public class BPMActivityEventProxy extends BPMEngineEvent {
 
-    private final FlowableProcessEngineEvent processEngineEvent;
+    private final FlowableProcessEngineEvent engineEvent;
 
-    public BPMEventProxy(FlowableProcessEngineEvent processEngineEvent) {
-        this.processEngineEvent = processEngineEvent;
+    public BPMActivityEventProxy(FlowableProcessEngineEvent engineEvent) {
+        this.engineEvent = engineEvent;
     }
 
     @Override
     public BPMEngineEventType getEventType() {
         BPMEngineEventType type = null;
 
-        if (this.processEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_CREATED)) {
-            type = BPMEngineEventType.PROCESS_INSTANCE_CREATED;
-        } else if (this.processEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_COMPLETED)) {
-            type = BPMEngineEventType.PROCESS_INSTANCE_ENDED;
+        if (this.engineEvent.getType().equals(FlowableEngineEventType.ACTIVITY_STARTED)) {
+            type = BPMEngineEventType.ACTIVITY_STARTED;
+        } else if (this.engineEvent.getType().equals(FlowableEngineEventType.ACTIVITY_COMPLETED)) {
+            type = BPMEngineEventType.ACTIVITY_COMPLETED;
         } else {
             type = BPMEngineEventType.UNKNOWN;
         }
@@ -30,12 +30,12 @@ public class BPMEventProxy extends BPMEngineEvent {
 
     @Override
     public String getProcessDefinitionKey() {
-        return this.processEngineEvent.getProcessDefinitionId().replaceFirst(":.*", "");
+        return this.engineEvent.getProcessDefinitionId().replaceFirst(":.*", "");
     }
 
     @Override
     public String getProcessInstanceId() {
-        return this.processEngineEvent.getExecutionId();
+        return this.engineEvent.getProcessInstanceId();
     }
 
     @Override
@@ -50,7 +50,7 @@ public class BPMEventProxy extends BPMEngineEvent {
 
     @Override
     public String getActivityName() {
-        return null;
+        return engineEvent.getExecution() != null ? engineEvent.getExecution().getCurrentActivityId() : null;
     }
 
     @Override

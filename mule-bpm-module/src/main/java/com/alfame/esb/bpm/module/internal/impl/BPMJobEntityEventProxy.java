@@ -3,24 +3,25 @@ package com.alfame.esb.bpm.module.internal.impl;
 import com.alfame.esb.bpm.api.BPMEngineEvent;
 import com.alfame.esb.bpm.api.BPMEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
-public class BPMEventProxy extends BPMEngineEvent {
+public class BPMJobEntityEventProxy extends BPMEngineEvent {
 
-    private final FlowableProcessEngineEvent processEngineEvent;
+    private final FlowableEntityEvent entityEvent;
+    private final JobEntity jobEntity;
 
-    public BPMEventProxy(FlowableProcessEngineEvent processEngineEvent) {
-        this.processEngineEvent = processEngineEvent;
+    public BPMJobEntityEventProxy(FlowableEntityEvent entityEvent) {
+        this.entityEvent = entityEvent;
+        this.jobEntity = (JobEntity) entityEvent.getEntity();
     }
 
     @Override
     public BPMEngineEventType getEventType() {
         BPMEngineEventType type = null;
 
-        if (this.processEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_CREATED)) {
-            type = BPMEngineEventType.PROCESS_INSTANCE_CREATED;
-        } else if (this.processEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_COMPLETED)) {
-            type = BPMEngineEventType.PROCESS_INSTANCE_ENDED;
+        if (this.entityEvent.getType().equals(FlowableEngineEventType.JOB_EXECUTION_FAILURE)) {
+            type = BPMEngineEventType.ACTIVITY_FAILURE;
         } else {
             type = BPMEngineEventType.UNKNOWN;
         }
@@ -30,12 +31,12 @@ public class BPMEventProxy extends BPMEngineEvent {
 
     @Override
     public String getProcessDefinitionKey() {
-        return this.processEngineEvent.getProcessDefinitionId().replaceFirst(":.*", "");
+        return this.jobEntity.getProcessDefinitionId().replaceFirst(":.*", "");
     }
 
     @Override
     public String getProcessInstanceId() {
-        return this.processEngineEvent.getExecutionId();
+        return this.jobEntity.getProcessInstanceId();
     }
 
     @Override
@@ -50,12 +51,12 @@ public class BPMEventProxy extends BPMEngineEvent {
 
     @Override
     public String getActivityName() {
-        return null;
+        return this.jobEntity.getElementId();
     }
 
     @Override
     public String getExceptionMessage() {
-        return null;
+        return this.jobEntity.getExceptionMessage();
     }
 
 }
