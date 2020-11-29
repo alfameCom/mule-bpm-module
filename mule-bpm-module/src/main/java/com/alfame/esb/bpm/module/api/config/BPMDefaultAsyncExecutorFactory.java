@@ -48,6 +48,12 @@ public class BPMDefaultAsyncExecutorFactory extends BPMAsyncExecutorFactory {
     @Optional(defaultValue = "1")
     private int maxTimerJobsPerAcquisition;
 
+    @Parameter
+    @Placement(order = 7)
+    @Expression(NOT_SUPPORTED)
+    @Optional(defaultValue = "10")
+    private int asyncFailedJobWaitTimeInSeconds;
+
     public int getMinThreads() {
         return minThreads;
     }
@@ -70,6 +76,10 @@ public class BPMDefaultAsyncExecutorFactory extends BPMAsyncExecutorFactory {
 
     public int getMaxTimerJobsPerAcquisition() {
         return maxTimerJobsPerAcquisition;
+    }
+
+    public int getAsyncFailedJobWaitTimeInSeconds() {
+        return asyncFailedJobWaitTimeInSeconds;
     }
 
     @Override

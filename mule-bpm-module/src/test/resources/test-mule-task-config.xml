@@ -12,6 +12,9 @@
                                      password="sa"
                                      type="H2"/>
         </bpm:data-source>
+        <bpm:async-executor-factory>
+            <bpm:default-async-executor-factory asyncFailedJobWaitTimeInSeconds="3"/>
+        </bpm:async-executor-factory>
     </bpm:config>
 
     <flow name="bpmListenerSuccessTestFlow">
