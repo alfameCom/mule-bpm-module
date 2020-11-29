@@ -162,8 +162,8 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
         return responseValue != null ? responseValue.getValue() : null;
     }
     private String responseValueAsString(TypedValue<Serializable> responseValue) {
-        Serializable vaue = responseValue(responseValue);
-        return vaue != null ? vaue.toString() : null;
+        Serializable value = responseValue(responseValue);
+        return value != null ? value.toString() : null;
     }
 
     private class Consumer {
