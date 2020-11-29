@@ -44,7 +44,7 @@
     </flow>
 
     <flow name="longRunningTaskFlow">
-        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://long.running.task"/>
+        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://long.running.task" transactionalAction="ALWAYS_BEGIN"/>
 
         <logger level="INFO" message="#[%dw 2.0
 import * from dw::Runtime
