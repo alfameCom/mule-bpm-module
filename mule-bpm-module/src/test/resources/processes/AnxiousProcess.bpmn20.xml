@@ -35,9 +35,13 @@
     </sequenceFlow>
     <exclusiveGateway id="sid-D718D1B7-7317-458D-A8C8-C4836F20D9D4"></exclusiveGateway>
     <sequenceFlow id="sid-1DA0D2D4-EE4A-436F-A28B-4772CCD2948D" sourceRef="sid-C477B4AF-B226-480B-89C6-16181B836ED4" targetRef="sid-D718D1B7-7317-458D-A8C8-C4836F20D9D4"></sequenceFlow>
-    <sequenceFlow id="sid-D32FD933-24B1-4468-A716-DCEB9BDF7E94" sourceRef="sid-D718D1B7-7317-458D-A8C8-C4836F20D9D4" targetRef="sid-5BDBCF97-8749-4F9F-97EB-E53CE6CE7378"></sequenceFlow>
     <intermediateThrowEvent id="sid-E413E039-0220-40FA-8EEF-F5A91041E6A6"></intermediateThrowEvent>
-    <sequenceFlow id="sid-360620C3-ECB1-4544-8CBE-EB225AE5FE5F" sourceRef="sid-D718D1B7-7317-458D-A8C8-C4836F20D9D4" targetRef="sid-E413E039-0220-40FA-8EEF-F5A91041E6A6"></sequenceFlow>
+    <sequenceFlow id="sid-360620C3-ECB1-4544-8CBE-EB225AE5FE5F" sourceRef="sid-D718D1B7-7317-458D-A8C8-C4836F20D9D4" targetRef="sid-E413E039-0220-40FA-8EEF-F5A91041E6A6">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tryAgain != true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-D32FD933-24B1-4468-A716-DCEB9BDF7E94" sourceRef="sid-D718D1B7-7317-458D-A8C8-C4836F20D9D4" targetRef="sid-5BDBCF97-8749-4F9F-97EB-E53CE6CE7378">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tryAgain == true}]]></conditionExpression>
+    </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_anxiousProcess">
     <bpmndi:BPMNPlane bpmnElement="anxiousProcess" id="BPMNPlane_anxiousProcess">
