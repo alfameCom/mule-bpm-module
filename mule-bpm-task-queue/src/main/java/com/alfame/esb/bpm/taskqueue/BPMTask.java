@@ -53,7 +53,9 @@ public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallbac
     }
 
     public void cancel() {
-        rollbackCallback.rollback();
+        if (rollbackCallback != null) {
+            rollbackCallback.rollback();
+        }
         completableFuture.cancel(true);
     }
 
