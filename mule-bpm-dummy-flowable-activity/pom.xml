@@ -20,7 +20,7 @@
         <url>https://github.com/alfameCom/mule-bpm-module/tree/master</url>
     </scm>
 
-    <artifactId>mule-bpm-dummy-activity</artifactId>
+    <artifactId>mule-bpm-dummy-flowable-activity</artifactId>
 
     <parent>
         <groupId>com.alfame.esb.bpm</groupId>
