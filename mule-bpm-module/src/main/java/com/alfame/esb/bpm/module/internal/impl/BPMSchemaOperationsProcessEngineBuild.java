@@ -1,6 +1,8 @@
 package com.alfame.esb.bpm.module.internal.impl;
 
+import org.apache.ibatis.session.SqlSession;
 import org.flowable.common.engine.api.FlowableWrongDbException;
+import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -44,6 +46,8 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
                         if (flyway.info().current() == null) {
                             LOGGER.info("database not created or baselined");
                             returnValue = super.execute(commandContext);
+                            // Ensure database session has been committed prior to Flyaway operations
+                            commitDbSqlContext(commandContext);
                             flyway.baseline();
                         } else {
                             try {
@@ -51,6 +55,8 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
                             } catch (FlowableWrongDbException flowableWrongDbException) {
                                 LOGGER.info("flowable database needs an update: {}", flowableWrongDbException.getMessage());
                                 returnValue = super.execute(commandContext);
+                                // Ensure database session has been committed prior to Flyaway operations
+                                commitDbSqlContext(commandContext);
                                 flyway.baseline();
                             } finally {
                             }
@@ -77,5 +83,18 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
         }
 
         return returnValue;
+    }
+
+    protected void commitDbSqlContext(CommandContext commandContext) throws SQLException {
+        DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
+        if (dbSqlSession != null) {
+            SqlSession sqlSession = dbSqlSession.getSqlSession();
+            if (sqlSession != null) {
+                Connection sqlConnection = sqlSession.getConnection();
+                if (sqlConnection != null) {
+                    sqlConnection.commit();
+                }
+            }
+        }
     }
 }
