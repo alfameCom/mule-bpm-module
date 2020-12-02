@@ -5,7 +5,7 @@ import java.io.InputStream;
 public interface BPMEngine {
 
     String getName();
-    String getDefaultTenantId();
+    String getTenantId();
 
     BPMProcessInstanceBuilder processInstanceBuilder();
 

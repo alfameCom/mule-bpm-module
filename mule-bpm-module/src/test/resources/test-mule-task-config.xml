@@ -4,14 +4,21 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
           http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
 
-    <bpm:config name="engineConfig" defaultTenantId="com.alfame.esb">
-        <bpm:default-data-source>
+    <bpm:config name="engineConfig" tenantId="com.alfame.esb">
+        <bpm:data-source>
             <bpm:generic-data-source driverClassName="org.h2.Driver"
                                      jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1"
                                      username="sa"
                                      password="sa"
                                      type="H2"/>
-        </bpm:default-data-source>
+        </bpm:data-source>
+        <bpm:definitions>
+            <bpm:classpath-definition resourceClasspath="processes/AnxiousProcess.bpmn20.xml"/>
+            <bpm:classpath-definition resourceClasspath="processes/AnxiousAsyncProcess.bpmn20.xml"/>
+        </bpm:definitions>
+        <bpm:async-executor-factory>
+            <bpm:default-async-executor-factory asyncFailedJobWaitTimeInSeconds="3"/>
+        </bpm:async-executor-factory>
     </bpm:config>
 
     <flow name="bpmListenerSuccessTestFlow">
@@ -33,6 +40,22 @@
             <on-error-propagate>
                 <set-payload value="#[error.description]"/>
             </on-error-propagate>
+        </error-handler>
+    </flow>
+
+    <flow name="longRunningTaskFlow">
+        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://long.running.task" transactionalAction="ALWAYS_BEGIN"/>
+
+        <logger level="INFO" message="#[%dw 2.0
+import * from dw::Runtime
+output application/json
+---
+{ 'message' : 'HEIHEI' } wait 2000]"/>
+
+        <error-handler name="loggingErrorHandler">
+            <on-error-continue>
+                <logger level="INFO" message="MOIMOI"/>
+            </on-error-continue>
         </error-handler>
     </flow>
 

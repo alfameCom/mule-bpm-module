@@ -84,8 +84,9 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
         if (endpointUrlValue != null && !endpointUrlValue.isEmpty()) {
             BPMTaskQueue queue = BPMTaskQueueFactory.getInstance(endpointUrlValue);
             if (queue != null) {
+                MuleSendActivityTask task = null;
                 try {
-                    MuleSendActivityTask task = new MuleSendActivityTask(payload, execution.getId(), execution);
+                    task = new MuleSendActivityTask(payload, execution.getId(), execution);
                     LOGGER.trace(">>>>> process definition {}: instance {}: activity {}: execution being published to task queue {}", processDefinitionKey, processInstanceId, currentActivityId, endpointUrlValue);
                     queue.publish(task);
                     BPMTaskResponse response = task.waitForResponse(requestTimeoutValue, TimeUnit.MILLISECONDS);
@@ -119,12 +120,15 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
                     }
                 } catch (InterruptedException exception) {
                     LOGGER.warn("<<<<< process definition {}: instance {}: activity {}: execution was interrupted by exception {} in {} ms", processDefinitionKey, processInstanceId, currentActivityId, exception, System.currentTimeMillis() - startTime);
+                    task.cancel();
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException exception) {
                     LOGGER.error("<<<<< process definition {}: instance {}: activity {}: execution caught exception {} in {} ms", processDefinitionKey, processInstanceId, currentActivityId, exception, System.currentTimeMillis() - startTime);
+                    task.cancel();
                     throw new RuntimeException(exception);
                 } catch (TimeoutException exception) {
                     LOGGER.warn("<<<<< process definition {}: instance {}: activity {}: execution timed out with exception {} in {} ms", processDefinitionKey, processInstanceId, currentActivityId, exception, System.currentTimeMillis() - startTime);
+                    task.cancel();
                     throw new RuntimeException(exception);
                 }
             } else {

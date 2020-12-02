@@ -7,6 +7,9 @@ public enum BPMEngineEventType {
     VARIABLE_CREATED,
     VARIABLE_UPDATED,
     VARIABLE_REMOVED,
+    ACTIVITY_STARTED,
+    ACTIVITY_FAILURE,
+    ACTIVITY_COMPLETED,
     UNKNOWN;
 
     public String getValue() {

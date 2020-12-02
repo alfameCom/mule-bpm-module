@@ -3,8 +3,8 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>mule-bpm-flowable-activity</name>
-    <description>Implementation of Flowable Engine's Mule task. The same Java interface is also being used for Flowable's built-in Mule 3 implementation and is thus supported by Flowable Modeller as such.</description>
+    <name>mule-bpm-dummy-flowable-activity</name>
+    <description>Dummy implementation of Flowable Engine's Mule task, which doesn't actually execute any Mule tasks. This dummy can be used for testing purposes or to satisfy class dependencies of Flowable UI.</description>
     <url>https://github.com/alfameCom/mule-bpm-module</url>
 
     <licenses>
@@ -20,7 +20,7 @@
         <url>https://github.com/alfameCom/mule-bpm-module/tree/master</url>
     </scm>
 
-    <artifactId>mule-bpm-flowable-activity</artifactId>
+    <artifactId>mule-bpm-dummy-flowable-activity</artifactId>
 
     <parent>
         <groupId>com.alfame.esb.bpm</groupId>
@@ -97,32 +97,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.alfame.esb.bpm</groupId>
-            <artifactId>mule-bpm-task-queue</artifactId>
-        </dependency>
-        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>mulesoft-releases</id>
-            <name>MuleSoft Releases Repository</name>
-            <url>http://repository.mulesoft.org/releases/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
 
 </project>

@@ -13,6 +13,7 @@ public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallbac
     private CompletableFuture<BPMTaskResponse> completableFuture = new CompletableFuture<>();
 
     private long requestTimeoutMillis = 300000;
+    private BPMTaskRollbackCallback rollbackCallback;
 
     abstract public Object getPayload();
 
@@ -26,6 +27,14 @@ public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallbac
         this.requestTimeoutMillis = requestTimeoutMillis;
     }
 
+    public BPMTaskRollbackCallback getRollbackCallback() {
+        return rollbackCallback;
+    }
+
+    public void setRollbackCallback(BPMTaskRollbackCallback rollbackCallback) {
+        this.rollbackCallback = rollbackCallback;
+    }
+
     public BPMTaskResponse waitForResponse() throws InterruptedException, ExecutionException, TimeoutException {
         return completableFuture.get(this.requestTimeoutMillis, TimeUnit.MILLISECONDS);
     }
@@ -36,7 +45,18 @@ public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallbac
     }
 
     public void submitResponse(BPMTaskResponse response) {
-        completableFuture.complete(response);
+        if (!completableFuture.isCancelled()) {
+            completableFuture.complete(response);
+        } else {
+            throw new IllegalStateException("Task has been already completed: instance " + this.getProcessInstanceId() + ": activity " + this.getActivityId());
+        }
+    }
+
+    public void cancel() {
+        if (rollbackCallback != null) {
+            rollbackCallback.rollback();
+        }
+        completableFuture.cancel(true);
     }
 
 }

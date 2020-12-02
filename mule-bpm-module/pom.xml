@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Mule BPM Module</name>
+    <name>mule-bpm-module</name>
     <description>Mule BPM Module extends Mule 4 by adding support for process-oriented integrations.</description>
     <url>https://github.com/alfameCom/mule-bpm-module</url>
 
@@ -23,13 +23,13 @@
 
     <groupId>com.alfame.esb.bpm</groupId>
     <artifactId>mule-bpm-module</artifactId>
-    <version>2.1.2-SNAPSHOT</version>
+    <version>2.2.0-SNAPSHOT</version>
     <packaging>mule-extension</packaging>
 
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-modules-parent</artifactId>
-        <version>1.1.7</version>
+        <version>1.2.1</version>
     </parent>
 
     <build>
@@ -37,7 +37,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -50,7 +49,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -77,7 +75,6 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -93,7 +90,7 @@
             <dependency>
                 <groupId>com.alfame.esb.bpm</groupId>
                 <artifactId>mule-bpm-root</artifactId>
-                <version>2.1.2-SNAPSHOT</version>
+                <version>2.2.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

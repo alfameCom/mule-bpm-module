@@ -5,8 +5,8 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 
-abstract public class BPMAsyncExecutor {
+abstract public class BPMAsyncExecutorFactory {
 
-    abstract public AsyncExecutor createAsyncExecutor(Initialisable initialisable, TenantInfoHolder tenantInfoHolder) throws InitialisationException;
+    abstract public AsyncExecutor createAsyncExecutor();
 
 }

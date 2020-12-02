@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
 
 import java.io.Serializable;
@@ -28,7 +29,7 @@ public class BPMProcessFactoryOperations {
     public BPMProcessInstance processFactory(
             @ParameterGroup(name = "Factory properties") BPMProcessFactoryProperties properties,
             @Config BPMExtension engine,
-            @Optional @Alias("process-variables") List<BPMProcessVariable> processVariables) {
+            @Optional @Alias("process-variables") @Placement(tab = "Variables") List<BPMProcessVariable> processVariables) {
 
         BPMProcessInstance processInstance = null;
 

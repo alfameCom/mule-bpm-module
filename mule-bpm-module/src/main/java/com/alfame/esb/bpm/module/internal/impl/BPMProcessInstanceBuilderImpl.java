@@ -42,8 +42,8 @@ public class BPMProcessInstanceBuilderImpl extends BPMProcessInstanceBuilder {
             LOGGER.debug(">>>>> process definition {}: instance starting with tenant {}", this.processDefinitionKey, this.tenantId);
             instanceBuilder = instanceBuilder.tenantId(this.tenantId);
         } else {
-            LOGGER.debug(">>>>> process definition {}: instance starting with tenant {}", this.processDefinitionKey, this.engine.getDefaultTenantId());
-            instanceBuilder = instanceBuilder.tenantId(this.engine.getDefaultTenantId());
+            LOGGER.debug(">>>>> process definition {}: instance starting with tenant {}", this.processDefinitionKey, this.engine.getTenantId());
+            instanceBuilder = instanceBuilder.tenantId(this.engine.getTenantId());
         }
 
         if (this.uniqueBusinessKey != null) {

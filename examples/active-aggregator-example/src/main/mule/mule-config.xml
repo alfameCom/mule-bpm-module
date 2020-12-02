@@ -15,7 +15,7 @@
             file="mule-artifact.properties"/>
     <bpm:config name="BPM_Config" doc:name="BPM Config"
                 doc:id="69a5b251-f382-4521-80ce-6161ba2ca84b"
-                defaultTenantId="com.alfame.esb.bpm.examples">
+                tenantId="com.alfame.esb.bpm.examples">
         <bpm:definitions>
             <bpm:classpath-definition resourceClasspath="processes/invoiceRetriever.bpmn20.xml"/>
             <bpm:classpath-definition resourceClasspath="processes/paymentRetriever.bpmn20.xml"/>

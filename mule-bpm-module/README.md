@@ -62,6 +62,8 @@ Java API, which defines domain model and services of Mule BPM Module. All Mule X
 
 Implementation of Flowable Engine's Mule task. The same Java interface is also being used for Flowable's built-in Mule 3 implementation and is thus supported by Flowable Modeller as such.
 
+There is also dummy version included, which doesn't actually execute any Mule tasks, but rather rejects them. This should be added to class path of Flowable UI to allow rendering of process definitions with Mule tasks.
+
 ### Mule BPM Task Queue
 
 A Java library implementing JVM level queueing for Mule tasks.
@@ -104,7 +106,7 @@ By setting `uniqueBusinessKey` attribute, the instance is guaranteed to be the o
 
 ### Mule task listener
 
-Mule tasks are Mule flows using `<bpm:task-listener />` as an inbound endpoint.
+Mule tasks are Mule flows using `<bpm:task-listener />` as a source. Process instances can be set to call such flows by adding `<serviceTask flowable:type="mule" />`, with matching Endpoint URL.
 
 Execution of Mule task can be either synchronous or asynchronous: synchronous Mule tasks are executed on calling thread, while asynchronous Mule tasks are always executed on background.
 
@@ -377,7 +379,3 @@ sequenceDiagram
 Awaiting events is really useful for Munit tests. However, event subscription is fully production grade implementation, which can be used inside actual Mule BPM Applications.
 
 Events can be filtered by adding nested `<bpm:event-filters />` tag inside `<bpm:event-subscription-builder />`, `<bpm:get-unique-event />` and `<bpm:get-events />` tags. By default, all matched events are returned. After adding filters, only matching events are qualified. Multiple filters of a same type may be added.
-
-
-
-

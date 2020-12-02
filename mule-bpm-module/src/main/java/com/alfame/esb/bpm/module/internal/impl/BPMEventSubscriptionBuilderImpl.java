@@ -2,6 +2,7 @@ package com.alfame.esb.bpm.module.internal.impl;
 
 import com.alfame.esb.bpm.api.*;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.RuntimeService;
@@ -66,19 +67,34 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
         if (this.subscribedForEvents == true) {
             BPMEngineEvent engineEvent = null;
 
+
             if (flowableEvent instanceof FlowableVariableEvent) {
                 FlowableVariableEvent flowableVariableEvent = (FlowableVariableEvent) flowableEvent;
+                LOGGER.trace("Received variable event {} for instance {}", flowableVariableEvent.getType(), flowableVariableEvent.getProcessInstanceId());
                 if (flowableVariableEvent.getType().equals(FlowableEngineEventType.VARIABLE_CREATED)
                         || flowableVariableEvent.getType().equals(FlowableEngineEventType.VARIABLE_UPDATED)
                         || flowableVariableEvent.getType().equals(FlowableEngineEventType.VARIABLE_DELETED)) {
                     engineEvent = new BPMVariableEventProxy(flowableVariableEvent);
                 }
             } else if (flowableEvent instanceof FlowableProcessEngineEvent) {
-                FlowableProcessEngineEvent flowableEngineEntityEvent = (FlowableProcessEngineEvent) flowableEvent;
-                if (flowableEngineEntityEvent.getType().equals(FlowableEngineEventType.PROCESS_CREATED)
-                        || flowableEngineEntityEvent.getType().equals(FlowableEngineEventType.PROCESS_COMPLETED)) {
-                    engineEvent = new BPMEventProxy(flowableEngineEntityEvent);
+                FlowableProcessEngineEvent flowableEngineEvent = (FlowableProcessEngineEvent) flowableEvent;
+                LOGGER.trace("Received engine event {} for instance {}", flowableEngineEvent.getType(), flowableEngineEvent.getProcessInstanceId());
+                if (flowableEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_CREATED)
+                        || flowableEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_COMPLETED)) {
+                    engineEvent = new BPMEventProxy(flowableEngineEvent);
                 }
+                if (flowableEngineEvent.getType().equals(FlowableEngineEventType.ACTIVITY_STARTED)
+                        || flowableEngineEvent.getType().equals(FlowableEngineEventType.ACTIVITY_COMPLETED)) {
+                    engineEvent = new BPMActivityEventProxy(flowableEngineEvent);
+                }
+            } else if (flowableEvent instanceof FlowableEntityEvent) {
+                FlowableEntityEvent flowableEntityEvent = (FlowableEntityEvent) flowableEvent;
+                LOGGER.trace("Received entity event {}", flowableEntityEvent.getType());
+                if (flowableEntityEvent.getType().equals(FlowableEngineEventType.JOB_EXECUTION_FAILURE)) {
+                    engineEvent = new BPMJobEntityEventProxy(flowableEntityEvent);
+                }
+            } else {
+                LOGGER.trace("Received event {} of type {}", flowableEvent.getType(), flowableEvent.getClass().getCanonicalName());
             }
 
             if (isUnfilteredEvent(engineEvent)) {

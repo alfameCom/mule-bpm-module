@@ -43,14 +43,14 @@ Add this dependency to your application pom.xml:
 <dependency>
 	<groupId>com.alfame.esb.bpm</groupId>
 	<artifactId>mule-bpm-module</artifactId>
-	<version>2.1.2-SNAPSHOT</version>
+	<version>2.2.0-SNAPSHOT</version>
 	<classifier>mule-plugin</classifier>
 </dependency>
 ```
 
-To model BPMN 2.0 processes use [Flowable Modeler](http://localhost:8080/flowable-modeler) after running:
+To model BPMN 2.0 processes use [Flowable Modeler](http://localhost:8080/flowable-ui/modeler) after running:
 ```
-docker run -p8080:8080 flowable/all-in-one
+docker run -p8080:8080 flowable/flowable-ui
 ```
 
 > Hint from Flowable: default credentials are admin/test.

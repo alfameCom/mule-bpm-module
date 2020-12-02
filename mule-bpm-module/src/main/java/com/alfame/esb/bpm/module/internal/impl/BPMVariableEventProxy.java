@@ -50,4 +50,14 @@ public class BPMVariableEventProxy extends BPMEngineEvent {
         return this.variableEvent.getVariableValue();
     }
 
+    @Override
+    public String getActivityName() {
+        return null;
+    }
+
+    @Override
+    public String getExceptionMessage() {
+        return null;
+    }
+
 }

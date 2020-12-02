@@ -2,7 +2,7 @@
 <Configuration>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%-5p %d [%t] %c{1.}: %m%n"/>
+            <PatternLayout pattern="%-5p %d [%15.15t] %35.35c{1.}: %m%n"/>
         </Console>
     </Appenders>
 
@@ -23,8 +23,8 @@
         <!--  BPM extension -->
         <AsyncLogger name="com.alfame.esb.bpm.module" level="DEBUG"/>
         <AsyncLogger name="org.flowable.mule" level="DEBUG"/>
-        <AsyncLogger name="com.alfame.esb.bpm.module.internal.impl.BPMEventSubscriptionBuilderImpl" level="TRACE"/>
-        <AsyncLogger name="com.alfame.esb.bpm.module.internal.impl.BPMEventSubscriptionImpl" level="TRACE"/>
+        <AsyncLogger name="com.alfame.esb.bpm.module.internal.impl.BPMEventSubscriptionBuilderImpl" level="DEBUG"/>
+        <AsyncLogger name="com.alfame.esb.bpm.module.internal.impl.BPMEventSubscriptionImpl" level="DEBUG"/>
 
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>

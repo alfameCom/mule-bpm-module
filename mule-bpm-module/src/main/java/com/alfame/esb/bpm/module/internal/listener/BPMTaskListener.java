@@ -3,16 +3,14 @@ package com.alfame.esb.bpm.module.internal.listener;
 import com.alfame.esb.bpm.api.BPMTaskInstance;
 import com.alfame.esb.bpm.module.internal.BPMExtension;
 import com.alfame.esb.bpm.module.internal.connection.BPMConnection;
-import com.alfame.esb.bpm.taskqueue.BPMTask;
-import com.alfame.esb.bpm.taskqueue.BPMTaskQueue;
-import com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory;
-import com.alfame.esb.bpm.taskqueue.BPMTaskResponse;
+import com.alfame.esb.bpm.taskqueue.*;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -30,9 +28,11 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
+import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -102,11 +102,8 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
     @OnSuccess
     public void onSuccess(@ParameterGroup(name = "Response", showInDsl = true) BPMTaskListenerSuccessResponseBuilder responseBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx) {
 
-        LOGGER.debug(responseBuilder.getValue() != null ?
-                responseBuilder.getValue().getValue() != null ?
-                        responseBuilder.getValue().getValue().toString() : null : null);
-        BPMTaskResponse response = new BPMTaskResponse(
-                responseBuilder.getValue() != null ? responseBuilder.getValue().getValue() : null);
+        LOGGER.debug("Submitting response after successful execution: " + responseValueAsString(responseBuilder.getValue()));
+        BPMTaskResponse response = new BPMTaskResponse(responseValue(responseBuilder.getValue()));
 
         BPMConnection connection = ctx.getConnection();
 
@@ -127,11 +124,8 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
         String msg = "" + namespace + ": " + identifier + ": " + description;
         LOGGER.error(msg);
 
-        LOGGER.debug(errorResponseBuilder.getValue() != null ?
-                errorResponseBuilder.getValue().getValue() != null ?
-                        errorResponseBuilder.getValue().getValue().toString() : null : null);
-        BPMTaskResponse response = new BPMTaskResponse(
-                errorResponseBuilder.getValue() != null ? errorResponseBuilder.getValue().getValue() : null,
+        LOGGER.debug("Submitting response after erroneous execution: " + responseValueAsString(errorResponseBuilder.getValue()));
+        BPMTaskResponse response = new BPMTaskResponse(responseValue(errorResponseBuilder.getValue()),
                 error != null ? error.getCause() : null);
 
         BPMConnection connection = ctx.getConnection();
@@ -160,6 +154,14 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                 .withName("bpm-listener-flow" + location.getRootContainerName())
                 .withWaitAllowed(true)
                 .withShutdownTimeout(endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit()));
+    }
+
+    private Serializable responseValue(TypedValue<Serializable> responseValue) {
+        return responseValue != null ? responseValue.getValue() : null;
+    }
+    private String responseValueAsString(TypedValue<Serializable> responseValue) {
+        Serializable value = responseValue(responseValue);
+        return value != null ? value.toString() : null;
     }
 
     private class Consumer {
@@ -269,6 +271,14 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
         private void cancel(SourceCallbackContext ctx) {
             try {
+                ctx.getTransactionHandle().rollback();
+            } catch (TransactionException e) {
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("Failed to rollback transaction: " + e.getMessage(), e);
+                }
+            }
+
+            try {
                 connectionProvider.disconnect(ctx.getConnection());
             } catch (IllegalStateException e) {
                 // Not connected
@@ -279,20 +289,13 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                     LOGGER.warn("Failed to disconnect connection: " + e.getMessage(), e);
                 }
             }
-
-            try {
-                ctx.getTransactionHandle().rollback();
-            } catch (TransactionException e) {
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("Failed to rollback transaction: " + e.getMessage(), e);
-                }
-            }
         }
 
         private BPMConnection connect(SourceCallbackContext ctx, BPMTask task) throws ConnectionException, TransactionException {
             BPMConnection connection = connectionProvider.connect();
             connection.setTask(task);
-            ctx.bindConnection(connection);
+            TransactionHandle transactionHandle = ctx.bindConnection(connection);
+            task.setRollbackCallback(new TaskRollback(transactionHandle));
             return connection;
         }
 
@@ -304,6 +307,24 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
             stop.set(true);
         }
 
+    }
+
+    public class TaskRollback implements BPMTaskRollbackCallback {
+
+        final private TransactionHandle transactionHandle;
+
+        public TaskRollback(TransactionHandle transactionHandle) {
+            this.transactionHandle = transactionHandle;
+        }
+
+        @Override
+        public void rollback() {
+            try {
+                transactionHandle.rollback();
+            } catch (TransactionException e) {
+                LOGGER.error("Error while rolling back task transaction", e);
+            }
+        }
     }
 
 }

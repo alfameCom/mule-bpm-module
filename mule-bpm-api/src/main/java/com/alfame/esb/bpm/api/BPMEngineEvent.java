@@ -29,6 +29,16 @@ public abstract class BPMEngineEvent {
      */
     public abstract Object getVariableValue();
 
+    /**
+     * The name of activity, if this event was caused by activity execution.
+     */
+    public abstract String getActivityName();
+
+    /**
+     * Exception message describing the cause of this event, in case of failures.
+     */
+    public abstract String getExceptionMessage();
+
     @Override
     public String toString() {
         return MessageFormat.format(

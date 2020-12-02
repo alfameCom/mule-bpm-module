@@ -1,5 +1,6 @@
 package com.alfame.esb.bpm.module;
 
+import com.alfame.esb.bpm.api.*;
 import com.alfame.esb.bpm.taskqueue.BPMTask;
 import com.alfame.esb.bpm.taskqueue.BPMTaskQueue;
 import com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory;
@@ -7,7 +8,7 @@ import com.alfame.esb.bpm.taskqueue.BPMTaskResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import java.util.concurrent.TimeUnit;
 
 public class BPMMuleTaskTestCase extends BPMAbstractTestCase {
 
@@ -58,4 +59,53 @@ public class BPMMuleTaskTestCase extends BPMAbstractTestCase {
         Assert.assertEquals("Response value should be set to true", "false", responseValue);
     }
 
+    @Test(expected = java.util.concurrent.TimeoutException.class)
+    public void timingOutMuleTaskTestFlow() throws Throwable {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMProcessInstanceBuilder processInstanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("anxiousProcess");
+        Assert.assertNotNull("Process instance builder should not be NULL", processInstanceBuilder);
+
+        try {
+            processInstanceBuilder.startProcessInstance();
+        } catch (Exception e) {
+            throw e.getCause();
+        }
+    }
+
+    @Test
+    public void timingOutAsyncMuleTaskTestFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMEngineEventSubscription activitySubscription = engine.eventSubscriptionBuilder()
+                .processDefinitionKey("anxiousAsyncProcess")
+                .eventType(BPMEngineEventType.ACTIVITY_FAILURE)
+                .subscribeForEvents();
+
+        BPMEngineEventSubscription processSubscription = engine.eventSubscriptionBuilder()
+                .processDefinitionKey("anxiousAsyncProcess")
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .subscribeForEvents();
+
+        BPMProcessInstanceBuilder processInstanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("anxiousAsyncProcess");
+        Assert.assertNotNull("Process instance builder should not be NULL", processInstanceBuilder);
+
+        BPMProcessInstance processInstance = processInstanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
+
+        activitySubscription.waitForEvents(2, 30, TimeUnit.SECONDS);
+
+        Assert.assertEquals("No process ending events should be found",
+                0, processSubscription.eventFinder().events().size());
+
+        Assert.assertEquals("Two failures should be found (one retry)",
+                2, activitySubscription.eventFinder().events().size());
+
+        Assert.assertTrue("Timeout exception message should be found",
+                activitySubscription.eventFinder().events().get(1).getExceptionMessage().contains("java.util.concurrent.TimeoutException"));
+    }
 }
