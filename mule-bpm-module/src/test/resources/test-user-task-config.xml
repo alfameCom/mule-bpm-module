@@ -18,17 +18,22 @@
     </bpm:config>
 
     <flow name="initiallyFailingMuleTaskFlow">
-        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://initially.failing.task" transactionalAction="ALWAYS_BEGIN"/>
+        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://initially.failing.task" transactionalAction="ALWAYS_BEGIN">
+            <bpm:response >
+                <bpm:value ><![CDATA[#[payload]]]></bpm:value>
+            </bpm:response>
+        </bpm:task-listener>
         
         <bpm:get-variable config-ref="engineConfig" variableName="tryAgain" target="tryAgain"/>
         
         <choice>
             <when expression="#[vars.tryAgain == true]">
                 <logger level="INFO" message="OK"/>
+                <set-payload value="true" />
             </when>
             <otherwise>
                 <logger level="INFO" message="FAILING"/>
-                <raise-error type="ANY" description="FAIL"/>
+                <set-payload value="false" />
             </otherwise>
         </choice>
 

@@ -10,6 +10,7 @@ public enum BPMEngineEventType {
     ACTIVITY_STARTED,
     ACTIVITY_FAILURE,
     ACTIVITY_COMPLETED,
+    TASK_CREATED,
     UNKNOWN;
 
     public String getValue() {

@@ -22,7 +22,7 @@
     <endEvent id="endEvent1"></endEvent>
     <exclusiveGateway id="sid-BC78D6B1-B23B-4262-9DC3-4089C79C5E7B"></exclusiveGateway>
     <sequenceFlow id="sid-665334F8-4468-4296-AA0A-5892349CBEB1" sourceRef="initiallyFailingMuleTask" targetRef="sid-BC78D6B1-B23B-4262-9DC3-4089C79C5E7B"></sequenceFlow>
-    <userTask id="sid-2B8066C5-3906-49B7-9447-7BA759534776" name="Handle Failure" flowable:formFieldValidation="true">
+    <userTask id="handleFailure" name="Handle Failure" flowable:formFieldValidation="true">
       <extensionElements>
         <flowable:formProperty id="tryAgain" name="Try again?" type="enum">
           <flowable:value id="true" name="Try again"></flowable:value>
@@ -31,7 +31,7 @@
       </extensionElements>
     </userTask>
     <exclusiveGateway id="sid-296D7F36-3DD5-49D8-91B8-39C699BD8D80"></exclusiveGateway>
-    <sequenceFlow id="sid-04920DFD-7D4D-4C0F-8F3E-74868B925AD3" sourceRef="sid-2B8066C5-3906-49B7-9447-7BA759534776" targetRef="sid-296D7F36-3DD5-49D8-91B8-39C699BD8D80"></sequenceFlow>
+    <sequenceFlow id="sid-04920DFD-7D4D-4C0F-8F3E-74868B925AD3" sourceRef="handleFailure" targetRef="sid-296D7F36-3DD5-49D8-91B8-39C699BD8D80"></sequenceFlow>
     <endEvent id="sid-7DC12E69-3075-45B0-B02F-5968E50E443A"></endEvent>
     <sequenceFlow id="sid-4E6CD60E-F01B-4DB4-835E-D489C752440E" sourceRef="sid-296D7F36-3DD5-49D8-91B8-39C699BD8D80" targetRef="initiallyFailingMuleTask">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tryAgain == true}]]></conditionExpression>
@@ -42,7 +42,7 @@
     <sequenceFlow id="sid-52D615D4-BCE4-497E-97FA-39859AC60ACD" sourceRef="sid-BC78D6B1-B23B-4262-9DC3-4089C79C5E7B" targetRef="endEvent1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${result == true}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="sid-D84AA095-A933-45BC-A6B2-C78B54A7CFBF" sourceRef="sid-BC78D6B1-B23B-4262-9DC3-4089C79C5E7B" targetRef="sid-2B8066C5-3906-49B7-9447-7BA759534776">
+    <sequenceFlow id="sid-D84AA095-A933-45BC-A6B2-C78B54A7CFBF" sourceRef="sid-BC78D6B1-B23B-4262-9DC3-4089C79C5E7B" targetRef="handleFailure">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${result != true}]]></conditionExpression>
     </sequenceFlow>
   </process>
@@ -60,7 +60,7 @@
       <bpmndi:BPMNShape bpmnElement="sid-BC78D6B1-B23B-4262-9DC3-4089C79C5E7B" id="BPMNShape_sid-BC78D6B1-B23B-4262-9DC3-4089C79C5E7B">
         <omgdc:Bounds height="40.0" width="40.0" x="421.5" y="290.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-2B8066C5-3906-49B7-9447-7BA759534776" id="BPMNShape_sid-2B8066C5-3906-49B7-9447-7BA759534776">
+      <bpmndi:BPMNShape bpmnElement="handleFailure" id="BPMNShape_handleFailure">
         <omgdc:Bounds height="80.0" width="100.0" x="391.5" y="135.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-296D7F36-3DD5-49D8-91B8-39C699BD8D80" id="BPMNShape_sid-296D7F36-3DD5-49D8-91B8-39C699BD8D80">

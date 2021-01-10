@@ -92,6 +92,8 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
                 LOGGER.trace("Received entity event {}", flowableEntityEvent.getType());
                 if (flowableEntityEvent.getType().equals(FlowableEngineEventType.JOB_EXECUTION_FAILURE)) {
                     engineEvent = new BPMJobEntityEventProxy(flowableEntityEvent);
+                } else if (flowableEntityEvent.getType().equals(FlowableEngineEventType.TASK_CREATED)) {
+                    engineEvent = new BPMTaskEntityEventProxy(flowableEntityEvent);
                 }
             } else {
                 LOGGER.trace("Received event {} of type {}", flowableEvent.getType(), flowableEvent.getClass().getCanonicalName());

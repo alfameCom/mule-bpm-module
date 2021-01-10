@@ -19,8 +19,13 @@ public class BPMUserTaskTestCase extends BPMAbstractTestCase {
         Assert.assertNotNull("Engine should not be NULL", engine);
 
         BPMEngineEventSubscription processSubscription = engine.eventSubscriptionBuilder()
-                .processDefinitionKey("anxiousAsyncProcess")
+                .processDefinitionKey("userTaskProcess")
                 .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .subscribeForEvents();
+
+        BPMEngineEventSubscription userTaskSubscription = engine.eventSubscriptionBuilder()
+                .processDefinitionKey("userTaskProcess")
+                .eventType(BPMEngineEventType.TASK_CREATED)
                 .subscribeForEvents();
 
         BPMProcessInstanceBuilder processInstanceBuilder = engine.processInstanceBuilder()
@@ -30,7 +35,15 @@ public class BPMUserTaskTestCase extends BPMAbstractTestCase {
         BPMProcessInstance processInstance = processInstanceBuilder.startProcessInstance();
         Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
 
+        userTaskSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+
         processSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+
+        Assert.assertEquals("User task event should be found",
+                1, userTaskSubscription.eventFinder().events().size());
+
+        Assert.assertEquals("Activity name must match the element on BPMN",
+                "handleFailure", userTaskSubscription.eventFinder().uniqueEvent().getActivityName());
 
         Assert.assertEquals("No process ending events should be found",
                 0, processSubscription.eventFinder().events().size());
