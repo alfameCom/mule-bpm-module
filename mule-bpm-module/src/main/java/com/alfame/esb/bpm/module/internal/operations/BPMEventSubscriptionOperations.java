@@ -186,6 +186,14 @@ public class BPMEventSubscriptionOperations {
             engineEventType = BPMEngineEventType.VARIABLE_UPDATED;
         } else if (eventType == BPMEventType.VARIABLE_REMOVED) {
             engineEventType = BPMEngineEventType.VARIABLE_REMOVED;
+        } else if (eventType == BPMEventType.ACTIVITY_STARTED) {
+            engineEventType = BPMEngineEventType.ACTIVITY_STARTED;
+        } else if (eventType == BPMEventType.ACTIVITY_FAILURE) {
+            engineEventType = BPMEngineEventType.ACTIVITY_FAILURE;
+        } else if (eventType == BPMEventType.ACTIVITY_COMPLETED) {
+            engineEventType = BPMEngineEventType.ACTIVITY_COMPLETED;
+        } else if (eventType == BPMEventType.TASK_CREATED) {
+            engineEventType = BPMEngineEventType.TASK_CREATED;
         } else {
             engineEventType = BPMEngineEventType.UNKNOWN;
         }
