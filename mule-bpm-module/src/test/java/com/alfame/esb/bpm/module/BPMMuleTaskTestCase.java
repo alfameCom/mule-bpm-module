@@ -107,5 +107,8 @@ public class BPMMuleTaskTestCase extends BPMAbstractTestCase {
 
         Assert.assertTrue("Timeout exception message should be found",
                 activitySubscription.eventFinder().events().get(1).getExceptionMessage().contains("java.util.concurrent.TimeoutException"));
+
+        Assert.assertEquals("Activity name must match the element on BPMN",
+                "longRunningTask", activitySubscription.eventFinder().events().get(1).getActivityName());
     }
 }

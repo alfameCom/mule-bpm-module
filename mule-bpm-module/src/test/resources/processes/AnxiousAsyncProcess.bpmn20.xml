@@ -2,7 +2,7 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
   <process id="anxiousAsyncProcess" name="AnxiousAsyncProcess" isExecutable="true">
     <startEvent id="startEvent1" flowable:formFieldValidation="true"></startEvent>
-    <serviceTask id="sid-5BDBCF97-8749-4F9F-97EB-E53CE6CE7378" name="Long running task" flowable:type="mule" flowable:async="true">
+    <serviceTask id="longRunningTask" name="Long running task" flowable:type="mule" flowable:async="true">
       <extensionElements>
         <flowable:field name="endpointUrl">
           <flowable:string><![CDATA[bpm://long.running.task]]></flowable:string>
@@ -15,9 +15,9 @@
         </flowable:field>
       </extensionElements>
     </serviceTask>
-    <sequenceFlow id="sid-1DC9A1C0-72DB-4BA2-B327-649A8E9EE460" sourceRef="startEvent1" targetRef="sid-5BDBCF97-8749-4F9F-97EB-E53CE6CE7378"></sequenceFlow>
+    <sequenceFlow id="sid-1DC9A1C0-72DB-4BA2-B327-649A8E9EE460" sourceRef="startEvent1" targetRef="longRunningTask"></sequenceFlow>
     <exclusiveGateway id="sid-24953E9B-2A06-433B-AB88-5AE7F5CAADA3"></exclusiveGateway>
-    <sequenceFlow id="sid-E83B2767-F099-4D08-B36D-D4FE130D21E6" sourceRef="sid-5BDBCF97-8749-4F9F-97EB-E53CE6CE7378" targetRef="sid-24953E9B-2A06-433B-AB88-5AE7F5CAADA3"></sequenceFlow>
+    <sequenceFlow id="sid-E83B2767-F099-4D08-B36D-D4FE130D21E6" sourceRef="longRunningTask" targetRef="sid-24953E9B-2A06-433B-AB88-5AE7F5CAADA3"></sequenceFlow>
     <intermediateThrowEvent id="sid-AAA393AD-8E08-4EE9-A71B-845FBCD78F2B"></intermediateThrowEvent>
     <userTask id="sid-C477B4AF-B226-480B-89C6-16181B836ED4" name="Handle error" flowable:formFieldValidation="true">
       <extensionElements>
@@ -39,7 +39,7 @@
     <sequenceFlow id="sid-360620C3-ECB1-4544-8CBE-EB225AE5FE5F" sourceRef="sid-D718D1B7-7317-458D-A8C8-C4836F20D9D4" targetRef="sid-E413E039-0220-40FA-8EEF-F5A91041E6A6">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tryAgain != true}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="sid-D32FD933-24B1-4468-A716-DCEB9BDF7E94" sourceRef="sid-D718D1B7-7317-458D-A8C8-C4836F20D9D4" targetRef="sid-5BDBCF97-8749-4F9F-97EB-E53CE6CE7378">
+    <sequenceFlow id="sid-D32FD933-24B1-4468-A716-DCEB9BDF7E94" sourceRef="sid-D718D1B7-7317-458D-A8C8-C4836F20D9D4" targetRef="longRunningTask">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tryAgain == true}]]></conditionExpression>
     </sequenceFlow>
   </process>
@@ -48,7 +48,7 @@
       <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
         <omgdc:Bounds height="30.0" width="30.0" x="75.0" y="289.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-5BDBCF97-8749-4F9F-97EB-E53CE6CE7378" id="BPMNShape_sid-5BDBCF97-8749-4F9F-97EB-E53CE6CE7378">
+      <bpmndi:BPMNShape bpmnElement="longRunningTask" id="BPMNShape_longRunningTask">
         <omgdc:Bounds height="80.0" width="100.0" x="200.0" y="264.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-24953E9B-2A06-433B-AB88-5AE7F5CAADA3" id="BPMNShape_sid-24953E9B-2A06-433B-AB88-5AE7F5CAADA3">
