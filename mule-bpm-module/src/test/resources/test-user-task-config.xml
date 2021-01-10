@@ -1,0 +1,37 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+
+    <bpm:config name="engineConfig" tenantId="com.alfame.esb">
+        <bpm:data-source>
+            <bpm:generic-data-source driverClassName="org.h2.Driver"
+                                     jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1"
+                                     username="sa"
+                                     password="sa"
+                                     type="H2"/>
+        </bpm:data-source>
+        <bpm:definitions>
+            <bpm:classpath-definition resourceClasspath="processes/UserTaskProcess.bpmn20.xml"/>
+        </bpm:definitions>
+    </bpm:config>
+
+    <flow name="initiallyFailingMuleTaskFlow">
+        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://initially.failing.task" transactionalAction="ALWAYS_BEGIN"/>
+        
+        <bpm:get-variable config-ref="engineConfig" variableName="tryAgain" target="tryAgain"/>
+        
+        <choice>
+            <when expression="#[vars.tryAgain == true]">
+                <logger level="INFO" message="OK"/>
+            </when>
+            <otherwise>
+                <logger level="INFO" message="FAILING"/>
+                <raise-error type="ANY" description="FAIL"/>
+            </otherwise>
+        </choice>
+
+    </flow>
+
+</mule>
