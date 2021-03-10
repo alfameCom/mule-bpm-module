@@ -39,6 +39,24 @@ public class BPMGenericDataSource extends BPMDataSource {
     @Optional(defaultValue = "sa")
     @Password
     private String password;
+    
+    @Parameter
+    @Placement(order = 6)
+    @Expression(NOT_SUPPORTED)
+    @Optional(defaultValue = "10")
+    private int maximumPoolSize;
+    
+    @Parameter
+    @Placement(order = 7)
+    @Expression(NOT_SUPPORTED)
+    @Optional(defaultValue = "1800000")
+    private long maxLifeTime;
+    
+    @Parameter
+    @Placement(order = 8)
+    @Expression(NOT_SUPPORTED)
+    @Optional(defaultValue = "30000")
+    private long connectionTimeout;
 
     public String getDriverClassName() {
         return driverClassName;
@@ -55,6 +73,18 @@ public class BPMGenericDataSource extends BPMDataSource {
     public String getPassword() {
         return password;
     }
+    
+    public int getMaximumPoolSize() {
+    	return maximumPoolSize;
+    }
+    
+    public long getMaxLifeTime() {
+    	return maxLifeTime;
+	}
+    
+    public long getConnectionTimeout() {
+    	return connectionTimeout;
+    }
 
     @Override
     public DataSource getDataSource() {
@@ -63,6 +93,9 @@ public class BPMGenericDataSource extends BPMDataSource {
         dataSource.setJdbcUrl(this.getJdbcUrl());
         dataSource.setUsername(this.getUsername());
         dataSource.setPassword(this.getPassword());
+        dataSource.setMaximumPoolSize(this.getMaximumPoolSize());
+        dataSource.setMaxLifetime(this.getMaxLifeTime());
+        dataSource.setConnectionTimeout(this.getConnectionTimeout());
         return dataSource;
     }
 
