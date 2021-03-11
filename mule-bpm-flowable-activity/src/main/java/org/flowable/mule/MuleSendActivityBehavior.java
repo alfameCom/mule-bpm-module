@@ -93,30 +93,31 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
                     if (response == null) {
                         LOGGER.error("<<<<< process definition {}: instance {}: activity {}: execution ended without response in {} ms", processDefinitionKey, processInstanceId, currentActivityId, System.currentTimeMillis() - startTime);
                         throw new RuntimeException("No response from BPM Queue: " + endpointUrlValue);
-                    }
-                    if (response.getError() != null) {
-                        LOGGER.error("<<<<< process definition {}: instance {}: activity {}: execution ended with exception {} in {} ms", processDefinitionKey, processInstanceId, currentActivityId, response.getError(), System.currentTimeMillis() - startTime);
-                        throw new RuntimeException(response.getError());
-                    }
-                    LOGGER.trace("<<<<< process definition {}: instance {}: activity {}: execution ended with response {}", processDefinitionKey, processInstanceId, currentActivityId, response);
+                    } else {
+                        LOGGER.trace("<<<<< process definition {}: instance {}: activity {}: execution ended with response {}", processDefinitionKey, processInstanceId, currentActivityId, response);
 
-                    if (response.getVariablesToUpdate() != null) {
-                        for (Map.Entry<String, Object> variableToUpdate : response.getVariablesToUpdate().entrySet()) {
-                            LOGGER.debug("<<<<< process definition {}: instance {}: activity {}: execution setting variable {} = {}", processDefinitionKey, processInstanceId, currentActivityId, variableToUpdate.getKey(), variableToUpdate.getValue());
-                            execution.setVariable(variableToUpdate.getKey(), variableToUpdate.getValue());
+                        if (response.getError() == null) {
+                            if (response.getVariablesToUpdate() != null) {
+                                for (Map.Entry<String, Object> variableToUpdate : response.getVariablesToUpdate().entrySet()) {
+                                    LOGGER.debug("<<<<< process definition {}: instance {}: activity {}: execution setting variable {} = {}", processDefinitionKey, processInstanceId, currentActivityId, variableToUpdate.getKey(), variableToUpdate.getValue());
+                                    execution.setVariable(variableToUpdate.getKey(), variableToUpdate.getValue());
+                                }
+                            }
+
+                            if (response.getVariablesToRemove() != null) {
+                                for (String variableToRemove : response.getVariablesToRemove()) {
+                                    LOGGER.debug("<<<<< process definition {}: instance {}: activity {}: execution removing variable {}", processDefinitionKey, processInstanceId, currentActivityId, variableToRemove);
+                                    execution.removeVariable(variableToRemove);
+                                }
+                            }
+                        } else {
+                            LOGGER.warn("<<<<< process definition {}: instance {}: activity {}: execution ended with exception {} in {} ms", processDefinitionKey, processInstanceId, currentActivityId, response.getError(), System.currentTimeMillis() - startTime);
                         }
-                    }
 
-                    if (response.getVariablesToRemove() != null) {
-                        for (String variableToRemove : response.getVariablesToRemove()) {
-                            LOGGER.debug("<<<<< process definition {}: instance {}: activity {}: execution removing variable {}", processDefinitionKey, processInstanceId, currentActivityId, variableToRemove);
-                            execution.removeVariable(variableToRemove);
+                        if (resultVariableValue != null && response.getValue() != null) {
+                            LOGGER.debug("<<<<< process definition {}: instance {}: activity {}: execution setting variable {} = {}", processDefinitionKey, processInstanceId, currentActivityId, resultVariableValue, response.getValue());
+                            execution.setVariable(resultVariableValue, response.getValue());
                         }
-                    }
-
-                    if (resultVariableValue != null && response.getValue() != null) {
-                        LOGGER.debug("<<<<< process definition {}: instance {}: activity {}: execution setting variable {} = {}", processDefinitionKey, processInstanceId, currentActivityId, resultVariableValue, response.getValue());
-                        execution.setVariable(resultVariableValue, response.getValue());
                     }
                 } catch (InterruptedException exception) {
                     LOGGER.warn("<<<<< process definition {}: instance {}: activity {}: execution was interrupted by exception {} in {} ms", processDefinitionKey, processInstanceId, currentActivityId, exception, System.currentTimeMillis() - startTime);
