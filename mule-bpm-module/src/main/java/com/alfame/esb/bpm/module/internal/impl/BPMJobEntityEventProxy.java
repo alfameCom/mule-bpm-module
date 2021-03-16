@@ -4,6 +4,7 @@ import com.alfame.esb.bpm.api.BPMEngineEvent;
 import com.alfame.esb.bpm.api.BPMEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.impl.event.FlowableEntityExceptionEventImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 public class BPMJobEntityEventProxy extends BPMEngineEvent {
@@ -14,6 +15,10 @@ public class BPMJobEntityEventProxy extends BPMEngineEvent {
     public BPMJobEntityEventProxy(FlowableEntityEvent entityEvent) {
         this.entityEvent = entityEvent;
         this.jobEntity = (JobEntity) entityEvent.getEntity();
+        // FlowableEntityExceptionEventImpl.getEntity().getExceptionMessage() is null after first failure, need to set it manually
+        if (entityEvent instanceof FlowableEntityExceptionEventImpl) {
+            this.jobEntity.setExceptionMessage(((FlowableEntityExceptionEventImpl) entityEvent).getCause().getMessage());
+        }
     }
 
     @Override

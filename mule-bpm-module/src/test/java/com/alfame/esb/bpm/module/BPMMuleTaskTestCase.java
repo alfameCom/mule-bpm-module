@@ -97,15 +97,15 @@ public class BPMMuleTaskTestCase extends BPMAbstractTestCase {
         BPMProcessInstance processInstance = processInstanceBuilder.startProcessInstance();
         Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
 
-        activitySubscription.waitForEvents(2, 30, TimeUnit.SECONDS);
+        activitySubscription.waitForEvents(1, 30, TimeUnit.SECONDS);
 
         Assert.assertEquals("No process ending events should be found",
                 0, processSubscription.eventFinder().events().size());
 
-        Assert.assertEquals("Two failures should be found (one retry)",
-                2, activitySubscription.eventFinder().events().size());
+        Assert.assertEquals("One failures should be found (no retries)",
+                1, activitySubscription.eventFinder().events().size());
 
         Assert.assertTrue("Timeout exception message should be found",
-                activitySubscription.eventFinder().events().get(1).getExceptionMessage().contains("java.util.concurrent.TimeoutException"));
+                activitySubscription.eventFinder().events().get(0).getExceptionMessage().contains("java.util.concurrent.TimeoutException"));
     }
 }
