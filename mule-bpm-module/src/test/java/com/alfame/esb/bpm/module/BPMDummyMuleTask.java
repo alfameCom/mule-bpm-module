@@ -51,6 +51,18 @@ public class BPMDummyMuleTask extends BPMTask {
     }
 
     @Override
+    public String getProcessDefinitionId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getProcessDefinitionKey() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public String getSuperExecutionId() {
         // TODO Auto-generated method stub
         return null;

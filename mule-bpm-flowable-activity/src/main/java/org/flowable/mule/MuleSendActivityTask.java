@@ -50,6 +50,12 @@ public class MuleSendActivityTask extends BPMTask {
     }
 
     @Override
+    public String getProcessDefinitionId() { return this.execution.getProcessDefinitionId(); }
+
+    @Override
+    public String getProcessDefinitionKey() { return this.execution.getProcessDefinitionId().replaceFirst(":.*", ""); }
+
+    @Override
     public String getSuperExecutionId() {
         return this.execution.getSuperExecutionId();
     }

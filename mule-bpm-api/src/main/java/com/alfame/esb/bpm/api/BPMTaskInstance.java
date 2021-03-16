@@ -20,6 +20,16 @@ public interface BPMTaskInstance {
     String getProcessInstanceId();
 
     /**
+     * Gets the definition identifier of this process instance
+     */
+    String getProcessDefinitionId();
+
+    /**
+     * Gets the definition key of this process instance
+     */
+    String getProcessDefinitionKey();
+
+    /**
      * Gets the id of the parent of this execution. If null, the execution
      * represents a process-instance.
      */
