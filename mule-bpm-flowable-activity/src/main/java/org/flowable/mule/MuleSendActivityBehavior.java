@@ -22,6 +22,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.slf4j.Logger;
 
 import java.util.Map;
@@ -42,10 +43,13 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
+    private static final String ERROR_VARIABLE_VALUE_DEFAULT = "muleExceptionMessage";
+
     private Expression endpointUrl;
     private Expression language;
     private Expression payloadExpression;
     private Expression resultVariable;
+    private Expression errorVariable;
     private Expression requestTimeout;
 
     @Override
@@ -54,6 +58,8 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
         String languageValue = this.getStringFromField(this.language, execution, "javascript");
         String payloadExpressionValue = this.getStringFromField(this.payloadExpression, execution);
         String resultVariableValue = this.getStringFromField(this.resultVariable, execution);
+        String errorVariableValue = this.getStringFromField(this.errorVariable, execution);
+        errorVariableValue = (errorVariableValue == null) ? ERROR_VARIABLE_VALUE_DEFAULT : errorVariableValue;
         long requestTimeoutValue = Long.parseLong(this.getStringFromField(this.requestTimeout, execution, "300000"));
         String processDefinitionKey = execution.getProcessDefinitionId().replaceFirst(":.*", "");
         String processInstanceId = execution.getProcessInstanceId();
@@ -112,6 +118,8 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
                             }
                         } else {
                             LOGGER.warn("<<<<< process definition {}: instance {}: activity {}: execution ended with exception {} in {} ms", processDefinitionKey, processInstanceId, currentActivityId, response.getError(), System.currentTimeMillis() - startTime);
+                            LOGGER.debug("<<<<< process definition {}: instance {}: activity {}: execution setting variable {} = {}", processDefinitionKey, processInstanceId, currentActivityId, errorVariableValue, response.getError().getMessage());
+                            execution.setVariable(errorVariableValue, response.getError().getMessage());
                         }
 
                         if (resultVariableValue != null && response.getValue() != null) {
@@ -186,6 +194,14 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
 
     public void setResultVariable(Expression resultVariable) {
         this.resultVariable = resultVariable;
+    }
+
+    public Expression getErrorVariable() {
+        return errorVariable;
+    }
+
+    public void setErrorVariable(Expression errorVariable) {
+        this.errorVariable = errorVariable;
     }
 
     public Expression getLanguage() {
