@@ -35,6 +35,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
     private Expression payloadExpression;
     private Expression resultVariable;
     private Expression requestTimeout;
+    private Expression errorVariable;
 
     @Override
     public void execute(DelegateExecution execution) {
@@ -65,5 +66,9 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
 
     public void setRequestTimeout(Expression requestTimeout) {
         this.requestTimeout = requestTimeout;
+    }
+
+    public void setErrorVariable(Expression errorVariable) {
+        this.errorVariable = errorVariable;
     }
 }
