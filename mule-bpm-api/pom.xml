@@ -14,6 +14,14 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
+    <developers>
+        <developer>
+            <name>Alfame Systems</name>
+            <email>info@alfame.com</email>
+            <organization>Alfame Systems</organization>
+            <organizationUrl>http://alfame.com</organizationUrl>
+        </developer>
+    </developers>
 
     <scm>
         <connection>scm:git:git://github.com/alfameCom/mule-bpm-module.git</connection>
