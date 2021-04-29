@@ -85,4 +85,4 @@ This project uses the following license: [Apache License, Version 2.0](https://w
 
 If you’re experiencing problems or need help, please create a Github Issue.
 
-Regarding consulting or commercial requests, email us at [mule-bpm-module@alfame.com](mule-bpm-module@alfame.com).
+Regarding consulting or commercial requests, email us at [info@alfame.com](info@alfame.com).
