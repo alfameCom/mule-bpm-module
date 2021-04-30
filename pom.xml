@@ -106,7 +106,7 @@
                 <configuration>
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
                 </configuration>
             </plugin>
             <plugin>
@@ -120,6 +120,9 @@
                     <goals>
                       <goal>sign</goal>
                     </goals>
+                    <configuration>
+                        <keyname>0x3EC81202DC4A2D1526EB322DF16BC2D045C9737F</keyname>
+                    </configuration> 
                   </execution>
                 </executions>
               </plugin>
@@ -240,5 +243,9 @@
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+          </repository>
     </distributionManagement>
 </project>
