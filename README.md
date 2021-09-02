@@ -43,7 +43,7 @@ Add this dependency to your application pom.xml:
 <dependency>
 	<groupId>com.alfame.esb.bpm</groupId>
 	<artifactId>mule-bpm-module</artifactId>
-	<version>2.2.2-SNAPSHOT</version>
+	<version>2.2.3-SNAPSHOT</version>
 	<classifier>mule-plugin</classifier>
 </dependency>
 ```
@@ -63,7 +63,7 @@ To install Mule BPM Module, follow these steps:
 ```
 git clone git@github.com:alfameCom/mule-bpm-module.git
 cd mule-bpm-module
-mvn clean install
+mvn clean install -Dgpg.skip
 ```
 
 ## Contributing to Mule BPM Module
