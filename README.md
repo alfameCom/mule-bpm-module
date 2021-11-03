@@ -22,28 +22,13 @@ Before you begin, ensure you have met the following requirements:
 
 To use Mule BPM Module, follow these steps:
 
-Add Maven Central's snapshot repository to your application pom.xml.
-```
-<repository>
-	<id>snapshots-repo</id>
-	<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-	<releases>
-		<enabled>false</enabled>
-	</releases>
-	<snapshots>
-		<enabled>true</enabled>
-	</snapshots>
-</repository>
-```
-
-
 Add this dependency to your application pom.xml:
 
 ```
 <dependency>
 	<groupId>com.alfame.esb.bpm</groupId>
 	<artifactId>mule-bpm-module</artifactId>
-	<version>2.2.2-SNAPSHOT</version>
+	<version>2.2.2</version>
 	<classifier>mule-plugin</classifier>
 </dependency>
 ```
