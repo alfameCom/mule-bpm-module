@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+<mule xmlns:spring="http://www.mulesoft.org/schema/mule/spring"
+      xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
       xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
       xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 			http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 			http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd
 			http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
-            http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+            http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd">
 
     <configuration-properties
             file="mule-artifact.properties"/>
     <bpm:config name="BPM_Config" doc:name="BPM Config"
                 doc:id="69a5b251-f382-4521-80ce-6161ba2ca84b"
                 tenantId="com.alfame.esb.bpm.examples">
-        <bpm:definitions>
+		<bpm:data-source >
+			<bpm:data-source-reference dataSourceRef="bpmDataSource" type="HSQL" />
+		</bpm:data-source>
+		<bpm:definitions>
             <bpm:classpath-definition resourceClasspath="processes/invoiceRetriever.bpmn20.xml"/>
             <bpm:classpath-definition resourceClasspath="processes/paymentRetriever.bpmn20.xml"/>
             <bpm:classpath-definition resourceClasspath="processes/transactionFiler.bpmn20.xml"/>
@@ -40,7 +44,8 @@
                         port="TransactionServiceSOAP"
                         address="http://localhost:${TARGET_TRANSACTION_HTTP_PORT}/TransactionContract/TransactionServiceSOAP"/>
     </wsc:config>
-    <flow name="retrieveInvoicesTaskFlow" doc:id="88668ff9-6faf-4e8b-a765-c04b8919e024">
+    <spring:config name="Spring_Config" doc:name="Spring Config" doc:id="6abdbe38-c657-43eb-adf7-4a19560fcb02" files="spring-beans.xml" />
+	<flow name="retrieveInvoicesTaskFlow" doc:id="88668ff9-6faf-4e8b-a765-c04b8919e024">
         <bpm:task-listener config-ref="BPM_Config" doc:name="Task listener"
                            doc:id="e867459a-7f86-4402-a8a9-6122d241ff51" endpointUrl="bpm://retrieve.invoices"/>
         <sftp:list config-ref="Invoice_SFTP_Config" doc:name="List" doc:id="890fab6d-f30f-4290-af92-626a5e8693dd"
