@@ -6,11 +6,11 @@
 
     <bpm:config name="engineConfig" tenantId="com.alfame.esb">
         <bpm:data-source>
-            <bpm:generic-data-source driverClassName="org.h2.Driver"
-                                     jdbcUrl="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1"
+            <bpm:generic-data-source driverClassName="org.hsqldb.jdbcDriver"
+                                     jdbcUrl="jdbc:hsqldb:mem:flowable"
                                      username="sa"
                                      password="sa"
-                                     type="H2"/>
+                                     type="HSQL"/>
         </bpm:data-source>
         <bpm:definitions>
             <bpm:classpath-definition resourceClasspath="processes/AttachmentHandler.bpmn20.xml"/>

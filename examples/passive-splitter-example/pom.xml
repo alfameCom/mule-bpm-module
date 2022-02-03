@@ -87,9 +87,9 @@
 			<version>6.6.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>2.1.210</version>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>

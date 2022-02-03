@@ -44,7 +44,7 @@
         <mule.api.version>1.2.0</mule.api.version>
         <flowable.version>6.6.0</flowable.version>
         <hikari.version>3.4.5</hikari.version>
-        <h2.version>2.1.210</h2.version>
+        <hsql.version>2.5.1</hsql.version>
         <flyway.version>6.5.7</flyway.version>
         <commons.logging.version>1.2</commons.logging.version>
 
@@ -202,9 +202,9 @@
                 <version>${flyway.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${h2.version}</version>
+                <groupId>org.hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>${hsql.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
