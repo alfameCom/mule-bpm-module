@@ -49,7 +49,7 @@
         <commons.logging.version>1.2</commons.logging.version>
 
         <sonar.projectKey>alfameCom_mule-bpm-module</sonar.projectKey>
-        <sonar.moduleKey>${artifactId}</sonar.moduleKey>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.organization>alfamecom</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.login>N/A</sonar.login>
@@ -87,6 +87,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
                 <configuration>
                     <fileSets>
                         <fileSet>
@@ -217,24 +218,24 @@
         <repository>
             <id>mulesoft-releases</id>
             <name>MuleSoft Releases Repository</name>
-            <url>http://repository.mulesoft.org/releases/</url>
+            <url>https://repository.mulesoft.org/releases/</url>
         </repository>
         <repository>
             <id>mulesoft-snapshots</id>
             <name>MuleSoft Snapshots Repository</name>
-            <url>http://repository.mulesoft.org/snapshots/</url>
+            <url>https://repository.mulesoft.org/snapshots/</url>
         </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
             <id>mulesoft-releases</id>
             <name>MuleSoft Releases</name>
-            <url>http://repository.mulesoft.org/releases/</url>
+            <url>https://repository.mulesoft.org/releases/</url>
         </pluginRepository>
         <pluginRepository>
             <id>mulesoft-snapshots</id>
             <name>MuleSoft Snapshots</name>
-            <url>http://repository.mulesoft.org/snapshots/</url>
+            <url>https://repository.mulesoft.org/snapshots/</url>
         </pluginRepository>
     </pluginRepositories>
 
