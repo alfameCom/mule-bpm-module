@@ -8,7 +8,7 @@ import com.alfame.esb.bpm.module.internal.listener.BPMTaskListener;
 import com.alfame.esb.bpm.module.internal.operations.BPMAttachmentOperations;
 import com.alfame.esb.bpm.module.internal.operations.BPMEventSubscriptionOperations;
 import com.alfame.esb.bpm.module.internal.operations.BPMProcessFactoryOperations;
-import com.alfame.esb.bpm.module.internal.operations.BPMProcessOperations;
+import com.alfame.esb.bpm.module.internal.operations.BPMProcessInstanceOperations;
 import com.alfame.esb.bpm.module.internal.operations.BPMProcessVariableOperations;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -57,7 +57,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Extension(name = "BPM", vendor = "Alfame Systems")
 @Sources(BPMTaskListener.class)
 @ConnectionProviders(BPMConnectionProvider.class)
-@Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class, BPMAttachmentOperations.class, BPMProcessOperations.class})
+@Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class, BPMAttachmentOperations.class, BPMProcessInstanceOperations.class})
 @SubTypeMapping(baseType = BPMDefinition.class,
         subTypes = {BPMClasspathDefinition.class, BPMStreamDefinition.class})
 @SubTypeMapping(baseType = BPMDataSource.class,
