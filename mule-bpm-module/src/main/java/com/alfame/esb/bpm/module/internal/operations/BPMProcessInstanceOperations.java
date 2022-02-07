@@ -44,7 +44,7 @@ public class BPMProcessInstanceOperations {
             for (BPMProcessInstanceFilter processInstanceFilter : processInstanceFilters) {
                 if (processInstanceFilter instanceof BPMProcessInstanceBusinessKeyLikeFilter) {
                     BPMProcessInstanceBusinessKeyLikeFilter businessKeyLikeFilter = (BPMProcessInstanceBusinessKeyLikeFilter) processInstanceFilter;
-
+                    LOGGER.debug("Filtering instances business keys like: {}", businessKeyLikeFilter.getBusinessKeyLike());
                 } else if (processInstanceFilter instanceof BPMProcessInstanceEndedAfterFilter) {
                     BPMProcessInstanceEndedAfterFilter endedAfterFilter = (BPMProcessInstanceEndedAfterFilter) processInstanceFilter;
                     LOGGER.debug("Filtering instances ended after: {}", endedAfterFilter.getEndedAfter());
@@ -67,8 +67,9 @@ public class BPMProcessInstanceOperations {
                     BPMProcessInstanceTenantFilter tenantFilter = (BPMProcessInstanceTenantFilter) processInstanceFilter;
                     LOGGER.debug("Filtering instances with tenant id: {}", tenantFilter.getTenantId());
                 } else if (processInstanceFilter instanceof BPMProcessInstanceUnfinishedFilter) {
-                    BPMProcessInstanceUnfinishedFilter unfinishedFilter = (BPMProcessInstanceUnfinishedFilter) processInstanceFilter;
-                    LOGGER.debug("Filtering instances with unfinished status: {}", unfinishedFilter.isUnfinished());
+                    LOGGER.debug("Filtering unfinished instances");
+                } else if (processInstanceFilter instanceof BPMProcessInstanceFinishedFilter) {
+                    LOGGER.debug("Filtering finished instances");
                 } else if (processInstanceFilter instanceof BPMProcessInstanceVariableLikeFilter) {
                     BPMProcessInstanceVariableLikeFilter variableLikeFilter = (BPMProcessInstanceVariableLikeFilter) processInstanceFilter;
                     if (variableLikeFilter.getValueLike() != null) {
