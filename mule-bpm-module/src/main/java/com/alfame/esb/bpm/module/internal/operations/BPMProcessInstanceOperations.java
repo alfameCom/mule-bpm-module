@@ -45,12 +45,12 @@ public class BPMProcessInstanceOperations {
                 if (processInstanceFilter instanceof BPMProcessInstanceBusinessKeyLikeFilter) {
                     BPMProcessInstanceBusinessKeyLikeFilter businessKeyLikeFilter = (BPMProcessInstanceBusinessKeyLikeFilter) processInstanceFilter;
                     LOGGER.debug("Filtering instances business keys like: {}", businessKeyLikeFilter.getBusinessKeyLike());
-                } else if (processInstanceFilter instanceof BPMProcessInstanceEndedAfterFilter) {
-                    BPMProcessInstanceEndedAfterFilter endedAfterFilter = (BPMProcessInstanceEndedAfterFilter) processInstanceFilter;
-                    LOGGER.debug("Filtering instances ended after: {}", endedAfterFilter.getEndedAfter());
-                } else if (processInstanceFilter instanceof BPMProcessInstanceEndedBeforeFilter) {
-                    BPMProcessInstanceEndedBeforeFilter endedBeforeFilter = (BPMProcessInstanceEndedBeforeFilter) processInstanceFilter;
-                    LOGGER.debug("Filtering instances before after: {}", endedBeforeFilter.getEndedBefore());
+                } else if (processInstanceFilter instanceof BPMProcessInstanceFinishedAfterFilter) {
+                    BPMProcessInstanceFinishedAfterFilter finishedAfterFilter = (BPMProcessInstanceFinishedAfterFilter) processInstanceFilter;
+                    LOGGER.debug("Filtering instances finished after: {}", finishedAfterFilter.getFinishedAfter());
+                } else if (processInstanceFilter instanceof BPMProcessInstanceFinishedBeforeFilter) {
+                    BPMProcessInstanceFinishedBeforeFilter finishedBeforeFilter = (BPMProcessInstanceFinishedBeforeFilter) processInstanceFilter;
+                    LOGGER.debug("Filtering instances finished before: {}", finishedBeforeFilter.getFinishedBefore());
                 } else if (processInstanceFilter instanceof BPMProcessInstanceProcessDefinitionFilter) {
                     BPMProcessInstanceProcessDefinitionFilter definitionFilter = (BPMProcessInstanceProcessDefinitionFilter) processInstanceFilter;
                     LOGGER.debug("Filtering instances with definition key: {}", definitionFilter.getKey());
