@@ -19,6 +19,11 @@ public class BPMEventSubscriptionOutputMetadataResolver extends OutputStaticType
     }
 
     @Override
+    public String getResolverName() {
+        return "BPMEventSubscriptionOutputMetadataResolver";
+    }
+
+    @Override
     public MetadataType getStaticMetadata() {
         return METADATA_TYPE;
     }
