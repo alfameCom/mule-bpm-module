@@ -11,8 +11,8 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.slf4j.Logger;
 
-public class BPMProcessOperations {
-    private static final Logger LOGGER = getLogger(BPMProcessOperations.class);
+public class BPMProcessInstanceOperations {
+    private static final Logger LOGGER = getLogger(BPMProcessInstanceOperations.class);
 
     @Alias("delete-process-instance")
     public void deleteProcessInstance(
