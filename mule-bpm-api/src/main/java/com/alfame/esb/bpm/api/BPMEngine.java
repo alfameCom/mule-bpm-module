@@ -19,5 +19,5 @@ public interface BPMEngine {
     InputStream getAttachmentContent(String attachmentId);
 
     void triggerSignal(String executionId, String signalName);
-
+    void deleteProcessInstance(String processInstanceId, String deleteReason);
 }

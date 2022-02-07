@@ -8,8 +8,10 @@ import com.alfame.esb.bpm.module.internal.listener.BPMTaskListener;
 import com.alfame.esb.bpm.module.internal.operations.BPMAttachmentOperations;
 import com.alfame.esb.bpm.module.internal.operations.BPMEventSubscriptionOperations;
 import com.alfame.esb.bpm.module.internal.operations.BPMProcessFactoryOperations;
+import com.alfame.esb.bpm.module.internal.operations.BPMProcessOperations;
 import com.alfame.esb.bpm.module.internal.operations.BPMProcessVariableOperations;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngine;
@@ -55,7 +57,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Extension(name = "BPM", vendor = "Alfame Systems")
 @Sources(BPMTaskListener.class)
 @ConnectionProviders(BPMConnectionProvider.class)
-@Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class, BPMAttachmentOperations.class})
+@Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class, BPMAttachmentOperations.class, BPMProcessOperations.class})
 @SubTypeMapping(baseType = BPMDefinition.class,
         subTypes = {BPMClasspathDefinition.class, BPMStreamDefinition.class})
 @SubTypeMapping(baseType = BPMDataSource.class,
@@ -282,6 +284,15 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
 
         deploymentBuilder.tenantId(tenantId).deploy();
         LOGGER.debug("{} made deployment for tenant {}", this.name, tenantId);
+    }
+
+    @Override
+    public void deleteProcessInstance(String processInstanceId, String deleteReason) {
+        try { 
+            this.getRuntimeService().deleteProcessInstance(processInstanceId, deleteReason);
+        } catch(FlowableObjectNotFoundException exception) {
+            LOGGER.warn("Failed to delete process with id {}", processInstanceId);
+        } 
     }
 
 }
