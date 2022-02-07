@@ -1,6 +1,7 @@
 package com.alfame.esb.bpm.module.internal.operations;
 
 import com.alfame.esb.bpm.api.BPMProcessInstance;
+import com.alfame.esb.bpm.api.BPMProcessInstanceQuery;
 import com.alfame.esb.bpm.module.api.config.*;
 import com.alfame.esb.bpm.module.internal.BPMExtension;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -30,15 +31,14 @@ public class BPMProcessInstanceOperations {
         LOGGER.debug("Trying to delete process instance id {} with reason {}", processInstanceId, deleteReason);
     }
 
-
-    @Alias("get-process-instances")
+    @Alias("process-instance-query-builder")
     @MediaType(value = MediaType.ANY, strict = false)
-    @OutputResolver(output = BPMProcessInstanceOutputMetadataResolver.class)
-    public List<BPMProcessInstance> fetchProcessInstances(
+    @OutputResolver(output = BPMProcessInstanceQueryOutputMetadataResolver.class)
+    public BPMProcessInstanceQuery buildProcessInstanceQuery(
             @Config BPMExtension engine,
             @Optional @Alias("process-instance-filters") List<BPMProcessInstanceFilter> processInstanceFilters) throws InterruptedException {
 
-        LOGGER.debug("Fetching process instances");
+        LOGGER.debug("Creating query for process instances");
 
         if (processInstanceFilters != null && processInstanceFilters.size() > 0) {
             for (BPMProcessInstanceFilter processInstanceFilter : processInstanceFilters) {
@@ -82,6 +82,30 @@ public class BPMProcessInstanceOperations {
                 }
             }
         }
+
+        return null;
+    }
+
+    @Alias("get-process-instances")
+    @MediaType(value = MediaType.ANY, strict = false)
+    @OutputResolver(output = BPMProcessInstanceOutputMetadataResolver.class)
+    public List<BPMProcessInstance> fetchProcessInstances(
+            @Config BPMExtension engine,
+            @Alias("query") BPMProcessInstanceQuery processInstanceQuery) throws InterruptedException {
+
+        LOGGER.debug("Fetching process instances");
+
+        return null;
+    }
+
+    @Alias("get-unique-process-instance")
+    @MediaType(value = MediaType.ANY, strict = false)
+    @OutputResolver(output = BPMProcessInstanceOutputMetadataResolver.class)
+    public BPMProcessInstance fetchUniqueProcessInstance(
+            @Config BPMExtension engine,
+            @Alias("query") BPMProcessInstanceQuery processInstanceQuery) throws InterruptedException {
+
+        LOGGER.debug("Fetching unique process instance");
 
         return null;
     }
