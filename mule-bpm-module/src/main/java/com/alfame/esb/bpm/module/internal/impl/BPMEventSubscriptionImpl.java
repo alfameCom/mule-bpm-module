@@ -79,11 +79,11 @@ public class BPMEventSubscriptionImpl implements BPMEngineEventSubscription {
             this.cacheLock.lock();
             if (this.cachedEvents != null) {
                 this.cachedEvents.add(engineEvent);
-                LOGGER.trace("Added event {} for process instance {}", engineEvent.getEventType(), engineEvent.getProcessInstanceId());
+                LOGGER.debug("Cached event {} for process instance {} activity {}", engineEvent.getEventType(), engineEvent.getProcessInstanceId(), engineEvent.getActivityName());
 
                 if (this.countDownLatch != null) {
                     this.countDownLatch.countDown();
-                    LOGGER.debug("Received awaited event {} for process instance {}", engineEvent.getEventType(), engineEvent.getProcessInstanceId());
+                    LOGGER.debug("Received awaited event {} for process instance {} activity {}", engineEvent.getEventType(), engineEvent.getProcessInstanceId(), engineEvent.getActivityName());
                 }
             }
         } finally {
