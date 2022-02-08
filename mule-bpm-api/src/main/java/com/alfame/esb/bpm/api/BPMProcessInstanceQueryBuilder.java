@@ -9,7 +9,7 @@ public abstract class BPMProcessInstanceQueryBuilder {
     protected String processDefinitionKey;
     protected String tenantId;
     protected String uniqueBusinessKeyLike;
-    protected String processInstanceName;
+    protected String processInstanceNameLike;
     protected Map<String, String> variablesLike = new HashMap<>();
 
     public BPMProcessInstanceQueryBuilder tenantId(String tenantId) {
@@ -32,8 +32,8 @@ public abstract class BPMProcessInstanceQueryBuilder {
         return this;
     }
 
-    public BPMProcessInstanceQueryBuilder processInstanceName(String processInstanceName) {
-        this.processInstanceName = processInstanceName;
+    public BPMProcessInstanceQueryBuilder processInstanceNameLike(String processInstanceNameLike) {
+        this.processInstanceNameLike = processInstanceNameLike;
         return this;
     }
 

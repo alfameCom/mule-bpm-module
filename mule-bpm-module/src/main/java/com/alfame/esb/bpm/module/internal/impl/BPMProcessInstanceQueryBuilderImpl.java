@@ -37,6 +37,11 @@ public class BPMProcessInstanceQueryBuilderImpl extends BPMProcessInstanceQueryB
             LOGGER.debug("Adding filter criteria for uniqueBusinessKeyLike: {}", this.uniqueBusinessKeyLike);
         }
 
+        if (this.processInstanceNameLike != null) {
+            query.processInstanceNameLike(this.processInstanceNameLike);
+            LOGGER.debug("Adding filter criteria for processInstanceNameLike: {}", this.processInstanceNameLike);
+        }
+
         if (this.tenantId != null) {
             query.processInstanceTenantId(this.tenantId);
             LOGGER.debug("Adding filter criteria for tenantId: {}", this.tenantId);

@@ -189,6 +189,48 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
     }
 
     @Test
+    public void testQueryByNameLikeFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMEngineEventSubscription activitySubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.ACTIVITY_STARTED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+        BPMEngineEventSubscription endSubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+
+        BPMProcessInstanceBuilder instanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("signalSleeperProcess")
+                .processInstanceName("superior100");
+        Assert.assertNotNull("Process instance builder should not be NULL", instanceBuilder);
+
+        BPMProcessInstance startedInstance = instanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", startedInstance);
+
+        activitySubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+
+        engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
+
+        List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+
+        BPMProcessInstanceQuery existingNameQuery = engine.processInstanceQueryBuilder()
+                .processInstanceNameLike("%superior%")
+                .processInstanceId(startedInstance.getProcessInstanceId())
+                .buildProcessInstanceQuery();
+        BPMProcessInstance existingNameInstance = existingNameQuery.uniqueInstance();
+        Assert.assertNotNull("Ended instance with superior name must be found", existingNameInstance);
+
+        BPMProcessInstanceQuery nonExistingNameQuery = engine.processInstanceQueryBuilder()
+                .processInstanceNameLike("%lesser%")
+                .processInstanceId(startedInstance.getProcessInstanceId())
+                .buildProcessInstanceQuery();
+        BPMProcessInstance nonExistingNameInstance = nonExistingNameQuery.uniqueInstance();
+        Assert.assertNull("Ended instance with lesser name must NOT be found", nonExistingNameInstance);
+    }
+
+    @Test
     public void testQueryByVariableLikeFlow() throws Exception {
         BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
         Assert.assertNotNull("Engine should not be NULL", engine);
