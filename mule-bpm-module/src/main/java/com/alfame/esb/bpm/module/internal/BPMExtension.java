@@ -214,6 +214,11 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     }
 
     @Override
+    public BPMProcessInstanceQueryBuilder processInstanceQueryBuilder() {
+        return new BPMProcessInstanceQueryBuilderImpl(this, this.getHistoryService());
+    }
+
+    @Override
     public BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder() {
         return new BPMEventSubscriptionBuilderImpl(this, this.getRuntimeService());
     }

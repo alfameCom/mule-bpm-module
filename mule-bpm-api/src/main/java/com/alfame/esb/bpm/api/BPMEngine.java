@@ -9,6 +9,8 @@ public interface BPMEngine {
 
     BPMProcessInstanceBuilder processInstanceBuilder();
 
+    BPMProcessInstanceQueryBuilder processInstanceQueryBuilder();
+
     BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder();
 
     BPMVariableInstance getVariableInstance(String executionId, String variableName);
