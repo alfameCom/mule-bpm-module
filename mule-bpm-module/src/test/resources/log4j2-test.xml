@@ -25,6 +25,7 @@
         <AsyncLogger name="org.flowable.mule" level="DEBUG"/>
         <AsyncLogger name="com.alfame.esb.bpm.module.internal.impl.BPMEventSubscriptionBuilderImpl" level="DEBUG"/>
         <AsyncLogger name="com.alfame.esb.bpm.module.internal.impl.BPMEventSubscriptionImpl" level="DEBUG"/>
+        <AsyncLogger name="com.alfame.esb.bpm.module.internal.impl.BPMProcessInstanceQueryBuilderImpl" level="DEBUG"/>
 
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>

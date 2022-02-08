@@ -66,6 +66,8 @@ import static org.slf4j.LoggerFactory.getLogger;
         subTypes = {BPMDefaultAsyncExecutorFactory.class})
 @SubTypeMapping(baseType = BPMEventSubscriptionFilter.class,
         subTypes = {BPMEventSubscriptionProcessDefinitionFilter.class, BPMEventSubscriptionProcessInstanceFilter.class, BPMEventSubscriptionEventTypeFilter.class, BPMEventSubscriptionVariableFilter.class})
+@SubTypeMapping(baseType = BPMProcessInstanceFilter.class,
+        subTypes = {BPMProcessInstanceProcessDefinitionFilter.class, BPMProcessInstanceBusinessKeyLikeFilter.class, BPMProcessInstanceProcessNameLikeFilter.class, BPMProcessInstanceTenantFilter.class, BPMProcessInstanceVariableLikeFilter.class, BPMProcessInstanceStartedAfterFilter.class, BPMProcessInstanceStartedBeforeFilter.class, BPMProcessInstanceFinishedAfterFilter.class, BPMProcessInstanceFinishedBeforeFilter.class, BPMProcessInstanceUnfinishedFilter.class, BPMProcessInstanceFinishedFilter.class})
 @SubTypeMapping(baseType = BPMAttachmentFilter.class,
         subTypes = {BPMAttachmentNameFilter.class})
 @ExternalLib(name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.6.0", requiredClassName = "org.flowable.engine.RuntimeService")
@@ -209,6 +211,11 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     @Override
     public BPMProcessInstanceBuilder processInstanceBuilder() {
         return new BPMProcessInstanceBuilderImpl(this, this.getRuntimeService(), this.getHistoryService());
+    }
+
+    @Override
+    public BPMProcessInstanceQueryBuilder processInstanceQueryBuilder() {
+        return new BPMProcessInstanceQueryBuilderImpl(this, this.getHistoryService());
     }
 
     @Override

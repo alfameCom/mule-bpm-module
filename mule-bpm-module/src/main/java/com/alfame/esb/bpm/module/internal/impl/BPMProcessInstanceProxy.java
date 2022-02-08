@@ -5,7 +5,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 
 import java.util.Date;
 
-public class BPMProcessInstanceProxy implements BPMProcessInstance {
+public class BPMProcessInstanceProxy extends BPMProcessInstance {
 
     private final ProcessInstance processInstance;
 

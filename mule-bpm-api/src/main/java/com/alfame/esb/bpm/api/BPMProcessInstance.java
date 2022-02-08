@@ -1,79 +1,87 @@
 package com.alfame.esb.bpm.api;
 
+import java.text.MessageFormat;
 import java.util.Date;
 
-public interface BPMProcessInstance {
+public abstract class BPMProcessInstance {
 
     /**
      * The id of the process definition of the process instance.
      */
-    String getProcessDefinitionId();
+    public abstract String getProcessDefinitionId();
 
     /**
      * The name of the process definition of the process instance.
      */
-    String getProcessDefinitionName();
+    public abstract String getProcessDefinitionName();
 
     /**
      * The key of the process definition of the process instance.
      */
-    String getProcessDefinitionKey();
+    public abstract String getProcessDefinitionKey();
 
     /**
      * The version of the process definition of the process instance.
      */
-    Integer getProcessDefinitionVersion();
+    public abstract Integer getProcessDefinitionVersion();
 
     /**
      * The deployment id of the process definition of the process instance.
      */
-    String getDeploymentId();
+    public abstract String getDeploymentId();
 
     /**
      * Returns the id of the activity where the execution currently is at. Returns
      * null if the execution is not a 'leaf' execution (eg concurrent parent).
      */
-    String getCurrentActivityId();
+    public abstract String getCurrentActivityId();
 
     /**
      * Id of the root of the execution tree representing the process instance.
      */
-    String getProcessInstanceId();
+    public abstract String getProcessInstanceId();
 
     /**
      * Gets the id of the parent of this execution. If null, the execution
      * represents a process-instance.
      */
-    String getParentId();
+    public abstract String getParentId();
 
     /**
      * Gets the id of the super execution of this execution.
      */
-    String getSuperExecutionId();
+    public abstract String getSuperExecutionId();
 
     /**
      * The tenant identifier of this process instance
      */
-    String getTenantId();
+    public abstract String getTenantId();
 
     /**
      * The business key of this process instance.
      */
-    String getBusinessKey();
+    public abstract String getBusinessKey();
 
     /**
      * Returns the name of this process instance.
      */
-    String getName();
+    public abstract String getName();
 
     /**
      * Returns the start time of this process instance.
      */
-    Date getStartTime();
+    public abstract Date getStartTime();
 
     /**
      * Returns the end time of this process instance.
      */
-    Date getEndTime();
+    public abstract Date getEndTime();
+
+    @Override
+    public String toString() {
+        return MessageFormat.format(
+                "[processDefinitionKey: {0}, processInstanceId: {1}, businessKey: {2}]",
+                getProcessDefinitionKey(), getProcessInstanceId(), getBusinessKey());
+    }
 
 }

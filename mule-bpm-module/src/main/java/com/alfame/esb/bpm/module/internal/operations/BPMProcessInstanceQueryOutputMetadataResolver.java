@@ -1,17 +1,18 @@
 package com.alfame.esb.bpm.module.internal.operations;
 
 import com.alfame.esb.bpm.api.BPMEngineEventSubscription;
+import com.alfame.esb.bpm.api.BPMProcessInstanceQuery;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.metadata.resolving.OutputStaticTypeResolver;
 
-public class BPMEventSubscriptionOutputMetadataResolver extends OutputStaticTypeResolver {
+public class BPMProcessInstanceQueryOutputMetadataResolver extends OutputStaticTypeResolver {
 
     private static MetadataType loadMetadataType(Class<?> classType) {
         return new JavaTypeLoader(ClassLoader.getSystemClassLoader()).load(classType);
     }
 
-    private static final MetadataType METADATA_TYPE = loadMetadataType(BPMEngineEventSubscription.class);
+    private static final MetadataType METADATA_TYPE = loadMetadataType(BPMProcessInstanceQuery.class);
 
     @Override
     public String getCategoryName() {
@@ -20,7 +21,7 @@ public class BPMEventSubscriptionOutputMetadataResolver extends OutputStaticType
 
     @Override
     public String getResolverName() {
-        return "BPMEventSubscriptionOutputMetadataResolver";
+        return "BPMProcessInstanceQueryOutputMetadataResolver";
     }
 
     @Override
