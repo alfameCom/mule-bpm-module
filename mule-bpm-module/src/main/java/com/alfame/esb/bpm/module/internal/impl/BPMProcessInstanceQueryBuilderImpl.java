@@ -80,6 +80,16 @@ public class BPMProcessInstanceQueryBuilderImpl extends BPMProcessInstanceQueryB
             }
         }
 
+        if (this.onlyFinished) {
+            query.finished();
+            LOGGER.debug("Adding filter criteria for finished instances only");
+        }
+
+        if (this.onlyUnfinished) {
+            query.unfinished();
+            LOGGER.debug("Adding filter criteria for unfinished instances only");
+        }
+
         return new BPMProcessInstanceQueryImpl(engine, query);
     }
 

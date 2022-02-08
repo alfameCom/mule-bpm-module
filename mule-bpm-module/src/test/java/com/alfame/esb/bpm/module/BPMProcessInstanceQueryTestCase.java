@@ -322,4 +322,61 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         Assert.assertNotNull("Ended instance must be ended", historicInstance.getEndTime());
     }
 
+    @Test
+    public void testQueryByRunningStatusFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMEngineEventSubscription activitySubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.ACTIVITY_STARTED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+        BPMEngineEventSubscription endSubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+
+        BPMProcessInstanceBuilder instanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("signalSleeperProcess");
+        Assert.assertNotNull("Process instance builder should not be NULL", instanceBuilder);
+
+        BPMProcessInstance startedInstance = instanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", startedInstance);
+
+        BPMProcessInstanceQuery runningUnfinishedQuery = engine.processInstanceQueryBuilder()
+                .processInstanceId(startedInstance.getProcessInstanceId())
+                .onlyUnfinished(true)
+                .buildProcessInstanceQuery();
+        BPMProcessInstance runningUnfinishedInstance = runningUnfinishedQuery.uniqueInstance();
+        Assert.assertNotNull("Running unfinished instance must be found", runningUnfinishedInstance);
+        Assert.assertNull("Running unfinished instance must be actually running", runningUnfinishedInstance.getEndTime());
+
+        BPMProcessInstanceQuery runningFinishedQuery = engine.processInstanceQueryBuilder()
+                .processInstanceId(startedInstance.getProcessInstanceId())
+                .onlyFinished(true)
+                .buildProcessInstanceQuery();
+        BPMProcessInstance runningFinishedInstance = runningFinishedQuery.uniqueInstance();
+        Assert.assertNull("Running finished instance must NOT be found", runningFinishedInstance);
+
+        activitySubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+
+        engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
+
+        List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+
+        BPMProcessInstanceQuery historicUnfinishedQuery = engine.processInstanceQueryBuilder()
+                .processInstanceId(startedInstance.getProcessInstanceId())
+                .onlyUnfinished(true)
+                .buildProcessInstanceQuery();
+        BPMProcessInstance historicUnfinishedInstance = historicUnfinishedQuery.uniqueInstance();
+        Assert.assertNull("Historic unfinished instance must NOT be found", historicUnfinishedInstance);
+
+        BPMProcessInstanceQuery historicFinishedQuery = engine.processInstanceQueryBuilder()
+                .processInstanceId(startedInstance.getProcessInstanceId())
+                .onlyFinished(true)
+                .buildProcessInstanceQuery();
+        BPMProcessInstance historicFinishedInstance = historicFinishedQuery.uniqueInstance();
+        Assert.assertNotNull("Historic finished instance must be found", historicFinishedInstance);
+        Assert.assertNotNull("Historic finished instance must have end date", historicFinishedInstance.getEndTime());
+    }
+
 }
