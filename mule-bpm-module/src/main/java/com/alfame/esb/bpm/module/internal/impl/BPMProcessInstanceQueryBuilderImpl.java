@@ -24,6 +24,12 @@ public class BPMProcessInstanceQueryBuilderImpl extends BPMProcessInstanceQueryB
     @Override
     public BPMProcessInstanceQuery buildProcessInstanceQuery() {
         HistoricProcessInstanceQuery query = this.historyService.createHistoricProcessInstanceQuery();
+
+        if (this.processInstanceId != null) {
+            query.processInstanceId(this.processInstanceId);
+            LOGGER.debug("Adding filter criteria for processInstanceId: {}", this.processInstanceId);
+        }
+
         return new BPMProcessInstanceQueryImpl(engine, query);
     }
 

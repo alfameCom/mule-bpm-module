@@ -5,6 +5,7 @@ import java.util.Map;
 
 public abstract class BPMProcessInstanceQueryBuilder {
 
+    protected String processInstanceId;
     protected String processDefinitionKey;
     protected String tenantId;
     protected String uniqueBusinessKey;
@@ -14,6 +15,11 @@ public abstract class BPMProcessInstanceQueryBuilder {
 
     public BPMProcessInstanceQueryBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
+        return this;
+    }
+
+    public BPMProcessInstanceQueryBuilder processInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
         return this;
     }
 
