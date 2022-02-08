@@ -59,8 +59,8 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
                 historicInstance = instance;
             }
         }
-        Assert.assertNotNull("Running instance must be found", historicInstance);
-        Assert.assertNotNull("Running instance must be ended", historicInstance.getEndTime());
+        Assert.assertNotNull("Ended instance must be found", historicInstance);
+        Assert.assertNotNull("Ended instance must be ended", historicInstance.getEndTime());
     }
 
     @Test
@@ -100,8 +100,8 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
                 .processInstanceId(startedInstance.getProcessInstanceId())
                 .buildProcessInstanceQuery();
         BPMProcessInstance historicInstance = historicQuery.uniqueInstance();
-        Assert.assertNotNull("Running instance must be found", historicInstance);
-        Assert.assertNotNull("Running instance must be ended", historicInstance.getEndTime());
+        Assert.assertNotNull("Ended instance must be found", historicInstance);
+        Assert.assertNotNull("Ended instance must be ended", historicInstance.getEndTime());
     }
 
     @Test
@@ -142,8 +142,48 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
                 .uniqueBusinessKeyLike("bond%")
                 .buildProcessInstanceQuery();
         BPMProcessInstance historicInstance = historicQuery.uniqueInstance();
-        Assert.assertNotNull("Running instance must be found", historicInstance);
-        Assert.assertNotNull("Running instance must be ended", historicInstance.getEndTime());
+        Assert.assertNotNull("Ended instance must be found", historicInstance);
+        Assert.assertNotNull("Ended instance must be ended", historicInstance.getEndTime());
+    }
+
+    @Test
+    public void testQueryByTenantIdFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMEngineEventSubscription activitySubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.ACTIVITY_STARTED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+        BPMEngineEventSubscription endSubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+
+        BPMProcessInstanceBuilder instanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("signalSleeperProcess")
+                .tenantId("com.alfame.esb");
+        Assert.assertNotNull("Process instance builder should not be NULL", instanceBuilder);
+
+        BPMProcessInstance startedInstance = instanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", startedInstance);
+
+        activitySubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+
+        engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
+
+        List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+
+        BPMProcessInstanceQuery defaultTenantQuery = engine.processInstanceQueryBuilder()
+                .tenantId("com.alfame.esb")
+                .buildProcessInstanceQuery();
+        BPMProcessInstance defaultTenantInstance = defaultTenantQuery.uniqueInstance();
+        Assert.assertNotNull("Ended instance must be found with default tenant", defaultTenantInstance);
+
+        BPMProcessInstanceQuery nonExistingTenantQuery = engine.processInstanceQueryBuilder()
+                .tenantId("non-existing")
+                .buildProcessInstanceQuery();
+        BPMProcessInstance nonExistingTenantInstance = nonExistingTenantQuery.uniqueInstance();
+        Assert.assertNull("Ended instance must NOT be found with non-existing tenant", nonExistingTenantInstance);
     }
 
 }
