@@ -11,7 +11,6 @@ public abstract class BPMProcessInstanceQueryBuilder {
     protected String uniqueBusinessKeyLike;
     protected String processInstanceName;
     protected Map<String, String> variablesLike = new HashMap<>();
-    protected boolean returnCollidedInstance;
 
     public BPMProcessInstanceQueryBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
@@ -45,11 +44,6 @@ public abstract class BPMProcessInstanceQueryBuilder {
 
     public BPMProcessInstanceQueryBuilder variableWithValueLike(String variableName, String value) {
         this.variablesLike.put(variableName, value);
-        return this;
-    }
-
-    public BPMProcessInstanceQueryBuilder returnCollidedInstance(boolean returnCollidedInstance) {
-        this.returnCollidedInstance = returnCollidedInstance;
         return this;
     }
 
