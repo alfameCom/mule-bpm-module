@@ -1,5 +1,6 @@
 package com.alfame.esb.bpm.api;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,10 @@ public abstract class BPMProcessInstanceQueryBuilder {
     protected String tenantId;
     protected String uniqueBusinessKeyLike;
     protected String processInstanceNameLike;
+    protected Date startedAfter;
+    protected Date startedBefore;
+    protected Date finishedAfter;
+    protected Date finishedBefore;
     protected Map<String, String> variablesLike = new HashMap<>();
 
     public BPMProcessInstanceQueryBuilder tenantId(String tenantId) {
@@ -34,6 +39,26 @@ public abstract class BPMProcessInstanceQueryBuilder {
 
     public BPMProcessInstanceQueryBuilder processInstanceNameLike(String processInstanceNameLike) {
         this.processInstanceNameLike = processInstanceNameLike;
+        return this;
+    }
+
+    public BPMProcessInstanceQueryBuilder startedAfter(Date startedAfter) {
+        this.startedAfter = startedAfter;
+        return this;
+    }
+
+    public BPMProcessInstanceQueryBuilder startedBefore(Date startedBefore) {
+        this.startedBefore = startedBefore;
+        return this;
+    }
+
+    public BPMProcessInstanceQueryBuilder finishedAfter(Date finishedAfter) {
+        this.finishedAfter = finishedAfter;
+        return this;
+    }
+
+    public BPMProcessInstanceQueryBuilder finishedBefore(Date finishedBefore) {
+        this.finishedBefore = finishedBefore;
         return this;
     }
 

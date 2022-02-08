@@ -1,6 +1,7 @@
 package com.alfame.esb.bpm.module;
 
 import com.alfame.esb.bpm.api.*;
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -274,6 +275,51 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
                 .buildProcessInstanceQuery();
         BPMProcessInstance instanceWithWrongVariableValueLike = instanceQueryWithWrongVariableValueLike.uniqueInstance();
         Assert.assertNull("Ended instance with agent variable with value 006 must NOT be found", instanceWithWrongVariableValueLike);
+    }
+
+    @Test
+    public void testQueryByDatesFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMEngineEventSubscription activitySubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.ACTIVITY_STARTED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+        BPMEngineEventSubscription endSubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+
+        BPMProcessInstanceBuilder instanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("signalSleeperProcess");
+        Assert.assertNotNull("Process instance builder should not be NULL", instanceBuilder);
+
+        BPMProcessInstance startedInstance = instanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", startedInstance);
+
+        BPMProcessInstanceQuery runningQuery = engine.processInstanceQueryBuilder()
+                .processInstanceId(startedInstance.getProcessInstanceId())
+                .startedAfter(DateUtils.addMinutes(startedInstance.getStartTime(), -1))
+                .startedBefore(DateUtils.addMinutes(startedInstance.getStartTime(), 1))
+                .buildProcessInstanceQuery();
+        BPMProcessInstance runningInstance = runningQuery.uniqueInstance();
+        Assert.assertNotNull("Running instance must be found", runningInstance);
+        Assert.assertNull("Running instance must be actually running", runningInstance.getEndTime());
+
+        activitySubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+
+        engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
+
+        List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+
+        BPMProcessInstanceQuery historicQuery = engine.processInstanceQueryBuilder()
+                .processInstanceId(startedInstance.getProcessInstanceId())
+                .finishedAfter(DateUtils.addMinutes(startedInstance.getStartTime(), -1))
+                .finishedBefore(DateUtils.addMinutes(startedInstance.getStartTime(), 1))
+                .buildProcessInstanceQuery();
+        BPMProcessInstance historicInstance = historicQuery.uniqueInstance();
+        Assert.assertNotNull("Ended instance must be found", historicInstance);
+        Assert.assertNotNull("Ended instance must be ended", historicInstance.getEndTime());
     }
 
 }

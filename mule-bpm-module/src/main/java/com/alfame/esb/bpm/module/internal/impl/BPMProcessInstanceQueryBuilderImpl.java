@@ -47,6 +47,26 @@ public class BPMProcessInstanceQueryBuilderImpl extends BPMProcessInstanceQueryB
             LOGGER.debug("Adding filter criteria for tenantId: {}", this.tenantId);
         }
 
+        if (this.startedAfter != null) {
+            query.startedAfter(this.startedAfter);
+            LOGGER.debug("Adding filter criteria for startedAfter: {}", this.startedAfter);
+        }
+
+        if (this.startedBefore != null) {
+            query.startedBefore(this.startedBefore);
+            LOGGER.debug("Adding filter criteria for startedBefore: {}", this.startedBefore);
+        }
+
+        if (this.finishedAfter != null) {
+            query.finishedAfter(this.finishedAfter);
+            LOGGER.debug("Adding filter criteria for finishedAfter: {}", this.finishedAfter);
+        }
+
+        if (this.finishedBefore != null) {
+            query.finishedBefore(this.finishedBefore);
+            LOGGER.debug("Adding filter criteria for finishedBefore: {}", this.finishedBefore);
+        }
+
         if (this.variablesLike != null) {
             for (Map.Entry<String, String> variableLike : this.variablesLike.entrySet()) {
                 if (variableLike.getValue() != null) {
