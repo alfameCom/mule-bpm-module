@@ -175,12 +175,14 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
 
         BPMProcessInstanceQuery defaultTenantQuery = engine.processInstanceQueryBuilder()
                 .tenantId("com.alfame.esb")
+                .processInstanceId(startedInstance.getProcessInstanceId())
                 .buildProcessInstanceQuery();
         BPMProcessInstance defaultTenantInstance = defaultTenantQuery.uniqueInstance();
         Assert.assertNotNull("Ended instance must be found with default tenant", defaultTenantInstance);
 
         BPMProcessInstanceQuery nonExistingTenantQuery = engine.processInstanceQueryBuilder()
                 .tenantId("non-existing")
+                .processInstanceId(startedInstance.getProcessInstanceId())
                 .buildProcessInstanceQuery();
         BPMProcessInstance nonExistingTenantInstance = nonExistingTenantQuery.uniqueInstance();
         Assert.assertNull("Ended instance must NOT be found with non-existing tenant", nonExistingTenantInstance);
