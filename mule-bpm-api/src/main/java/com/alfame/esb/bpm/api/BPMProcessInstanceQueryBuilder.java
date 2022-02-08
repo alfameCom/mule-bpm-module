@@ -8,7 +8,7 @@ public abstract class BPMProcessInstanceQueryBuilder {
     protected String processInstanceId;
     protected String processDefinitionKey;
     protected String tenantId;
-    protected String uniqueBusinessKey;
+    protected String uniqueBusinessKeyLike;
     protected String processInstanceName;
     protected Map<String, Object> variables = new HashMap<>();
     protected boolean returnCollidedInstance;
@@ -28,8 +28,8 @@ public abstract class BPMProcessInstanceQueryBuilder {
         return this;
     }
 
-    public BPMProcessInstanceQueryBuilder uniqueBusinessKey(String uniqueBusinessKey) {
-        this.uniqueBusinessKey = uniqueBusinessKey;
+    public BPMProcessInstanceQueryBuilder uniqueBusinessKeyLike(String uniqueBusinessKeyLike) {
+        this.uniqueBusinessKeyLike = uniqueBusinessKeyLike;
         return this;
     }
 

@@ -104,4 +104,46 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         Assert.assertNotNull("Running instance must be ended", historicInstance.getEndTime());
     }
 
+    @Test
+    public void testQueryByBusinessIdLikeFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMEngineEventSubscription activitySubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.ACTIVITY_STARTED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+        BPMEngineEventSubscription endSubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+
+        BPMProcessInstanceBuilder instanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("signalSleeperProcess")
+                .uniqueBusinessKey("bond007");
+        Assert.assertNotNull("Process instance builder should not be NULL", instanceBuilder);
+
+        BPMProcessInstance startedInstance = instanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", startedInstance);
+
+        BPMProcessInstanceQuery runningQuery = engine.processInstanceQueryBuilder()
+                .uniqueBusinessKeyLike("bond%")
+                .buildProcessInstanceQuery();
+        BPMProcessInstance runningInstance = runningQuery.uniqueInstance();
+        Assert.assertNotNull("Running instance must be found", runningInstance);
+        Assert.assertNull("Running instance must be actually running", runningInstance.getEndTime());
+
+        activitySubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+
+        engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
+
+        List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+
+        BPMProcessInstanceQuery historicQuery = engine.processInstanceQueryBuilder()
+                .uniqueBusinessKeyLike("bond%")
+                .buildProcessInstanceQuery();
+        BPMProcessInstance historicInstance = historicQuery.uniqueInstance();
+        Assert.assertNotNull("Running instance must be found", historicInstance);
+        Assert.assertNotNull("Running instance must be ended", historicInstance.getEndTime());
+    }
+
 }
