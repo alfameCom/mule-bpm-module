@@ -188,4 +188,50 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         Assert.assertNull("Ended instance must NOT be found with non-existing tenant", nonExistingTenantInstance);
     }
 
+    @Test
+    public void testQueryByVariableLikeFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMEngineEventSubscription activitySubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.ACTIVITY_STARTED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+        BPMEngineEventSubscription endSubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+
+        BPMProcessInstanceBuilder instanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("signalSleeperProcess")
+                .variableWithValue("agent", "bond007");
+        Assert.assertNotNull("Process instance builder should not be NULL", instanceBuilder);
+
+        BPMProcessInstance startedInstance = instanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", startedInstance);
+
+        activitySubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+
+        engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
+
+        List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+
+        BPMProcessInstanceQuery instanceQueryWithVariable = engine.processInstanceQueryBuilder()
+                .variable("agent")
+                .buildProcessInstanceQuery();
+        BPMProcessInstance instanceWithVariable = instanceQueryWithVariable.uniqueInstance();
+        Assert.assertNotNull("Ended instance with agent variable must be found", instanceWithVariable);
+
+        BPMProcessInstanceQuery instanceQueryWithVariableValueLike = engine.processInstanceQueryBuilder()
+                .variableWithValueLike("agent", "%007")
+                .buildProcessInstanceQuery();
+        BPMProcessInstance instanceWithVariableValueLike = instanceQueryWithVariableValueLike.uniqueInstance();
+        Assert.assertNotNull("Ended instance with agent variable with value 007 must be found", instanceWithVariableValueLike);
+
+        BPMProcessInstanceQuery instanceQueryWithWrongVariableValueLike = engine.processInstanceQueryBuilder()
+                .variableWithValueLike("agent", "%006")
+                .buildProcessInstanceQuery();
+        BPMProcessInstance instanceWithWrongVariableValueLike = instanceQueryWithWrongVariableValueLike.uniqueInstance();
+        Assert.assertNull("Ended instance with agent variable with value 006 must NOT be found", instanceWithWrongVariableValueLike);
+    }
+
 }

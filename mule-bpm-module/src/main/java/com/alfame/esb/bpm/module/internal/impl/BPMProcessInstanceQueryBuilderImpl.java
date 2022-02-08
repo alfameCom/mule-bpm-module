@@ -7,6 +7,8 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.slf4j.Logger;
 
+import java.util.Map;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class BPMProcessInstanceQueryBuilderImpl extends BPMProcessInstanceQueryBuilder {
@@ -38,6 +40,19 @@ public class BPMProcessInstanceQueryBuilderImpl extends BPMProcessInstanceQueryB
         if (this.tenantId != null) {
             query.processInstanceTenantId(this.tenantId);
             LOGGER.debug("Adding filter criteria for tenantId: {}", this.tenantId);
+        }
+
+        if (this.variablesLike != null) {
+            for (Map.Entry<String, String> variableLike : this.variablesLike.entrySet()) {
+                if (variableLike.getValue() != null) {
+                    query.variableValueLike(variableLike.getKey(), variableLike.getValue());
+                    LOGGER.debug("Adding filter criteria for variable {} with value like: {}",
+                            variableLike.getKey(), variableLike.getValue());
+                } else {
+                    query.variableExists(variableLike.getKey());
+                    LOGGER.debug("Adding filter criteria for variable {}", variableLike.getKey());
+                }
+            }
         }
 
         return new BPMProcessInstanceQueryImpl(engine, query);
