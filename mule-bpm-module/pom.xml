@@ -60,7 +60,7 @@
                 <configuration>
                     <forkCount>0</forkCount>
                     <reuseForks>false</reuseForks>
-                    <argLine>-Xmx512m</argLine>
+                    <argLine>-Xmx256m</argLine>
 
                     <systemProperties>
                         <property>
