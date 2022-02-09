@@ -3,10 +3,9 @@ package com.alfame.esb.bpm.module;
 import com.alfame.esb.bpm.api.*;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mule.functional.api.flow.FlowRunner;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.CoreEvent;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class BPMMultiTenancyTestCase extends BPMAbstractTestCase {
 
@@ -22,6 +21,12 @@ public class BPMMultiTenancyTestCase extends BPMAbstractTestCase {
         BPMEngine otherEngine = BPMEnginePool.getInstance("otherEngineConfig");
         Assert.assertNotNull("Other engine should not be NULL", otherEngine);
 
+        BPMEngineEventSubscription processEndSubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .processDefinitionKey("testProcess").subscribeForEvents();
+        BPMEngineEventSubscription otherProcessEndSubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .processDefinitionKey("testProcess").subscribeForEvents();
 
         BPMProcessInstanceBuilder otherProcessInstanceBuilder = engine.processInstanceBuilder()
                 .processDefinitionKey("testProcess")
@@ -38,6 +43,13 @@ public class BPMMultiTenancyTestCase extends BPMAbstractTestCase {
         Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
         BPMProcessInstance otherProcessInstance = otherProcessInstanceBuilder.startProcessInstance();
         Assert.assertNotNull("Returned other process instance should not not be NULL", otherProcessInstance);
+
+        List<BPMEngineEvent> processEndEvents =
+                otherProcessEndSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event for process must be present", processEndEvents.size() == 1);
+        List<BPMEngineEvent> otherProcessEndEvents =
+                otherProcessEndSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event for other process must be present", otherProcessEndEvents.size() == 1);
 
         BPMVariableInstance otherResultVariable = otherEngine.getHistoricVariableInstance(
                 otherProcessInstance.getProcessInstanceId(), "result");
