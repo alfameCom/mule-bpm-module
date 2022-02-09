@@ -296,9 +296,11 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     @Override
     public void deleteProcessInstance(String processInstanceId, String deleteReason) {
         try { 
+            LOGGER.debug("Deleting process with id: {}, with reason: {}", processInstanceId, deleteReason);
             this.getRuntimeService().deleteProcessInstance(processInstanceId, deleteReason);
         } catch(FlowableObjectNotFoundException exception) {
-            LOGGER.warn("Failed to delete process with id {}", processInstanceId);
+            LOGGER.error("Failed to delete process with id {}", processInstanceId);
+            throw exception;
         } 
     }
 
