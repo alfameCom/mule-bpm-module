@@ -174,17 +174,17 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
-			<version>5.3.2</version>
+			<version>5.3.14</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
-			<version>5.4.2</version>
+			<version>5.4.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>5.3.2</version>
+			<version>5.3.14</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
