@@ -388,6 +388,9 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
                 .activityName("successEndEvent")
                 .eventType(BPMEngineEventType.ACTIVITY_COMPLETED)
                 .processDefinitionKey("signalSleeperOrchestratorProcess").subscribeForEvents();
+        BPMEngineEventSubscription endSubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .processDefinitionKey("signalSleeperOrchestratorProcess").subscribeForEvents();
 
         BPMProcessInstanceBuilder instanceBuilder = engine.processInstanceBuilder()
                 .processDefinitionKey("signalSleeperOrchestratorProcess");
@@ -399,6 +402,9 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         List<BPMEngineEvent> successEndActivityEvents =
                 successEndActivitySubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
         Assert.assertTrue("One end event must be present", successEndActivityEvents.size() == 1);
+
+        List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
     }
 
 }
