@@ -67,7 +67,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @SubTypeMapping(baseType = BPMEventSubscriptionFilter.class,
         subTypes = {BPMEventSubscriptionProcessDefinitionFilter.class, BPMEventSubscriptionProcessInstanceFilter.class, BPMEventSubscriptionActivityNameFilter.class, BPMEventSubscriptionEventTypeFilter.class, BPMEventSubscriptionVariableFilter.class})
 @SubTypeMapping(baseType = BPMProcessInstanceFilter.class,
-        subTypes = {BPMProcessInstanceProcessDefinitionFilter.class, BPMProcessInstanceBusinessKeyLikeFilter.class, BPMProcessInstanceProcessNameLikeFilter.class, BPMProcessInstanceTenantFilter.class, BPMProcessInstanceVariableLikeFilter.class, BPMProcessInstanceStartedAfterFilter.class, BPMProcessInstanceStartedBeforeFilter.class, BPMProcessInstanceFinishedAfterFilter.class, BPMProcessInstanceFinishedBeforeFilter.class, BPMProcessInstanceUnfinishedFilter.class, BPMProcessInstanceFinishedFilter.class})
+        subTypes = {BPMProcessInstanceIdFilter.class, BPMProcessInstanceProcessDefinitionFilter.class, BPMProcessInstanceBusinessKeyLikeFilter.class, BPMProcessInstanceProcessNameLikeFilter.class, BPMProcessInstanceTenantFilter.class, BPMProcessInstanceVariableLikeFilter.class, BPMProcessInstanceStartedAfterFilter.class, BPMProcessInstanceStartedBeforeFilter.class, BPMProcessInstanceFinishedAfterFilter.class, BPMProcessInstanceFinishedBeforeFilter.class, BPMProcessInstanceUnfinishedFilter.class, BPMProcessInstanceFinishedFilter.class})
 @SubTypeMapping(baseType = BPMAttachmentFilter.class,
         subTypes = {BPMAttachmentNameFilter.class})
 @ExternalLib(name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.6.0", requiredClassName = "org.flowable.engine.RuntimeService")

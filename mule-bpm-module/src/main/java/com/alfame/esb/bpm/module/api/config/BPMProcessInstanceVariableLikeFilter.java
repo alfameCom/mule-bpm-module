@@ -1,13 +1,9 @@
 package com.alfame.esb.bpm.module.api.config;
 
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-
-import java.io.Serializable;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
@@ -19,17 +15,16 @@ public class BPMProcessInstanceVariableLikeFilter extends BPMProcessInstanceFilt
     @Expression(NOT_SUPPORTED)
     private String variableName;
 
-    @Content
     @Parameter
     @Expression(SUPPORTED)
     @Optional
-    private TypedValue<Serializable> valueLike;
+    private String valueLike;
 
     public String getVariableName() {
         return variableName;
     }
 
-    public TypedValue<Serializable> getValueLike() {
+    public String getValueLike() {
         return valueLike;
     }
 

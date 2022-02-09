@@ -379,4 +379,26 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         Assert.assertNotNull("Historic finished instance must have end date", historicFinishedInstance.getEndTime());
     }
 
+    @Test
+    public void testQueriesByOrchestratorProcessFlow() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMEngineEventSubscription successEndActivitySubscription = engine.eventSubscriptionBuilder()
+                .activityName("successEndEvent")
+                .eventType(BPMEngineEventType.ACTIVITY_COMPLETED)
+                .processDefinitionKey("signalSleeperOrchestratorProcess").subscribeForEvents();
+
+        BPMProcessInstanceBuilder instanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("signalSleeperOrchestratorProcess");
+        Assert.assertNotNull("Process instance builder should not be NULL", instanceBuilder);
+
+        BPMProcessInstance startedInstance = instanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", startedInstance);
+
+        List<BPMEngineEvent> successEndActivityEvents =
+                successEndActivitySubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event must be present", successEndActivityEvents.size() == 1);
+    }
+
 }
