@@ -38,8 +38,10 @@ public class BPMProcessInstanceQueryImpl implements BPMProcessInstanceQuery {
                 instanceProxies.add(instanceProxy);
                 LOGGER.debug("Found process instance: {}", instanceProxy);
             }
+            LOGGER.info("Found {} process instances in {} ms", instances.size(), System.currentTimeMillis() - startTime);
+        } else {
+            LOGGER.info("Found {} process instances in {} ms", 0, System.currentTimeMillis() - startTime);
         }
-        LOGGER.info("Found {} process instances in {} ms", instances.size(), System.currentTimeMillis() - startTime);
 
         return instanceProxies;
     }
