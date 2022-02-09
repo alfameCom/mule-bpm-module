@@ -97,35 +97,42 @@ public class BPMEventSubscriptionOperations {
 
         BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder = engine.eventSubscriptionBuilder();
 
-        for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
-            if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
-                BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =
-                        (BPMEventSubscriptionProcessDefinitionFilter) eventSubscriptionFilter;
-                LOGGER.debug("Filtering events without process definition key {}", processDefinitionFilter.getKey());
-                eventSubscriptionBuilder.processDefinitionKey(processDefinitionFilter.getKey());
-            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessInstanceFilter) {
-                BPMEventSubscriptionProcessInstanceFilter processInstanceFilter =
-                        (BPMEventSubscriptionProcessInstanceFilter) eventSubscriptionFilter;
-                LOGGER.debug("Filtering events without process instance id {}", processInstanceFilter.getProcessInstanceId());
-                eventSubscriptionBuilder.processDefinitionKey(processInstanceFilter.getProcessInstanceId());
-            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
-                BPMEventSubscriptionEventTypeFilter eventTypeFilter =
-                        (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
-                BPMEngineEventType engineEventType = mapEventType(eventTypeFilter.getEventType());
-                LOGGER.debug("Filtering events without event type {}", engineEventType);
-                eventSubscriptionBuilder.eventType(engineEventType);
-            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionVariableFilter) {
-                BPMEventSubscriptionVariableFilter variableFilter =
-                        (BPMEventSubscriptionVariableFilter) eventSubscriptionFilter;
-                if (variableFilter.getValue() != null) {
-                    LOGGER.debug("Filtering events without variables {} with value {}", variableFilter.getVariableName(), variableFilter.getValue());
-                    eventSubscriptionBuilder.variableWithValue(variableFilter.getVariableName(), variableFilter.getValue());
+        if (eventSubscriptionFilters != null && eventSubscriptionFilters.size() > 0) {
+            for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
+                if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
+                    BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =
+                            (BPMEventSubscriptionProcessDefinitionFilter) eventSubscriptionFilter;
+                    LOGGER.debug("Filtering events without process definition key {}", processDefinitionFilter.getKey());
+                    eventSubscriptionBuilder.processDefinitionKey(processDefinitionFilter.getKey());
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessInstanceFilter) {
+                    BPMEventSubscriptionProcessInstanceFilter processInstanceFilter =
+                            (BPMEventSubscriptionProcessInstanceFilter) eventSubscriptionFilter;
+                    LOGGER.debug("Filtering events without process instance id {}", processInstanceFilter.getProcessInstanceId());
+                    eventSubscriptionBuilder.processDefinitionKey(processInstanceFilter.getProcessInstanceId());
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionActivityNameFilter) {
+                    BPMEventSubscriptionActivityNameFilter activityNameFilter =
+                            (BPMEventSubscriptionActivityNameFilter) eventSubscriptionFilter;
+                    LOGGER.debug("Filtering events without activity name {}", activityNameFilter.getActivityName());
+                    eventSubscriptionBuilder.activityName(activityNameFilter.getActivityName());
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
+                    BPMEventSubscriptionEventTypeFilter eventTypeFilter =
+                            (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
+                    BPMEngineEventType engineEventType = mapEventType(eventTypeFilter.getEventType());
+                    LOGGER.debug("Filtering events without event type {}", engineEventType);
+                    eventSubscriptionBuilder.eventType(engineEventType);
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionVariableFilter) {
+                    BPMEventSubscriptionVariableFilter variableFilter =
+                            (BPMEventSubscriptionVariableFilter) eventSubscriptionFilter;
+                    if (variableFilter.getValue() != null) {
+                        LOGGER.debug("Filtering events without variables {} with value {}", variableFilter.getVariableName(), variableFilter.getValue());
+                        eventSubscriptionBuilder.variableWithValue(variableFilter.getVariableName(), variableFilter.getValue());
+                    } else {
+                        LOGGER.debug("Filtering events without variables {}", variableFilter.getVariableName());
+                        eventSubscriptionBuilder.variable(variableFilter.getVariableName());
+                    }
                 } else {
-                    LOGGER.debug("Filtering events without variables {}", variableFilter.getVariableName());
-                    eventSubscriptionBuilder.variable(variableFilter.getVariableName());
+                    throw new IllegalArgumentException("Unsupported filter");
                 }
-            } else {
-                throw new IllegalArgumentException("Unsupported filter");
             }
         }
 
@@ -138,35 +145,42 @@ public class BPMEventSubscriptionOperations {
 
         BPMEngineEventFinder eventFinder = eventSubscription.eventFinder();
 
-        for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
-            if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
-                BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =
-                        (BPMEventSubscriptionProcessDefinitionFilter) eventSubscriptionFilter;
-                LOGGER.debug("Filtering events without process definition key {}", processDefinitionFilter.getKey());
-                eventFinder.processDefinitionKey(processDefinitionFilter.getKey());
-            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessInstanceFilter) {
-                BPMEventSubscriptionProcessInstanceFilter processInstanceFilter =
-                        (BPMEventSubscriptionProcessInstanceFilter) eventSubscriptionFilter;
-                LOGGER.debug("Filtering events without process instance id {}", processInstanceFilter.getProcessInstanceId());
-                eventFinder.processDefinitionKey(processInstanceFilter.getProcessInstanceId());
-            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
-                BPMEventSubscriptionEventTypeFilter eventTypeFilter =
-                        (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
-                BPMEngineEventType engineEventType = mapEventType(eventTypeFilter.getEventType());
-                LOGGER.debug("Filtering events without event type {}", engineEventType);
-                eventFinder.eventType(engineEventType);
-            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionVariableFilter) {
-                BPMEventSubscriptionVariableFilter variableFilter =
-                        (BPMEventSubscriptionVariableFilter) eventSubscriptionFilter;
-                if (variableFilter.getValue() != null) {
-                    LOGGER.debug("Filtering events without variables {} with value {}", variableFilter.getVariableName(), variableFilter.getValue());
-                    eventFinder.variableWithValue(variableFilter.getVariableName(), variableFilter.getValue());
+        if (eventSubscriptionFilters != null && eventSubscriptionFilters.size() > 0) {
+            for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
+                if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
+                    BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =
+                            (BPMEventSubscriptionProcessDefinitionFilter) eventSubscriptionFilter;
+                    LOGGER.debug("Filtering events without process definition key {}", processDefinitionFilter.getKey());
+                    eventFinder.processDefinitionKey(processDefinitionFilter.getKey());
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessInstanceFilter) {
+                    BPMEventSubscriptionProcessInstanceFilter processInstanceFilter =
+                            (BPMEventSubscriptionProcessInstanceFilter) eventSubscriptionFilter;
+                    LOGGER.debug("Filtering events without process instance id {}", processInstanceFilter.getProcessInstanceId());
+                    eventFinder.processDefinitionKey(processInstanceFilter.getProcessInstanceId());
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionActivityNameFilter) {
+                    BPMEventSubscriptionActivityNameFilter activityNameFilter =
+                            (BPMEventSubscriptionActivityNameFilter) eventSubscriptionFilter;
+                    LOGGER.debug("Filtering events without activity name {}", activityNameFilter.getActivityName());
+                    eventFinder.activityName(activityNameFilter.getActivityName());
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
+                    BPMEventSubscriptionEventTypeFilter eventTypeFilter =
+                            (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
+                    BPMEngineEventType engineEventType = mapEventType(eventTypeFilter.getEventType());
+                    LOGGER.debug("Filtering events without event type {}", engineEventType);
+                    eventFinder.eventType(engineEventType);
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionVariableFilter) {
+                    BPMEventSubscriptionVariableFilter variableFilter =
+                            (BPMEventSubscriptionVariableFilter) eventSubscriptionFilter;
+                    if (variableFilter.getValue() != null) {
+                        LOGGER.debug("Filtering events without variables {} with value {}", variableFilter.getVariableName(), variableFilter.getValue());
+                        eventFinder.variableWithValue(variableFilter.getVariableName(), variableFilter.getValue());
+                    } else {
+                        LOGGER.debug("Filtering events without variables {}", variableFilter.getVariableName());
+                        eventFinder.variable(variableFilter.getVariableName());
+                    }
                 } else {
-                    LOGGER.debug("Filtering events without variables {}", variableFilter.getVariableName());
-                    eventFinder.variable(variableFilter.getVariableName());
+                    throw new IllegalArgumentException("Unsupported filter");
                 }
-            } else {
-                throw new IllegalArgumentException("Unsupported filter");
             }
         }
 

@@ -6,7 +6,7 @@
     "id": "mule",
     "attributes": {
       "exportedPackages": [
-      	"org.h2"
+      	"org.hsqldb"
       ],
       "exportedResources": [
         "api/api.raml",

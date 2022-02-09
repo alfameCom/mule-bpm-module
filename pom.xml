@@ -44,12 +44,12 @@
         <mule.api.version>1.2.0</mule.api.version>
         <flowable.version>6.6.0</flowable.version>
         <hikari.version>3.4.5</hikari.version>
-        <h2.version>1.4.200</h2.version>
+        <hsql.version>2.5.1</hsql.version>
         <flyway.version>6.5.7</flyway.version>
         <commons.logging.version>1.2</commons.logging.version>
 
         <sonar.projectKey>alfameCom_mule-bpm-module</sonar.projectKey>
-        <sonar.moduleKey>${artifactId}</sonar.moduleKey>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.organization>alfamecom</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.login>N/A</sonar.login>
@@ -87,6 +87,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
                 <configuration>
                     <fileSets>
                         <fileSet>
@@ -201,9 +202,9 @@
                 <version>${flyway.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${h2.version}</version>
+                <groupId>org.hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>${hsql.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
@@ -217,24 +218,24 @@
         <repository>
             <id>mulesoft-releases</id>
             <name>MuleSoft Releases Repository</name>
-            <url>http://repository.mulesoft.org/releases/</url>
+            <url>https://repository.mulesoft.org/releases/</url>
         </repository>
         <repository>
             <id>mulesoft-snapshots</id>
             <name>MuleSoft Snapshots Repository</name>
-            <url>http://repository.mulesoft.org/snapshots/</url>
+            <url>https://repository.mulesoft.org/snapshots/</url>
         </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
             <id>mulesoft-releases</id>
             <name>MuleSoft Releases</name>
-            <url>http://repository.mulesoft.org/releases/</url>
+            <url>https://repository.mulesoft.org/releases/</url>
         </pluginRepository>
         <pluginRepository>
             <id>mulesoft-snapshots</id>
             <name>MuleSoft Snapshots</name>
-            <url>http://repository.mulesoft.org/snapshots/</url>
+            <url>https://repository.mulesoft.org/snapshots/</url>
         </pluginRepository>
     </pluginRepositories>
 

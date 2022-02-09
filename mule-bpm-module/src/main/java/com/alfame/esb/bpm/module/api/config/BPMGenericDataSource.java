@@ -18,13 +18,13 @@ public class BPMGenericDataSource extends BPMDataSource {
     @Parameter
     @Placement(order = 2)
     @Expression(NOT_SUPPORTED)
-    @Optional(defaultValue = "org.h2.Driver")
+    @Optional(defaultValue = "org.hsqldb.jdbcDriver")
     private String driverClassName;
 
     @Parameter
     @Placement(order = 3)
     @Expression(NOT_SUPPORTED)
-    @Optional(defaultValue = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1")
+    @Optional(defaultValue = "jdbc:hsqldb:mem:flowable")
     private String jdbcUrl;
 
     @Parameter

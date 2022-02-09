@@ -91,6 +91,11 @@ output application/json
 }]]]></sftp:content>
             </sftp:write>
             <bpm:event-subscription-builder
+                    config-ref="BPM_Config" target="globalEventSubscription"
+                    doc:name="Global event subscription builder"
+                    doc:id="16057127-3616-410c-9051-7b994a3a3355">
+            </bpm:event-subscription-builder>
+            <bpm:event-subscription-builder
                     config-ref="BPM_Config" target="invoiceEventSubscription"
                     doc:name="Invoice event subscription builder"
                     doc:id="16057127-3616-410c-9051-9c994a6f3654">
@@ -141,7 +146,9 @@ output application/json
                     doc:id="9b34ec66-617f-4c27-b66b-14d6138a866c"/>
         </munit:execution>
         <munit:validation>
-            <bpm:get-unique-event
+            <bpm:get-events doc:name="Get all events" doc:id="bfb2abaf-fcf7-4452-ba81-fbb29c3c5867" config-ref="BPM_Config" subscription="#[vars.globalEventSubscription]" target="allEvents"/>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="eaff720d-41fe-4b13-8a3c-d608b2a1564c" expression="#[sizeOf(vars.allEvents)]" is="#[MunitTools::greaterThan(2)]" message="Atleast two events should be found without any filters"/>
+			<bpm:get-unique-event
                     doc:name="Get unique event from subscription"
                     doc:id="ccfbbc66-afd3-4e6d-b595-a9ceaf36fa46"
                     config-ref="BPM_Config"

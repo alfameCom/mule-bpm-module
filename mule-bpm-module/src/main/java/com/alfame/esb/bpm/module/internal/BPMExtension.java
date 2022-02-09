@@ -8,8 +8,10 @@ import com.alfame.esb.bpm.module.internal.listener.BPMTaskListener;
 import com.alfame.esb.bpm.module.internal.operations.BPMAttachmentOperations;
 import com.alfame.esb.bpm.module.internal.operations.BPMEventSubscriptionOperations;
 import com.alfame.esb.bpm.module.internal.operations.BPMProcessFactoryOperations;
+import com.alfame.esb.bpm.module.internal.operations.BPMProcessInstanceOperations;
 import com.alfame.esb.bpm.module.internal.operations.BPMProcessVariableOperations;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngine;
@@ -55,7 +57,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Extension(name = "BPM", vendor = "Alfame Systems")
 @Sources(BPMTaskListener.class)
 @ConnectionProviders(BPMConnectionProvider.class)
-@Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class, BPMAttachmentOperations.class})
+@Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class, BPMAttachmentOperations.class, BPMProcessInstanceOperations.class})
 @SubTypeMapping(baseType = BPMDefinition.class,
         subTypes = {BPMClasspathDefinition.class, BPMStreamDefinition.class})
 @SubTypeMapping(baseType = BPMDataSource.class,
@@ -63,7 +65,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 @SubTypeMapping(baseType = BPMAsyncExecutorFactory.class,
         subTypes = {BPMDefaultAsyncExecutorFactory.class})
 @SubTypeMapping(baseType = BPMEventSubscriptionFilter.class,
-        subTypes = {BPMEventSubscriptionProcessDefinitionFilter.class, BPMEventSubscriptionProcessInstanceFilter.class, BPMEventSubscriptionEventTypeFilter.class, BPMEventSubscriptionVariableFilter.class})
+        subTypes = {BPMEventSubscriptionProcessDefinitionFilter.class, BPMEventSubscriptionProcessInstanceFilter.class, BPMEventSubscriptionActivityNameFilter.class, BPMEventSubscriptionEventTypeFilter.class, BPMEventSubscriptionVariableFilter.class})
+@SubTypeMapping(baseType = BPMProcessInstanceFilter.class,
+        subTypes = {BPMProcessInstanceIdFilter.class, BPMProcessInstanceProcessDefinitionFilter.class, BPMProcessInstanceBusinessKeyLikeFilter.class, BPMProcessInstanceProcessNameLikeFilter.class, BPMProcessInstanceTenantFilter.class, BPMProcessInstanceVariableLikeFilter.class, BPMProcessInstanceStartedAfterFilter.class, BPMProcessInstanceStartedBeforeFilter.class, BPMProcessInstanceFinishedAfterFilter.class, BPMProcessInstanceFinishedBeforeFilter.class, BPMProcessInstanceUnfinishedFilter.class, BPMProcessInstanceFinishedFilter.class})
 @SubTypeMapping(baseType = BPMAttachmentFilter.class,
         subTypes = {BPMAttachmentNameFilter.class})
 @ExternalLib(name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.6.0", requiredClassName = "org.flowable.engine.RuntimeService")
@@ -210,6 +214,11 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     }
 
     @Override
+    public BPMProcessInstanceQueryBuilder processInstanceQueryBuilder() {
+        return new BPMProcessInstanceQueryBuilderImpl(this, this.getHistoryService());
+    }
+
+    @Override
     public BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder() {
         return new BPMEventSubscriptionBuilderImpl(this, this.getRuntimeService());
     }
@@ -282,6 +291,17 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
 
         deploymentBuilder.tenantId(tenantId).deploy();
         LOGGER.debug("{} made deployment for tenant {}", this.name, tenantId);
+    }
+
+    @Override
+    public void deleteProcessInstance(String processInstanceId, String deleteReason) {
+        try { 
+            LOGGER.debug("Deleting process with id: {}, with reason: {}", processInstanceId, deleteReason);
+            this.getRuntimeService().deleteProcessInstance(processInstanceId, deleteReason);
+        } catch(FlowableObjectNotFoundException exception) {
+            LOGGER.error("Failed to delete process with id {}", processInstanceId);
+            throw exception;
+        } 
     }
 
 }

@@ -10,6 +10,7 @@ public abstract class BPMEngineEventFilter<T> {
     protected List<BPMEngineEventType> eventTypes = new ArrayList<>();
     protected List<String> processDefinitionKeys = new ArrayList<>();
     protected List<String> processInstanceIds = new ArrayList<>();
+    protected List<String> activityNames = new ArrayList<>();
     protected Map<String, Object> variableValues = new HashMap<>();
 
     public T eventType(BPMEngineEventType eventType) {
@@ -24,6 +25,11 @@ public abstract class BPMEngineEventFilter<T> {
 
     public T processInstanceId(String processInstanceId) {
         this.processInstanceIds.add(processInstanceId);
+        return (T) this;
+    }
+
+    public T activityName(String activityName) {
+        this.activityNames.add(activityName);
         return (T) this;
     }
 
@@ -49,6 +55,8 @@ public abstract class BPMEngineEventFilter<T> {
             } else if (!isUnfilteredEvent((List) this.processDefinitionKeys, engineEvent.getProcessDefinitionKey())) {
                 isUnfilteredEvent = false;
             } else if (!isUnfilteredEvent((List) this.processInstanceIds, engineEvent.getProcessInstanceId())) {
+                isUnfilteredEvent = false;
+            } else if (!isUnfilteredEvent((List) this.activityNames, engineEvent.getActivityName())) {
                 isUnfilteredEvent = false;
             } else if (!isUnfilteredEvent((Map) this.variableValues, engineEvent.getVariableName(), engineEvent.getVariableValue())) {
                 isUnfilteredEvent = false;
