@@ -24,7 +24,7 @@ public class BPMMultiTenancyTestCase extends BPMAbstractTestCase {
         BPMEngineEventSubscription processEndSubscription = engine.eventSubscriptionBuilder()
                 .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
                 .processDefinitionKey("testProcess").subscribeForEvents();
-        BPMEngineEventSubscription otherProcessEndSubscription = engine.eventSubscriptionBuilder()
+        BPMEngineEventSubscription otherProcessEndSubscription = otherEngine.eventSubscriptionBuilder()
                 .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
                 .processDefinitionKey("testProcess").subscribeForEvents();
 
