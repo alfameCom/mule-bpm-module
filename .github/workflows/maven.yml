@@ -29,7 +29,7 @@ jobs:
         java-version: 11
 
     - name: Build and verify with Maven
-      run: mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install verify org.jacoco:jacoco-maven-plugin:merge org.jacoco:jacoco-maven-plugin:report sonar:sonar deploy -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file pom.xml
+      run: mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install verify org.jacoco:jacoco-maven-plugin:merge org.jacoco:jacoco-maven-plugin:report sonar:sonar deploy -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dgpg.skip --file pom.xml
 
     - name: Deploy with Maven
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -37,4 +37,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-      run: mvn -B deploy --file pom.xml
+      run: mvn -B deploy -Dgpg.skip --file pom.xml
