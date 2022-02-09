@@ -9,6 +9,8 @@ public interface BPMEngine {
 
     BPMProcessInstanceBuilder processInstanceBuilder();
 
+    BPMProcessInstanceQueryBuilder processInstanceQueryBuilder();
+
     BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder();
 
     BPMVariableInstance getVariableInstance(String executionId, String variableName);
@@ -19,5 +21,5 @@ public interface BPMEngine {
     InputStream getAttachmentContent(String attachmentId);
 
     void triggerSignal(String executionId, String signalName);
-
+    void deleteProcessInstance(String processInstanceId, String deleteReason);
 }

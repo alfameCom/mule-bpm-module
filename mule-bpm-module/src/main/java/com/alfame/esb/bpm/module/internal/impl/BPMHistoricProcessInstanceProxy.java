@@ -5,7 +5,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 
 import java.util.Date;
 
-public class BPMHistoricProcessInstanceProxy implements BPMProcessInstance {
+public class BPMHistoricProcessInstanceProxy extends BPMProcessInstance {
 
     private final HistoricProcessInstance historicProcessInstance;
 

@@ -109,6 +109,11 @@ public class BPMEventSubscriptionOperations {
                             (BPMEventSubscriptionProcessInstanceFilter) eventSubscriptionFilter;
                     LOGGER.debug("Filtering events without process instance id {}", processInstanceFilter.getProcessInstanceId());
                     eventSubscriptionBuilder.processDefinitionKey(processInstanceFilter.getProcessInstanceId());
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionActivityNameFilter) {
+                    BPMEventSubscriptionActivityNameFilter activityNameFilter =
+                            (BPMEventSubscriptionActivityNameFilter) eventSubscriptionFilter;
+                    LOGGER.debug("Filtering events without activity name {}", activityNameFilter.getActivityName());
+                    eventSubscriptionBuilder.activityName(activityNameFilter.getActivityName());
                 } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
                     BPMEventSubscriptionEventTypeFilter eventTypeFilter =
                             (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
@@ -152,6 +157,11 @@ public class BPMEventSubscriptionOperations {
                             (BPMEventSubscriptionProcessInstanceFilter) eventSubscriptionFilter;
                     LOGGER.debug("Filtering events without process instance id {}", processInstanceFilter.getProcessInstanceId());
                     eventFinder.processDefinitionKey(processInstanceFilter.getProcessInstanceId());
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionActivityNameFilter) {
+                    BPMEventSubscriptionActivityNameFilter activityNameFilter =
+                            (BPMEventSubscriptionActivityNameFilter) eventSubscriptionFilter;
+                    LOGGER.debug("Filtering events without activity name {}", activityNameFilter.getActivityName());
+                    eventFinder.activityName(activityNameFilter.getActivityName());
                 } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
                     BPMEventSubscriptionEventTypeFilter eventTypeFilter =
                             (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
