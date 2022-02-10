@@ -56,7 +56,7 @@
                 <bpm:process-instance-only-unfinished-filter />
             </bpm:process-instance-filters>
         </bpm:process-instance-query-builder>
-        <bpm:get-unique-process-instance query="#[vars.sleeperProcessQuery]" target="sleeperProcess" />
+        <bpm:get-unique-process-instance config-ref="engineConfig" query="#[vars.sleeperProcessQuery]" target="sleeperProcess" />
 
         <choice>
             <when expression="#[vars.sleeperProcess != null and vars.sleeperProcess.processInstanceId == vars.sleeperProcessInstanceId]">
@@ -99,7 +99,7 @@
                 <bpm:process-instance-only-finished-filter />
             </bpm:process-instance-filters>
         </bpm:process-instance-query-builder>
-        <bpm:get-process-instances query="#[vars.sleeperProcessQuery]" target="sleeperProcesses" />
+        <bpm:get-process-instances  config-ref="engineConfig" query="#[vars.sleeperProcessQuery]" target="sleeperProcesses" />
 
         <choice>
             <when expression="#[sizeOf(vars.sleeperProcesses) &gt; 0 and vars.sleeperProcesses[0].processInstanceId == vars.sleeperProcessInstanceId]">
