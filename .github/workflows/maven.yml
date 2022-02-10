@@ -26,6 +26,9 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+        server-id: ossrh
+        server-username: MAVEN_USERNAME
+        server-password: MAVEN_PASSWORD
 
     - name: Build and verify with Maven
       run: mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install verify org.jacoco:jacoco-maven-plugin:merge org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dgpg.skip --file pom.xml
