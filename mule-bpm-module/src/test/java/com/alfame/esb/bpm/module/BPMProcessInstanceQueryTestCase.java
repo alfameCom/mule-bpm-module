@@ -400,10 +400,10 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         Assert.assertNotNull("Returned process instance should not not be NULL", startedInstance);
 
         List<BPMEngineEvent> successEndActivityEvents =
-                successEndActivitySubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+                successEndActivitySubscription.waitForEvents(1, 10, TimeUnit.SECONDS);
         Assert.assertTrue("One end event must be present", successEndActivityEvents.size() == 1);
 
-        List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 10, TimeUnit.SECONDS);
         Assert.assertTrue("One end event must be present", endEvents.size() == 1);
     }
 
