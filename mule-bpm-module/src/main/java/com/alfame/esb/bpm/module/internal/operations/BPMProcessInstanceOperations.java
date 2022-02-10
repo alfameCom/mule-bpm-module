@@ -5,9 +5,11 @@ import com.alfame.esb.bpm.api.BPMProcessInstanceQuery;
 import com.alfame.esb.bpm.api.BPMProcessInstanceQueryBuilder;
 import com.alfame.esb.bpm.module.api.config.*;
 import com.alfame.esb.bpm.module.internal.BPMExtension;
+import com.alfame.esb.bpm.module.internal.connection.BPMConnection;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -25,8 +27,12 @@ public class BPMProcessInstanceOperations {
     @Alias("delete-process-instance")
     public void deleteProcessInstance(
             @Config BPMExtension config,
+            @Connection BPMConnection connection,
             @DisplayName("Process instance Id") String processInstanceId,
             @Optional @DisplayName("Delete reason") String deleteReason) throws IOException {
+        if (connection == null || connection.getTask() == null) {
+            throw new IllegalStateException("Process instance deletion operations must join to task listener transaction");
+        }
         
         config.deleteProcessInstance(processInstanceId, deleteReason);
 
@@ -38,7 +44,11 @@ public class BPMProcessInstanceOperations {
     @OutputResolver(output = BPMProcessInstanceQueryOutputMetadataResolver.class)
     public BPMProcessInstanceQuery buildProcessInstanceQuery(
             @Config BPMExtension engine,
+            @Connection BPMConnection connection,
             @Optional @Alias("process-instance-filters") List<BPMProcessInstanceFilter> processInstanceFilters) throws InterruptedException {
+        if (connection == null || connection.getTask() == null) {
+            throw new IllegalStateException("Process instance query operations must join to task listener transaction");
+        }
 
         LOGGER.debug("Creating query for process instances");
         BPMProcessInstanceQueryBuilder processInstanceQueryBuilder = engine.processInstanceQueryBuilder();
@@ -110,9 +120,13 @@ public class BPMProcessInstanceOperations {
     @OutputResolver(output = BPMProcessInstanceOutputMetadataResolver.class)
     public List<BPMProcessInstance> fetchProcessInstances(
             @Config BPMExtension engine,
+            @Connection BPMConnection connection,
             @Alias("query") BPMProcessInstanceQuery processInstanceQuery,
             @Optional(defaultValue = "0") int firstResult,
             @Optional(defaultValue = "100") int maxResults) throws InterruptedException {
+        if (connection == null || connection.getTask() == null) {
+            throw new IllegalStateException("Process instance query operations must join to task listener transaction");
+        }
 
         LOGGER.debug("Fetching maximum of {} process instances starting from {}", maxResults, firstResult);
 
@@ -124,7 +138,11 @@ public class BPMProcessInstanceOperations {
     @OutputResolver(output = BPMProcessInstanceOutputMetadataResolver.class)
     public BPMProcessInstance fetchUniqueProcessInstance(
             @Config BPMExtension engine,
+            @Connection BPMConnection connection,
             @Alias("query") BPMProcessInstanceQuery processInstanceQuery) throws InterruptedException {
+        if (connection == null || connection.getTask() == null) {
+            throw new IllegalStateException("Process instance query operations must join to task listener transaction");
+        }
 
         LOGGER.debug("Fetching unique process instance");
 

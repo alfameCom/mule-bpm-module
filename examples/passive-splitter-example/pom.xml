@@ -66,6 +66,21 @@
 					</coverage>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.7</version>
+				<configuration>
+					<fileSets>
+						<fileSet>
+							<directory>${project.build.directory}</directory>
+							<includes>
+								<include>jacoco.exec</include>
+							</includes>
+						</fileSet>
+					</fileSets>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
