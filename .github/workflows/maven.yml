@@ -31,6 +31,8 @@ jobs:
         server-password: MAVEN_PASSWORD
 
     - name: Build and verify with Maven
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: mvn -B -Pexamples clean org.jacoco:jacoco-maven-plugin:prepare-agent install verify org.jacoco:jacoco-maven-plugin:merge org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dgpg.skip --file pom.xml
 
     - name: Deploy with Maven

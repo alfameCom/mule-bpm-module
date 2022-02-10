@@ -71,17 +71,13 @@
 						<phase>test</phase>
 						<goals>
 							<goal>test</goal>
-							<goal>coverage-report</goal>
 						</goals>
 					</execution>
 				</executions>
 				<configuration>
-					<coverage>
-						<runCoverage>true</runCoverage>
-						<formats>
-							<format>html</format>
-						</formats>
-					</coverage>
+					<argLines>
+						<argLine>${surefire.jacoco.args}</argLine>
+					</argLines>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -97,6 +93,7 @@
 							</includes>
 						</fileSet>
 					</fileSets>
+					<propertyName>surefire.jacoco.args</propertyName>
 				</configuration>
 			</plugin>
 		</plugins>
