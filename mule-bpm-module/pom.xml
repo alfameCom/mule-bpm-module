@@ -46,6 +46,9 @@
     </properties>
 
     <build>
+        <filters>
+            <filter>src/main/java/com/alfame/esb/bpm/module/internal/BPMExtension.java</filter>
+        </filters>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
