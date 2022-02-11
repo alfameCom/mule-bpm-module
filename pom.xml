@@ -54,6 +54,8 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.login>N/A</sonar.login>
         <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+
+        <gpg.skip>true</gpg.skip>
     </properties>
 
     <build>
