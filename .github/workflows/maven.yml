@@ -29,11 +29,15 @@ jobs:
         server-id: ossrh
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
+        gpg-private-key: ${{ secrets.OSSRH_PGP_PRIVATE_KEY }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
     - name: Build and verify with Maven
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: mvn -B -Pexamples clean org.jacoco:jacoco-maven-plugin:prepare-agent install verify org.jacoco:jacoco-maven-plugin:merge org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dgpg.skip --file pom.xml
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_PGP_PASSPHRASE }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn -B -Pexamples clean org.jacoco:jacoco-maven-plugin:prepare-agent install verify org.jacoco:jacoco-maven-plugin:merge org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dgpg.skip=false --file pom.xml
 
     - name: Deploy with Maven
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -41,4 +45,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-      run: mvn -B deploy -Dgpg.skip --file pom.xml
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_PGP_PASSPHRASE }}
+      run: mvn -B deploy -Dgpg.skip=false --file pom.xml
