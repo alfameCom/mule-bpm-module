@@ -54,6 +54,8 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.login>N/A</sonar.login>
         <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+
+        <gpg.skip>true</gpg.skip>
     </properties>
 
     <build>
@@ -123,6 +125,10 @@
                     </goals>
                     <configuration>
                         <keyname>0x3EC81202DC4A2D1526EB322DF16BC2D045C9737F</keyname>
+                        <gpgArguments>
+                            <arg>--pinentry-mode</arg>
+                            <arg>loopback</arg>
+                        </gpgArguments>
                     </configuration> 
                   </execution>
                 </executions>

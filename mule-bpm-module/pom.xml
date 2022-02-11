@@ -27,7 +27,7 @@
         <developerConnection>scm:git:ssh://git@github.com/alfameCom/mule-bpm-module.git</developerConnection>
         <url>https://github.com/alfameCom/mule-bpm-module/tree/master</url>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <groupId>com.alfame.esb.bpm</groupId>
     <artifactId>mule-bpm-module</artifactId>
@@ -97,34 +97,6 @@
                     </fileSets>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.8</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                  <execution>
-                    <id>sign-artifacts</id>
-                    <phase>verify</phase>
-                    <goals>
-                      <goal>sign</goal>
-                    </goals>
-                    <configuration>
-                        <keyname>0x3EC81202DC4A2D1526EB322DF16BC2D045C9737F</keyname>
-                    </configuration> 
-                  </execution>
-                </executions>
-              </plugin>
         </plugins>
     </build>
 

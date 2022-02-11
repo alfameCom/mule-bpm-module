@@ -48,7 +48,7 @@ To install Mule BPM Module, follow these steps:
 ```
 git clone git@github.com:alfameCom/mule-bpm-module.git
 cd mule-bpm-module
-mvn clean install -Dgpg.skip
+mvn clean install
 ```
 
 ## Contributing to Mule BPM Module
