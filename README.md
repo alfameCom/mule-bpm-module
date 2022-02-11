@@ -60,6 +60,8 @@ To contribute to Mule BPM Module, follow these steps:
 4. Push to the original branch: `git push origin <project_name>/<location>`
 5. Create the pull request.
 
+> Hint for starting new development versions: `mvn release:update-versions -Pexamples -DdevelopmentVersion=2.2.4-SNAPSHOT`
+
 Alternatively see the GitHub documentation on [creating a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request).
 
 ## License
