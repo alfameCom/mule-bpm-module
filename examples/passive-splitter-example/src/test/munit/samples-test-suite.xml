@@ -74,6 +74,21 @@ output application/json
 			"id": "550e8400-e29b-41d4-a716-446655440111",
 			"name": "Small sample",
 			"value": 1
+		},
+		{
+			"id": "550e8400-e29b-41d4-a716-446655440112",
+			"name": "Super sample",
+			"value": 100
+		},
+		{
+			"id": "550e8400-e29b-41d4-a716-446655440121",
+			"name": "Ulta sample",
+			"value": 999
+		},
+		{
+			"id": "550e8400-e29b-41d4-a716-446655440122",
+			"name": "Hyper sample",
+			"value": 100000
 		}
 	]
 }]'
@@ -84,7 +99,7 @@ output application/json
 
             <bpm:wait-for-events
                     config-ref="engineConfig" subscription="#[vars.eventSubscription]"
-                    numberOfEvents="3" timeout="15" target="events"
+                    numberOfEvents="6" timeout="30" target="events"
                     doc:name="Wait events and unsubscribe"
                     doc:id="ce91e15b-18f6-4471-a356-e31737e23cb3"/>
         </munit:execution>
@@ -103,8 +118,8 @@ output application/json
                     doc:id="0XX2cc8b-1v10-4f10-a1sz-1v9bf910ab30"/>
             <munit-tools:assert-equals
                     actual="#[%dw 2.0 output application/java --- sizeOf(vars.events)]"
-                    expected="#[3]"
-                    message="Three process ending events in total should be present"
+                    expected="#[6]"
+                    message="Six process ending events in total should be present"
                     doc:name="Assert equals"
                     doc:id="5cad4ade-910a-4a0e-855f-fc000e4dfbd2"/>
             <bpm:get-events
@@ -133,8 +148,8 @@ output application/json
             </bpm:get-events>
             <munit-tools:assert-equals
                     actual="#[%dw 2.0 output application/java --- sizeOf(vars.submitEvents)]"
-                    expected="#[2]"
-                    message="Two submit process ending events should be present"
+                    expected="#[5]"
+                    message="Five submit process ending events should be present"
                     doc:name="Assert equals"
                     doc:id="85945a65-23d9-4d14-abc1-c6c30dcf9f90"/>
             <foreach
@@ -143,7 +158,10 @@ output application/java
 ---
 [
 	'samples_550e8400-e29b-41d4-a716-446655440111.xml',
-	'samples_550e8400-e29b-41d4-a716-446655440000.xml'
+	'samples_550e8400-e29b-41d4-a716-446655440000.xml',
+	'samples_550e8400-e29b-41d4-a716-446655440112.xml',
+	'samples_550e8400-e29b-41d4-a716-446655440121.xml',
+	'samples_550e8400-e29b-41d4-a716-446655440122.xml'
 ]]">
                 <ftpserver:contains-files
                         config-ref="MUnit_FTP_Server_Config" file="#[payload]"

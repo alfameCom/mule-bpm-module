@@ -130,7 +130,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
                 } catch (InterruptedException exception) {
                     LOGGER.warn("<<<<< process definition {}: instance {}: activity {}: execution was interrupted by exception {} in {} ms", processDefinitionKey, processInstanceId, currentActivityId, exception, System.currentTimeMillis() - startTime);
                     task.cancel();
-                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(exception);
                 } catch (ExecutionException exception) {
                     LOGGER.error("<<<<< process definition {}: instance {}: activity {}: execution caught exception {} in {} ms", processDefinitionKey, processInstanceId, currentActivityId, exception, System.currentTimeMillis() - startTime);
                     task.cancel();
