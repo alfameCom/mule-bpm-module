@@ -81,20 +81,20 @@ public class BPMConnection implements TransactionalConnection {
     @Override
     public void begin() throws TransactionException {
         if (task != null) {
-            this.cachedConnection.put(this, task);
+            this.connectionCache.put(this, task);
             LOGGER.debug("{} of activity {} beginning for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
         }
     }
 
     @Override
     public void commit() throws TransactionException {
-        this.cachedConnection.remove(this);
+        this.connectionCache.remove(this);
         LOGGER.debug("{} of activity {} committing for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
     }
 
     @Override
     public void rollback() throws TransactionException {
-        this.cachedConnection.remove(this);
+        this.connectionCache.remove(this);
         LOGGER.debug("{} transaction of activity {} rolling back for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
     }
 
