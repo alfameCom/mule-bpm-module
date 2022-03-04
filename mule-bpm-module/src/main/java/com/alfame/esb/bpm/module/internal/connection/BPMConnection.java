@@ -4,6 +4,7 @@ import com.alfame.esb.bpm.taskqueue.BPMTask;
 import com.alfame.esb.bpm.taskqueue.BPMTaskResponseCallback;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
+import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -20,7 +21,13 @@ public class BPMConnection implements TransactionalConnection {
     private BPMTaskResponseCallback responseCallback;
     private Map<String, Object> variablesToUpdate = new HashMap<>();
     private List<String> variablesToRemove = new ArrayList<>();
+
     private BPMTask task;
+    Map<BPMConnection, BPMTask> connectionCache;
+
+    public BPMConnection(Map<BPMConnection, BPMTask> connectionCache) {
+        this.connectionCache = connectionCache;
+    }
 
     public BPMTaskResponseCallback getResponseCallback() {
         return responseCallback;
@@ -39,15 +46,32 @@ public class BPMConnection implements TransactionalConnection {
     }
 
     public List<String> getVariablesToRemove() {
-    	return variablesToRemove;
+        return variablesToRemove;
     }
 
     public void setVariablesToDelete(List<String> variablesToRemove) {
-    	this.variablesToRemove = variablesToRemove;
+        this.variablesToRemove = variablesToRemove;
     }
 
     public BPMTask getTask() {
     	return task;
+    }
+
+    public BPMConnection joinIfForked(CorrelationInfo correlationInfo) {
+        BPMConnection connection = this;
+        if (connection.getTask() == null) {
+            for (BPMConnection cachedConnection : this.connectionCache.keySet()) {
+                if (correlationInfo.getCorrelationId().equals(cachedConnection.getTask().getCorrelationId().get())) {
+                    connection = cachedConnection;
+                    LOGGER.debug("{} of activity {} joined {} for instance {}", this, connection.getTask().getActivityId(), connection, connection.getTask().getProcessInstanceId());
+                    break;
+                }
+            }
+        }
+        if (connection.getTask() == null) {
+            throw new IllegalStateException("No active task listener transaction to join");
+        }
+        return connection;
     }
 
     public void setTask(BPMTask task) {
@@ -56,17 +80,22 @@ public class BPMConnection implements TransactionalConnection {
 
     @Override
     public void begin() throws TransactionException {
-        LOGGER.debug("BPMConnection transaction of activity {} beginning for instance {}", task.getActivityId(), task.getProcessInstanceId());
+        if (task != null) {
+            this.cachedConnection.put(this, task);
+            LOGGER.debug("{} of activity {} beginning for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
+        }
     }
 
     @Override
     public void commit() throws TransactionException {
-        LOGGER.debug("BPMConnection transaction of activity {} committing for instance {}", task.getActivityId(), task.getProcessInstanceId());
+        this.cachedConnection.remove(this);
+        LOGGER.debug("{} of activity {} committing for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
     }
 
     @Override
     public void rollback() throws TransactionException {
-        LOGGER.debug("BPMConnection transaction of activity {} rolling back for instance {}", task.getActivityId(), task.getProcessInstanceId());
+        this.cachedConnection.remove(this);
+        LOGGER.debug("{} transaction of activity {} rolling back for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
     }
 
 }

@@ -13,6 +13,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -29,10 +30,9 @@ public class BPMProcessInstanceOperations {
             @Config BPMExtension config,
             @Connection BPMConnection connection,
             @DisplayName("Process instance Id") String processInstanceId,
-            @Optional @DisplayName("Delete reason") String deleteReason) throws IOException {
-        if (connection == null || connection.getTask() == null) {
-            throw new IllegalStateException("Process instance deletion operations must join to task listener transaction");
-        }
+            @Optional @DisplayName("Delete reason") String deleteReason,
+            CorrelationInfo correlationInfo) throws IOException {
+        connection = connection.joinIfForked(correlationInfo);
         
         config.deleteProcessInstance(processInstanceId, deleteReason);
 
@@ -45,10 +45,9 @@ public class BPMProcessInstanceOperations {
     public BPMProcessInstanceQuery buildProcessInstanceQuery(
             @Config BPMExtension engine,
             @Connection BPMConnection connection,
-            @Optional @Alias("process-instance-filters") List<BPMProcessInstanceFilter> processInstanceFilters) throws InterruptedException {
-        if (connection == null || connection.getTask() == null) {
-            throw new IllegalStateException("Process instance query operations must join to task listener transaction");
-        }
+            @Optional @Alias("process-instance-filters") List<BPMProcessInstanceFilter> processInstanceFilters,
+            CorrelationInfo correlationInfo) throws InterruptedException {
+        connection = connection.joinIfForked(correlationInfo);
 
         LOGGER.debug("Creating query for process instances");
         BPMProcessInstanceQueryBuilder processInstanceQueryBuilder = engine.processInstanceQueryBuilder();
@@ -123,10 +122,9 @@ public class BPMProcessInstanceOperations {
             @Connection BPMConnection connection,
             @Alias("query") BPMProcessInstanceQuery processInstanceQuery,
             @Optional(defaultValue = "0") int firstResult,
-            @Optional(defaultValue = "100") int maxResults) throws InterruptedException {
-        if (connection == null || connection.getTask() == null) {
-            throw new IllegalStateException("Process instance query operations must join to task listener transaction");
-        }
+            @Optional(defaultValue = "100") int maxResults,
+            CorrelationInfo correlationInfo) throws InterruptedException {
+        connection = connection.joinIfForked(correlationInfo);
 
         LOGGER.debug("Fetching maximum of {} process instances starting from {}", maxResults, firstResult);
 
@@ -139,10 +137,9 @@ public class BPMProcessInstanceOperations {
     public BPMProcessInstance fetchUniqueProcessInstance(
             @Config BPMExtension engine,
             @Connection BPMConnection connection,
-            @Alias("query") BPMProcessInstanceQuery processInstanceQuery) throws InterruptedException {
-        if (connection == null || connection.getTask() == null) {
-            throw new IllegalStateException("Process instance query operations must join to task listener transaction");
-        }
+            @Alias("query") BPMProcessInstanceQuery processInstanceQuery,
+            CorrelationInfo correlationInfo) throws InterruptedException {
+        connection = connection.joinIfForked(correlationInfo);
 
         LOGGER.debug("Fetching unique process instance");
 
