@@ -7,8 +7,8 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.slf4j.Logger;
 
-import java.util.Collection;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -18,7 +18,7 @@ public class BPMConnectionProvider implements ConnectionProvider<BPMConnection>,
 
     private static final Logger LOGGER = getLogger(BPMConnectionProvider.class);
 
-    private static Collection<BPMConnection> connectionCache = new LinkedBlockingDeque<>();
+    private static Map<String, BPMConnection> connectionCache = new ConcurrentHashMap<>();
 
     @Override
     public BPMConnection connect() throws ConnectionException {
