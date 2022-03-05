@@ -18,7 +18,6 @@ import org.mule.runtime.extension.api.runtime.operation.Result.Builder;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;

@@ -13,10 +13,8 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 
