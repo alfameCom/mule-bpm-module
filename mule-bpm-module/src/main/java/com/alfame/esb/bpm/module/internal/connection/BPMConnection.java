@@ -58,7 +58,7 @@ public class BPMConnection implements TransactionalConnection {
         BPMConnection connection = this;
         if (connection.getTask() == null) {
             for (BPMConnection cachedConnection : this.connectionCache) {
-                if (correlationInfo.getCorrelationId().equals(cachedConnection.getTask().getCorrelationId().get())) {
+                if (correlationInfo.getCorrelationId().equals(cachedConnection.getTask().getCorrelationId().orElse(null))) {
                     connection = cachedConnection;
                     LOGGER.debug("{} of activity {} joined {} for instance {}", this, connection.getTask().getActivityId(), connection, connection.getTask().getProcessInstanceId());
                     break;
