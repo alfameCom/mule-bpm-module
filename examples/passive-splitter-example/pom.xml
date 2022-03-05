@@ -58,6 +58,7 @@
 				<configuration>
 					<argLines>
 						<argLine>${surefire.jacoco.args}</argLine>
+						<argLine>-Djava.awt.headless=true</argLine>
 					</argLines>
 				</configuration>
 			</plugin>
