@@ -79,15 +79,17 @@ public class BPMConnection implements TransactionalConnection {
         String correlationId = this.task.getCorrelationId().orElse(null);
         if (this.task != null && correlationId != null && !correlationId.isEmpty()) {
             this.connectionCache.put(correlationId, this);
-            LOGGER.debug("{} of activity {} beginning for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
+            LOGGER.debug("{} of activity {} cached for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
         }
+        LOGGER.debug("{} of activity {} beginning for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
     }
 
     @Override
     public void commit() throws TransactionException {
         String correlationId = this.task.getCorrelationId().orElse(null);
         if (correlationId != null && !correlationId.isEmpty()) {
-            this.connectionCache.remove(this);
+            this.connectionCache.remove(correlationId);
+            LOGGER.debug("{} of activity {} uncached for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
         }
         LOGGER.debug("{} of activity {} committing for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
     }
@@ -96,9 +98,10 @@ public class BPMConnection implements TransactionalConnection {
     public void rollback() throws TransactionException {
         String correlationId = this.task.getCorrelationId().orElse(null);
         if (correlationId != null && !correlationId.isEmpty()) {
-            this.connectionCache.remove(this);
+            this.connectionCache.remove(correlationId);
+            LOGGER.debug("{} of activity {} uncached for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
         }
-        LOGGER.debug("{} transaction of activity {} rolling back for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
+        LOGGER.debug("{} of activity {} rolling back for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
     }
 
 }
