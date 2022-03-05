@@ -7,10 +7,7 @@ import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -23,9 +20,9 @@ public class BPMConnection implements TransactionalConnection {
     private List<String> variablesToRemove = new ArrayList<>();
 
     private BPMTask task;
-    Map<BPMConnection, BPMTask> connectionCache;
+    Collection<BPMConnection> connectionCache;
 
-    public BPMConnection(Map<BPMConnection, BPMTask> connectionCache) {
+    public BPMConnection(Collection<BPMConnection> connectionCache) {
         this.connectionCache = connectionCache;
     }
 
@@ -60,7 +57,7 @@ public class BPMConnection implements TransactionalConnection {
     public BPMConnection joinIfForked(CorrelationInfo correlationInfo) {
         BPMConnection connection = this;
         if (connection.getTask() == null) {
-            for (BPMConnection cachedConnection : this.connectionCache.keySet()) {
+            for (BPMConnection cachedConnection : this.connectionCache) {
                 if (correlationInfo.getCorrelationId().equals(cachedConnection.getTask().getCorrelationId().get())) {
                     connection = cachedConnection;
                     LOGGER.debug("{} of activity {} joined {} for instance {}", this, connection.getTask().getActivityId(), connection, connection.getTask().getProcessInstanceId());
@@ -81,7 +78,7 @@ public class BPMConnection implements TransactionalConnection {
     @Override
     public void begin() throws TransactionException {
         if (task != null) {
-            this.connectionCache.put(this, task);
+            this.connectionCache.add(this);
             LOGGER.debug("{} of activity {} beginning for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
         }
     }
