@@ -263,6 +263,11 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         return this.getTaskService().getAttachmentContent(attachmentId);
     }
 
+    @Override
+    public void removeAttachment(String attachmentId) {
+        this.getTaskService().deleteAttachment(attachmentId);
+    }
+
     public void triggerSignal(String processInstanceId, String signalName) {
         Execution execution = this.getRuntimeService().createExecutionQuery()
                 .signalEventSubscriptionName(signalName).processInstanceId(processInstanceId)

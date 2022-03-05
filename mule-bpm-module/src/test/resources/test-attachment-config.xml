@@ -60,6 +60,9 @@ attachment: {
         <bpm:set-variable config-ref="engineConfig" variableName="kokeilempaVaa">
             <bpm:variable-content>#['heihei']</bpm:variable-content>
         </bpm:set-variable>
+
+        <bpm:remove-attachment config-ref="engineConfig" attachmentId="#[attributes.id]" />
+
         <set-payload value="true"/>
     </flow>
 

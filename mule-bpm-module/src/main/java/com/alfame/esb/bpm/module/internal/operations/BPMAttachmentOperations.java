@@ -10,6 +10,7 @@ import com.alfame.esb.bpm.module.internal.BPMExtension;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.*;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.slf4j.Logger;
@@ -82,6 +83,16 @@ public class BPMAttachmentOperations {
         }
 
         return resultBuilder.build();
+    }
+
+    @Alias("remove-attachment")
+    public void removeAttachment(
+            @Config BPMExtension engine,
+            @DisplayName("Attachment id") String attachmentId) {
+
+        engine.removeAttachment(attachmentId);
+
+        LOGGER.debug("Removed attachment " + attachmentId);
     }
 
 }
