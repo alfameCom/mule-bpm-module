@@ -61,7 +61,7 @@ public class BPMProcessVariableOperations {
             @Connection BPMConnection connection,
             @DisplayName("Variable name") String variableName,
             @Alias("variable-content") @Content @Summary("Content for variable") TypedValue<Serializable> variableContent,
-            CorrelationInfo correlationInfo) throws IOException {
+            CorrelationInfo correlationInfo) {
         connection = connection.joinIfForked(correlationInfo);
 
         connection.getVariablesToUpdate().put(variableName, variableContent.getValue());
