@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -68,6 +69,8 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
     private SourceTransactionalAction action;
 
     private Scheduler scheduler;
+
+    private Semaphore semaphore;
 
     @Inject
     private SchedulerConfig schedulerConfig;
@@ -135,11 +138,15 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
     @OnTerminate
     public void onTerminate() {
+        if (semaphore != null) {
+            semaphore.release();
+        }
     }
 
     private void startConsumers(SourceCallback<Object, BPMTaskInstance> sourceCallback) {
         createScheduler();
         consumers = new ArrayList<>(numberOfConsumers);
+        semaphore = new Semaphore(1, false);
         for (int i = 0; i < numberOfConsumers; i++) {
             final Consumer consumer = new Consumer(config, endpointDescriptor, sourceCallback);
             consumers.add(consumer);
@@ -182,14 +189,18 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
             while (isAlive()) {
 
-                final SourceCallbackContext ctx = sourceCallback.createContext();
-                if (ctx == null) {
-                    LOGGER.warn("Consumer for <bpm:task-listener> on flow '{}' no callback context. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                    stop();
-                    continue;
-                }
+                SourceCallbackContext ctx = null;
 
                 try {
+                    semaphore.acquire();
+                    ctx = sourceCallback.createContext();
+                    if (ctx == null) {
+                        LOGGER.warn("Consumer for <bpm:task-listener> on flow '{}' no callback context. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
+                        stop();
+                        cancel(ctx);
+                        continue;
+                    }
+                    semaphore.release();
 
                     final BPMTaskQueue queue = BPMTaskQueueFactory.getInstance(endpointDescriptor.getEndpointUrl());
                     BPMTask task = queue.pop(endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit());
@@ -210,6 +221,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                             continue;
                         }
 
+                        semaphore.acquire();
                         String correlationId = task.getCorrelationId().orElse(null);
                         if (correlationId == null || correlationId.isEmpty()) {
                             LOGGER.error("Consumer for <bpm:task-listener> on flow '{}' no correlation id available. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
@@ -237,15 +249,17 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                         resultBuilder.mediaType(APPLICATION_JAVA);
                         resultBuilder.attributes(task);
                         resultBuilder.mediaType(APPLICATION_JAVA);
+                        semaphore.release();
 
                         Result<Object, BPMTaskInstance> result = resultBuilder.build();
 
+                        semaphore.acquire();
                         if (isAlive()) {
                             sourceCallback.handle(result, ctx);
                         } else {
                             cancel(ctx);
                         }
-
+                        semaphore.release();
                     }
 
                 } catch (ConnectionException e) {
@@ -271,7 +285,9 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
         private void cancel(SourceCallbackContext ctx) {
             try {
-                ctx.getTransactionHandle().rollback();
+                if (ctx != null) {
+                    ctx.getTransactionHandle().rollback();
+                }
             } catch (TransactionException e) {
                 if (LOGGER.isWarnEnabled()) {
                     LOGGER.warn("Failed to rollback transaction: " + e.getMessage(), e);
@@ -279,7 +295,9 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
             }
 
             try {
-                connectionProvider.disconnect(ctx.getConnection());
+                if (ctx != null) {
+                    connectionProvider.disconnect(ctx.getConnection());
+                }
             } catch (IllegalStateException e) {
                 // Not connected
             } catch (IllegalArgumentException e) {
@@ -289,6 +307,8 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                     LOGGER.warn("Failed to disconnect connection: " + e.getMessage(), e);
                 }
             }
+
+            semaphore.release();
         }
 
         private BPMConnection connect(SourceCallbackContext ctx, BPMTask task) throws ConnectionException, TransactionException {
