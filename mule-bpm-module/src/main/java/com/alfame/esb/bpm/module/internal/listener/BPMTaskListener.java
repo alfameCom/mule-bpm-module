@@ -192,24 +192,22 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                 SourceCallbackContext ctx = null;
 
                 try {
-                    semaphore.acquire();
-                    ctx = sourceCallback.createContext();
-                    if (ctx == null) {
-                        LOGGER.warn("Consumer for <bpm:task-listener> on flow '{}' no callback context. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                        stop();
-                        cancel(ctx);
-                        continue;
-                    }
-                    semaphore.release();
-
                     final BPMTaskQueue queue = BPMTaskQueueFactory.getInstance(endpointDescriptor.getEndpointUrl());
                     BPMTask task = queue.pop(endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit());
 
                     if (task == null) {
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                        cancel(ctx);
                         continue;
                     } else {
+
+                        semaphore.acquire();
+                        ctx = sourceCallback.createContext();
+                        if (ctx == null) {
+                            LOGGER.warn("Consumer for <bpm:task-listener> on flow '{}' no callback context. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
+                            stop();
+                            cancel(null);
+                            continue;
+                        }
 
                         long taskTimeoutMillis = task.getRequestTimeoutMillis();
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' uses activity timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), taskTimeoutMillis, currentThread().getName());
@@ -221,7 +219,6 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                             continue;
                         }
 
-                        semaphore.acquire();
                         String correlationId = task.getCorrelationId().orElse(null);
                         if (correlationId == null || correlationId.isEmpty()) {
                             LOGGER.error("Consumer for <bpm:task-listener> on flow '{}' no correlation id available. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
