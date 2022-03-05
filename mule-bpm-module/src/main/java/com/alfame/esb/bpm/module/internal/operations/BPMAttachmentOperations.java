@@ -92,7 +92,7 @@ public class BPMAttachmentOperations {
 
         engine.removeAttachment(attachmentId);
 
-        LOGGER.debug("Removed attachment " + attachmentId);
+        LOGGER.debug("Removed attachment {}", attachmentId);
     }
 
 }
