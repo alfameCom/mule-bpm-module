@@ -5,11 +5,7 @@ import com.alfame.esb.bpm.module.api.config.*;
 import com.alfame.esb.bpm.module.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.bpm.module.internal.impl.*;
 import com.alfame.esb.bpm.module.internal.listener.BPMTaskListener;
-import com.alfame.esb.bpm.module.internal.operations.BPMAttachmentOperations;
-import com.alfame.esb.bpm.module.internal.operations.BPMEventSubscriptionOperations;
-import com.alfame.esb.bpm.module.internal.operations.BPMProcessFactoryOperations;
-import com.alfame.esb.bpm.module.internal.operations.BPMProcessInstanceOperations;
-import com.alfame.esb.bpm.module.internal.operations.BPMProcessVariableOperations;
+import com.alfame.esb.bpm.module.internal.operations.*;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -17,6 +13,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -106,10 +103,24 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     private BPMDataSource dataSource;
 
     @Parameter
+    @Expression(NOT_SUPPORTED)
+    @Optional
+    @Placement(tab = "General", order = 4)
+    @DisplayName("Unique name for process definition deployments")
+    private String uniqueDeploymentName;
+
+    @Parameter
+    @Expression(NOT_SUPPORTED)
+    @Optional(defaultValue = "false")
+    @Placement(tab = "General", order = 5)
+    @DisplayName("Filter duplicate process definition deployments")
+    private boolean duplicateDeploymentFiltering;
+
+    @Parameter
     @Optional
     @Expression(NOT_SUPPORTED)
     @Alias("definitions")
-    @Placement(tab = "General", order = 4)
+    @Placement(tab = "General", order = 6)
     @DisplayName("Process definitions")
     private List<BPMDefinition> definitions;
 
@@ -118,7 +129,7 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     @NullSafe(defaultImplementingType = BPMDefaultAsyncExecutorFactory.class)
     @Expression(NOT_SUPPORTED)
     @Alias("async-executor-factory")
-    @Placement(tab = "General", order = 5)
+    @Placement(tab = "General", order = 7)
     @DisplayName("Async executor factory")
     private BPMAsyncExecutorFactory asyncExecutorFactory;
 
@@ -285,17 +296,28 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         if (definitions != null) {
             for (BPMDefinition definition : definitions) {
                 try {
-                    LOGGER.debug("{} adding {} resource {} for tenant {}", this.name, definition.getType(), definition.getResourceName(), tenantId);
+                    LOGGER.debug("{} adding {} process definition resource {} for tenant {}", this.name, definition.getType(), definition.getResourceName(), tenantId);
                     definition.addToDeploymentBuilder(deploymentBuilder);
-                    LOGGER.debug("{} added {} resource {} for tenant {}", this.name, definition.getType(), definition.getResourceName(), tenantId);
+                    LOGGER.debug("{} added {} process definition resource {} for tenant {}", this.name, definition.getType(), definition.getResourceName(), tenantId);
                 } catch (FlowableIllegalArgumentException exception) {
-                    LOGGER.warn("{} failed to add {} resource {} for tenant {}", this.name, definition.getType(), definition.getResourceName(), tenantId);
+                    LOGGER.warn("{} failed to add {} process definition resource {} for tenant {}", this.name, definition.getType(), definition.getResourceName(), tenantId);
                 }
             }
         }
 
-        deploymentBuilder.tenantId(tenantId).deploy();
-        LOGGER.debug("{} made deployment for tenant {}", this.name, tenantId);
+        Deployment deployment = null;
+        if (this.uniqueDeploymentName != null && !this.uniqueDeploymentName.isEmpty() && this.duplicateDeploymentFiltering) {
+            deployment = deploymentBuilder.tenantId(tenantId).name(this.uniqueDeploymentName).enableDuplicateFiltering().deploy();
+        } else {
+            deployment = deploymentBuilder.tenantId(tenantId).deploy();
+        }
+        if (deployment != null && deployment.isNew()) {
+            if (this.uniqueDeploymentName != null && !this.uniqueDeploymentName.isEmpty()) {
+                LOGGER.info("{} made process definition deployment called {} with id {} for tenant {}", this.name, this.uniqueDeploymentName, deployment.getId(), tenantId);
+            } else {
+                LOGGER.info("{} made process definition deployment with id {} for tenant {}", this.name, deployment.getId(), tenantId);
+            }
+        }
     }
 
     @Override
