@@ -59,7 +59,7 @@ public class BPMConnection implements TransactionalConnection {
         BPMConnection connection = this;
         if (connection.getTask() == null) {
             BPMConnection cachedConnection = this.connectionCache.get(correlationInfo.getCorrelationId());
-            if (cachedConnection != null) {
+            if (cachedConnection != null && cachedConnection.getTask() != null) {
                 connection = cachedConnection;
                 LOGGER.debug("{} of activity {} joined {} for instance {}", this, connection.getTask().getActivityId(), connection, connection.getTask().getProcessInstanceId());
             }
@@ -76,32 +76,38 @@ public class BPMConnection implements TransactionalConnection {
 
     @Override
     public void begin() throws TransactionException {
-        String correlationId = this.task.getCorrelationId().orElse(null);
-        if (this.task != null && correlationId != null && !correlationId.isEmpty()) {
-            this.connectionCache.put(correlationId, this);
-            LOGGER.debug("{} of activity {} cached for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
+        if (this.task != null) {
+            String correlationId = this.task.getCorrelationId().orElse(null);
+            if (correlationId != null && !correlationId.isEmpty()) {
+                this.connectionCache.put(correlationId, this);
+                LOGGER.debug("{} of activity {} cached for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
+            }
+            LOGGER.debug("{} of activity {} beginning for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
         }
-        LOGGER.debug("{} of activity {} beginning for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
     }
 
     @Override
     public void commit() throws TransactionException {
-        String correlationId = this.task.getCorrelationId().orElse(null);
-        if (correlationId != null && !correlationId.isEmpty()) {
-            this.connectionCache.remove(correlationId);
-            LOGGER.debug("{} of activity {} uncached for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
+        if (this.task != null) {
+            String correlationId = this.task.getCorrelationId().orElse(null);
+            if (correlationId != null && !correlationId.isEmpty()) {
+                this.connectionCache.remove(correlationId);
+                LOGGER.debug("{} of activity {} uncached for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
+            }
+            LOGGER.debug("{} of activity {} committing for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
         }
-        LOGGER.debug("{} of activity {} committing for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
     }
 
     @Override
     public void rollback() throws TransactionException {
-        String correlationId = this.task.getCorrelationId().orElse(null);
-        if (correlationId != null && !correlationId.isEmpty()) {
-            this.connectionCache.remove(correlationId);
-            LOGGER.debug("{} of activity {} uncached for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
+        if (this.task != null) {
+            String correlationId = this.task.getCorrelationId().orElse(null);
+            if (correlationId != null && !correlationId.isEmpty()) {
+                this.connectionCache.remove(correlationId);
+                LOGGER.debug("{} of activity {} uncached for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
+            }
+            LOGGER.debug("{} of activity {} rolling back for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
         }
-        LOGGER.debug("{} of activity {} rolling back for instance {}", this, task.getActivityId(), task.getProcessInstanceId());
     }
 
 }
