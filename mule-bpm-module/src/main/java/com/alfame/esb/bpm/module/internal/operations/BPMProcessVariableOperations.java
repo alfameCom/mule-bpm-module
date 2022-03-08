@@ -7,10 +7,7 @@ import com.alfame.esb.bpm.module.internal.connection.BPMConnection;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
-import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Content;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.param.*;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -33,14 +30,21 @@ public class BPMProcessVariableOperations {
     public Result<Object, BPMVariableAttributes> getVariable(
             @Config BPMExtension config,
             @Connection BPMConnection connection,
+            @Optional @DisplayName("Process instance id") String processInstanceId,
             @DisplayName("Variable name") String variableName,
             CorrelationInfo correlationInfo) {
-        connection = connection.joinIfForked(correlationInfo);
-
         Builder<Object, BPMVariableAttributes> resultBuilder = Result.builder();
 
-        BPMVariableInstance variableInstance = config.getVariableInstance(
-                connection.getTask().getProcessInstanceId(), variableName);
+        BPMVariableInstance variableInstance = null;
+        if (processInstanceId == null) {
+            connection = connection.joinIfForked(correlationInfo);
+
+            variableInstance = config.getVariableInstance(
+                    connection.getTask().getProcessInstanceId(), variableName);
+
+        } else {
+            variableInstance = config.getHistoricVariableInstance(processInstanceId, variableName);
+        }
 
         if (variableInstance != null) {
             LOGGER.debug("Variable {} found for process {}", variableName, connection.getTask().getProcessInstanceId());
