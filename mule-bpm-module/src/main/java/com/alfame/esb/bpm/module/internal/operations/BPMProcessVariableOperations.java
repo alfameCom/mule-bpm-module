@@ -38,21 +38,21 @@ public class BPMProcessVariableOperations {
         BPMVariableInstance variableInstance = null;
         if (processInstanceId == null) {
             connection = connection.joinIfForked(correlationInfo);
+            processInstanceId = connection.getTask().getProcessInstanceId();
 
-            variableInstance = config.getVariableInstance(
-                    connection.getTask().getProcessInstanceId(), variableName);
+            variableInstance = config.getVariableInstance(processInstanceId, variableName);
 
         } else {
             variableInstance = config.getHistoricVariableInstance(processInstanceId, variableName);
         }
 
         if (variableInstance != null) {
-            LOGGER.debug("Variable {} found for process {}", variableName, connection.getTask().getProcessInstanceId());
+            LOGGER.debug("Variable {} found for process {}", variableName, processInstanceId);
 
             resultBuilder.output(variableInstance.getValue());
             resultBuilder.attributes(variableInstance);
         } else {
-            LOGGER.debug("Variable {} not found for process {}", variableName, connection.getTask().getProcessInstanceId());
+            LOGGER.debug("Variable {} not found for process {}", variableName, processInstanceId);
         }
 
         return resultBuilder.build();
