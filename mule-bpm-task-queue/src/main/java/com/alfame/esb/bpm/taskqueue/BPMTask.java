@@ -1,5 +1,6 @@
 package com.alfame.esb.bpm.taskqueue;
 
+import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.api.BPMTaskInstance;
 
 import java.util.Optional;
@@ -14,6 +15,8 @@ public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallbac
 
     private long requestTimeoutMillis = 300000;
     private BPMTaskRollbackCallback rollbackCallback;
+
+    abstract public BPMProcessInstance getProcessInstance();
 
     abstract public Object getPayload();
 

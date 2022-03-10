@@ -38,10 +38,14 @@ public class BPMProcessVariableOperations {
         BPMVariableInstance variableInstance = null;
         if (processInstanceId == null) {
             connection = connection.joinIfForked(correlationInfo);
-            processInstanceId = connection.getTask().getProcessInstanceId();
 
-            variableInstance = config.getVariableInstance(processInstanceId, variableName);
+            variableInstance = connection.getTask().getProcessInstance().getVariableInstance(variableName);
 
+            if (variableInstance == null) {
+                processInstanceId = connection.getTask().getProcessInstanceId();
+
+                variableInstance = config.getVariableInstance(processInstanceId, variableName);
+            }
         } else {
             variableInstance = config.getHistoricVariableInstance(processInstanceId, variableName);
         }

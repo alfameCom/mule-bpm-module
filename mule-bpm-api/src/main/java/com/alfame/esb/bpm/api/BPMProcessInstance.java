@@ -77,6 +77,8 @@ public abstract class BPMProcessInstance {
      */
     public abstract Date getEndTime();
 
+    public abstract BPMVariableInstance getVariableInstance(String variableName);
+
     @Override
     public String toString() {
         return MessageFormat.format(

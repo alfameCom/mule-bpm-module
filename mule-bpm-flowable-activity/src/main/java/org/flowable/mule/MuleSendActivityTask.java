@@ -1,5 +1,6 @@
 package org.flowable.mule;
 
+import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.taskqueue.BPMTask;
 import org.flowable.engine.delegate.DelegateExecution;
 
@@ -17,6 +18,11 @@ public class MuleSendActivityTask extends BPMTask {
         this.payload = payload;
         this.correlationId = correlationId;
         this.execution = execution;
+    }
+
+    @Override
+    public BPMProcessInstance getProcessInstance() {
+        return new MuleDelegateExecutionProxy(this.execution);
     }
 
     @Override

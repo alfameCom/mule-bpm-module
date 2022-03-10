@@ -1,6 +1,7 @@
 package com.alfame.esb.bpm.module.internal.impl;
 
 import com.alfame.esb.bpm.api.BPMProcessInstance;
+import com.alfame.esb.bpm.api.BPMVariableInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 
 import java.util.Date;
@@ -80,6 +81,11 @@ public class BPMProcessInstanceProxy extends BPMProcessInstance {
 
     @Override
     public Date getEndTime() {
+        return null;
+    }
+
+    @Override
+    public BPMVariableInstance getVariableInstance(String variableName) {
         return null;
     }
 

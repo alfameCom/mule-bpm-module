@@ -1,5 +1,6 @@
 package com.alfame.esb.bpm.module;
 
+import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.taskqueue.BPMTask;
 
 import java.util.Optional;
@@ -36,6 +37,11 @@ public class BPMDummyMuleTask extends BPMTask {
     @Override
     public String getParentId() {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BPMProcessInstance getProcessInstance() {
         return null;
     }
 
