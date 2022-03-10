@@ -7,17 +7,14 @@ import com.alfame.esb.bpm.module.internal.connection.BPMConnection;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
-import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Content;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.param.*;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.operation.Result.Builder;
+import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
@@ -33,23 +30,29 @@ public class BPMProcessVariableOperations {
     public Result<Object, BPMVariableAttributes> getVariable(
             @Config BPMExtension config,
             @Connection BPMConnection connection,
-            @DisplayName("Variable name") String variableName) {
-        if (connection == null || connection.getTask() == null) {
-            throw new IllegalStateException("Variable getting operations must join to task listener transaction");
-        }
-
+            @Optional @DisplayName("Process instance id") String processInstanceId,
+            @DisplayName("Variable name") String variableName,
+            CorrelationInfo correlationInfo) {
         Builder<Object, BPMVariableAttributes> resultBuilder = Result.builder();
 
-        BPMVariableInstance variableInstance = config.getVariableInstance(
-                connection.getTask().getProcessInstanceId(), variableName);
+        BPMVariableInstance variableInstance = null;
+        if (processInstanceId == null) {
+            connection = connection.joinIfForked(correlationInfo);
+            processInstanceId = connection.getTask().getProcessInstanceId();
+
+            variableInstance = config.getVariableInstance(processInstanceId, variableName);
+
+        } else {
+            variableInstance = config.getHistoricVariableInstance(processInstanceId, variableName);
+        }
 
         if (variableInstance != null) {
-            LOGGER.debug("Variable {} found for process {}", variableName, connection.getTask().getProcessInstanceId());
+            LOGGER.debug("Variable {} found for process {}", variableName, processInstanceId);
 
             resultBuilder.output(variableInstance.getValue());
             resultBuilder.attributes(variableInstance);
         } else {
-            LOGGER.debug("Variable {} not found for process {}", variableName, connection.getTask().getProcessInstanceId());
+            LOGGER.debug("Variable {} not found for process {}", variableName, processInstanceId);
         }
 
         return resultBuilder.build();
@@ -60,10 +63,9 @@ public class BPMProcessVariableOperations {
             @Config BPMExtension config,
             @Connection BPMConnection connection,
             @DisplayName("Variable name") String variableName,
-            @Alias("variable-content") @Content @Summary("Content for variable") TypedValue<Serializable> variableContent) throws IOException {
-        if (connection == null || connection.getTask() == null) {
-            throw new IllegalStateException("Variable setting operations must join to task listener transaction");
-        }
+            @Alias("variable-content") @Content @Summary("Content for variable") TypedValue<Serializable> variableContent,
+            CorrelationInfo correlationInfo) {
+        connection = connection.joinIfForked(correlationInfo);
 
         connection.getVariablesToUpdate().put(variableName, variableContent.getValue());
 
@@ -75,10 +77,9 @@ public class BPMProcessVariableOperations {
     public void removeVariable(
             @Config BPMExtension config,
             @Connection BPMConnection connection,
-            @DisplayName("Variable name") String variableName) {
-        if (connection == null || connection.getTask() == null) {
-            throw new IllegalStateException("Variable removal operations must join to task listener transaction");
-        }
+            @DisplayName("Variable name") String variableName,
+            CorrelationInfo correlationInfo) {
+        connection = connection.joinIfForked(correlationInfo);
 
         connection.getVariablesToRemove().add(variableName);
 

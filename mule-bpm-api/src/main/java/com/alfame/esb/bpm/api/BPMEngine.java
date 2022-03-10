@@ -19,6 +19,7 @@ public interface BPMEngine {
 
     BPMAttachmentBuilder attachmentBuilder();
     InputStream getAttachmentContent(String attachmentId);
+    void removeAttachment(String attachmentId);
 
     void triggerSignal(String executionId, String signalName);
     void deleteProcessInstance(String processInstanceId, String deleteReason);

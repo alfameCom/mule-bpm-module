@@ -67,7 +67,7 @@ public class BPMEventSubscriptionOperations {
     public BPMEngineEvent fetchUniqueSubscriptionEvent(
             @Config BPMExtension engine,
             @Alias("subscription") BPMEngineEventSubscription eventSubscription,
-            @Optional @Alias("event-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) throws InterruptedException {
+            @Optional @Alias("event-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) {
 
         BPMEngineEventFinder eventFinder = createEventFinder(eventSubscription, eventSubscriptionFilters);
 
@@ -82,7 +82,7 @@ public class BPMEventSubscriptionOperations {
     public List<BPMEngineEvent> fetchSubscriptionEvents(
             @Config BPMExtension engine,
             @Alias("subscription") BPMEngineEventSubscription eventSubscription,
-            @Optional @Alias("event-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) throws InterruptedException {
+            @Optional @Alias("event-filters") List<BPMEventSubscriptionFilter> eventSubscriptionFilters) {
 
         BPMEngineEventFinder eventFinder = createEventFinder(eventSubscription, eventSubscriptionFilters);
 

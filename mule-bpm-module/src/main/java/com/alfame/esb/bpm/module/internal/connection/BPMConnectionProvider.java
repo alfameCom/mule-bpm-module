@@ -7,6 +7,9 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.slf4j.Logger;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -15,9 +18,11 @@ public class BPMConnectionProvider implements ConnectionProvider<BPMConnection>,
 
     private static final Logger LOGGER = getLogger(BPMConnectionProvider.class);
 
+    private static Map<String, BPMConnection> connectionCache = new ConcurrentHashMap<>();
+
     @Override
     public BPMConnection connect() throws ConnectionException {
-        BPMConnection connection = new BPMConnection();
+        BPMConnection connection = new BPMConnection(connectionCache);
         LOGGER.debug("BPMConnectionProvider created connection {}", connection);
         return connection;
     }
