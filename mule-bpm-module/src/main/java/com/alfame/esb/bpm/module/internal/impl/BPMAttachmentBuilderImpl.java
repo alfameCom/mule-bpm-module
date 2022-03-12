@@ -22,6 +22,10 @@ public class BPMAttachmentBuilderImpl extends BPMAttachmentBuilder {
     public BPMAttachmentInstance createAttachment() {
         Attachment attachment = null;
 
+        if (this.processInstanceId == null && this.taskId == null) {
+            throw new IllegalArgumentException("Either process instance id or task id required");
+        }
+
         if (this.content != null && this.url != null) {
             throw new IllegalArgumentException("Only content or URL support");
         } else if (this.content != null) {
@@ -32,7 +36,7 @@ public class BPMAttachmentBuilderImpl extends BPMAttachmentBuilder {
             throw new IllegalArgumentException("Either content or URL must be set");
         }
 
-        LOGGER.info("Created attachment " + attachment.getId());
+        LOGGER.info("Created attachment {} of type {} called {} for process {} and task {}", attachment.getId(), this.type, this.name, this.processInstanceId, this.taskId);
 
         return new BPMAttachmentInstanceProxy(attachment);
     }
