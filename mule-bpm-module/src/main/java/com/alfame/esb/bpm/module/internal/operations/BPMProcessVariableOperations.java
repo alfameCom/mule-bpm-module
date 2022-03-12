@@ -44,6 +44,7 @@ public class BPMProcessVariableOperations {
             if (variableInstance == null) {
                 processInstanceId = connection.getTask().getProcessInstanceId();
 
+                LOGGER.debug("Variable {} not found from cache for process {}, querying from database", variableName, processInstanceId);
                 variableInstance = config.getVariableInstance(processInstanceId, variableName);
             }
         } else {
