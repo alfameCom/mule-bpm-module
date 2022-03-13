@@ -5,6 +5,7 @@ import com.alfame.esb.bpm.api.BPMVariableInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 
 import java.util.Date;
+import java.util.Map;
 
 public class BPMProcessInstanceProxy extends BPMProcessInstance {
 
@@ -86,7 +87,14 @@ public class BPMProcessInstanceProxy extends BPMProcessInstance {
 
     @Override
     public BPMVariableInstance getVariableInstance(String variableName) {
-        return null;
+        BPMVariableInstance variableInstance = null;
+
+        Map<String, Object> variables = this.processInstance.getProcessVariables();
+        if (variables != null && variables.containsKey(variableName)) {
+            variableInstance = new BPMProcessInstanceVariableProxy(this, variableName, variables.get(variableName));
+        }
+
+        return variableInstance;
     }
 
 }
