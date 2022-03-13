@@ -4,10 +4,17 @@ import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.api.BPMVariableInstance;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.slf4j.Logger;
 
 import java.util.Date;
+import java.util.Map;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class MuleDelegateExecutionProxy extends BPMProcessInstance {
+
+    private static final Logger LOGGER = getLogger(MuleDelegateExecutionProxy.class);
 
     private final DelegateExecution delegateExecution;
 
@@ -90,9 +97,14 @@ public class MuleDelegateExecutionProxy extends BPMProcessInstance {
         BPMVariableInstance variableInstance = null;
 
         try {
-            variableInstance = new MuleDelegateVariableInstanceProxy(this.delegateExecution.getVariableInstanceLocal(variableName, false));
+            Map<String, VariableInstance> variableInstances = this.delegateExecution.getVariableInstances();
+            if (variableInstances != null && variableInstances.containsKey(variableName)) {
+                LOGGER.debug("Found cached variable {}", variableName);
+                variableInstance = new MuleDelegateVariableInstanceProxy(variableInstances.get(variableName));
+            }
         } catch(FlowableException e) {
             if(e.getMessage().equals("lazy loading outside command context")) {
+                LOGGER.debug("Cached variable retrieval {} was interrupted by command context switch", variableName);
                 variableInstance = null;
             } else {
                 throw e;
