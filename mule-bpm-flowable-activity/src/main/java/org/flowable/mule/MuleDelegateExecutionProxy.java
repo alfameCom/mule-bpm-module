@@ -102,13 +102,16 @@ public class MuleDelegateExecutionProxy extends BPMProcessInstance {
                 LOGGER.debug("Found cached variable {}", variableName);
                 variableInstance = new MuleDelegateVariableInstanceProxy(variableInstances.get(variableName));
             }
-        } catch(FlowableException e) {
+        } catch (FlowableException e) {
             if(e.getMessage().equals("lazy loading outside command context")) {
                 LOGGER.debug("Cached variable retrieval {} was interrupted by command context switch", variableName);
                 variableInstance = null;
             } else {
                 throw e;
             }
+        } catch (NullPointerException e) {
+            LOGGER.debug("Cached variable retrieval {} was interrupted by null pointer exception", variableName);
+            variableInstance = null;
         }
 
         return variableInstance;
