@@ -22,6 +22,8 @@ public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallbac
 
     abstract public Optional<String> getCorrelationId();
 
+    abstract public void applyCommandContext();
+
     public long getRequestTimeoutMillis() {
         return this.requestTimeoutMillis;
     }

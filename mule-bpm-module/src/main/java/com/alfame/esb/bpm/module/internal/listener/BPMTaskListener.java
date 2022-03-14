@@ -246,6 +246,8 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                         resultBuilder.mediaType(APPLICATION_JAVA);
                         resultBuilder.attributes(task);
                         resultBuilder.mediaType(APPLICATION_JAVA);
+
+                        task.applyCommandContext();
                         semaphore.release();
 
                         Result<Object, BPMTaskInstance> result = resultBuilder.build();

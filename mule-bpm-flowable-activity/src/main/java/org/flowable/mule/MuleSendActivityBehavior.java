@@ -22,7 +22,6 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.mule.runtime.core.api.util.StringUtils;
 import org.slf4j.Logger;
 
 import java.util.Map;
@@ -92,7 +91,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
             if (queue != null) {
                 MuleSendActivityTask task = null;
                 try {
-                    task = new MuleSendActivityTask(payload, execution.getId(), execution);
+                    task = new MuleSendActivityTask(payload, execution.getId(), execution, Context.getCommandContext());
                     LOGGER.trace(">>>>> process definition {}: instance {}: activity {}: execution being published to task queue {}", processDefinitionKey, processInstanceId, currentActivityId, endpointUrlValue);
                     queue.publish(task);
                     BPMTaskResponse response = task.waitForResponse(requestTimeoutValue, TimeUnit.MILLISECONDS);

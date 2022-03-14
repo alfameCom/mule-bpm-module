@@ -29,6 +29,10 @@ public class BPMDummyMuleTask extends BPMTask {
     }
 
     @Override
+    public void applyCommandContext() {
+    }
+
+    @Override
     public String getId() {
         // TODO Auto-generated method stub
         return null;
