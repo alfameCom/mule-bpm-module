@@ -69,4 +69,5 @@ public class BPMProcessInstanceVariableProxy implements BPMVariableInstance {
     public String getTaskId() {
         return null;
     }
+
 }
