@@ -96,19 +96,10 @@ public class MuleDelegateExecutionProxy extends BPMProcessInstance {
     public BPMVariableInstance getVariableInstance(String variableName) {
         BPMVariableInstance variableInstance = null;
 
-        try {
-            Map<String, VariableInstance> variableInstances = this.delegateExecution.getVariableInstances();
-            if (variableInstances != null && variableInstances.containsKey(variableName)) {
-                LOGGER.debug("Found cached variable {}", variableName);
-                variableInstance = new MuleDelegateVariableInstanceProxy(variableInstances.get(variableName));
-            }
-        } catch(FlowableException e) {
-            if(e.getMessage().equals("lazy loading outside command context")) {
-                LOGGER.debug("Cached variable retrieval {} was interrupted by command context switch", variableName);
-                variableInstance = null;
-            } else {
-                throw e;
-            }
+        VariableInstance cachedVariableInstance = this.delegateExecution.getVariableInstance(variableName, false);
+        if (cachedVariableInstance != null) {
+            LOGGER.debug("Found variable {} from execution context", variableName);
+            variableInstance = new MuleDelegateVariableInstanceProxy(cachedVariableInstance);
         }
 
         return variableInstance;
