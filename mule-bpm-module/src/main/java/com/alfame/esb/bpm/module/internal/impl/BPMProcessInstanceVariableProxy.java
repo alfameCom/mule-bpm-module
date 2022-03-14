@@ -2,7 +2,6 @@ package com.alfame.esb.bpm.module.internal.impl;
 
 import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.api.BPMVariableInstance;
-import com.alfame.esb.bpm.module.internal.cache.BPMRuntimeCache;
 
 public class BPMProcessInstanceVariableProxy implements BPMVariableInstance {
 
