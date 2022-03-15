@@ -44,7 +44,8 @@ public class BPMAttachmentOperations {
                 .type(properties.getType())
                 .content(attachmentContent)
                 .createAttachment();
-        LOGGER.debug("Created attachment " + attachmentInstance.getId());
+        LOGGER.debug("Created attachment {} for process {} and task {}",
+                attachmentInstance.getId(), attachmentInstance.getProcessInstanceId(), attachmentInstance.getTaskId());
 
         return attachmentInstance;
     }

@@ -1,0 +1,44 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+
+    <bpm:config name="engineConfig" tenantId="com.alfame.esb">
+        <bpm:data-source>
+            <bpm:generic-data-source driverClassName="org.hsqldb.jdbcDriver"
+                                     jdbcUrl="jdbc:hsqldb:mem:flowable"
+                                     username="sa"
+                                     password="sa"
+                                     type="HSQL"/>
+        </bpm:data-source>
+        <bpm:definitions>
+            <bpm:classpath-definition resourceClasspath="processes/SynchronousVariableProcess.bpmn20.xml"/>
+        </bpm:definitions>
+    </bpm:config>
+
+    <flow name="oneToTwoTaskFlow">
+        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://oneToTwo" transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN"/>
+
+        <logger level="INFO" message="" />
+        <bpm:get-variable config-ref="engineConfig" variableName="firstVariable" target="firstVariable"/>
+
+        <bpm:set-variable config-ref="engineConfig" variableName="secondVariable">
+            <bpm:variable-content>#[vars.firstVariable]</bpm:variable-content>
+        </bpm:set-variable>
+    </flow>
+
+    <flow name="twoToThreeAndRemoveOneTaskFlow">
+        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://twoToThreeAndRemoveOne" transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN"/>
+
+        <logger level="INFO" message="" />
+        <bpm:get-variable config-ref="engineConfig" variableName="secondVariable" target="secondVariable"/>
+
+        <bpm:set-variable config-ref="engineConfig" variableName="thirdVariable">
+            <bpm:variable-content>#[vars.secondVariable]</bpm:variable-content>
+        </bpm:set-variable>
+
+        <bpm:remove-variable config-ref="engineConfig" variableName="firstVariable"/>
+    </flow>
+
+</mule>

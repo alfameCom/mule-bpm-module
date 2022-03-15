@@ -1,6 +1,9 @@
 package org.flowable.mule;
 
+import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.taskqueue.BPMTask;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 
 import java.util.Optional;
@@ -12,11 +15,18 @@ public class MuleSendActivityTask extends BPMTask {
     private final Object payload;
     private final String correlationId;
     private final DelegateExecution execution;
+    private final CommandContext commandContext;
 
-    public MuleSendActivityTask(Object payload, String correlationId, DelegateExecution execution) {
+    public MuleSendActivityTask(Object payload, String correlationId, DelegateExecution execution, CommandContext commandContext) {
         this.payload = payload;
         this.correlationId = correlationId;
         this.execution = execution;
+        this.commandContext = commandContext;
+    }
+
+    @Override
+    public BPMProcessInstance getProcessInstance() {
+        return new MuleDelegateExecutionProxy(this.execution);
     }
 
     @Override
@@ -27,6 +37,11 @@ public class MuleSendActivityTask extends BPMTask {
     @Override
     public Optional<String> getCorrelationId() {
         return ofNullable(correlationId);
+    }
+
+    @Override
+    public void applyCommandContext() {
+        Context.setCommandContext(this.commandContext);
     }
 
     @Override
