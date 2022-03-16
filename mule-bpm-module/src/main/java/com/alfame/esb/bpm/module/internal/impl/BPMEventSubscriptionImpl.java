@@ -109,6 +109,11 @@ public class BPMEventSubscriptionImpl implements BPMEngineEventSubscription {
     }
 
     @Override
+    public boolean hasEvents() {
+        return !this.cachedEvents.isEmpty();
+    }
+
+    @Override
     public BPMEngineEventFinder eventFinder() {
         return new BPMEventSubscriptionEventFinder(this.cachedEvents);
     }

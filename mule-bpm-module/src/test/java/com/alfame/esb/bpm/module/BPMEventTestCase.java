@@ -22,11 +22,6 @@ public class BPMEventTestCase extends BPMAbstractTestCase {
         BPMEngineEventSubscription eventSubscription = engine.eventSubscriptionBuilder()
                 .processDefinitionKey("variableProcess")
                 .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
-                .eventType(BPMEngineEventType.VARIABLE_CREATED)
-                .eventType(BPMEngineEventType.VARIABLE_UPDATED)
-                .eventType(BPMEngineEventType.VARIABLE_REMOVED)
-                .variable("inputVariable")
-                .variable("outputVariable")
                 .subscribeForEvents();
         Assert.assertNotNull("Engine subscription should not be NULL", eventSubscription);
 
@@ -40,25 +35,10 @@ public class BPMEventTestCase extends BPMAbstractTestCase {
         Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
 
         List<BPMEngineEvent> engineEvents = eventSubscription
-                .waitForEvents(5, 10, TimeUnit.SECONDS);
+                .waitForEvents(1, 10, TimeUnit.SECONDS);
         eventSubscription.unsubscribeForEvents();
         Assert.assertNotNull("Returned engine events should not not be NULL", engineEvents);
-        Assert.assertEquals("Five events should returned", 5, engineEvents.size());
-        
-        BPMEngineEventFinder processVariableRemovedFinder = eventSubscription.eventFinder()
-                .eventType(BPMEngineEventType.VARIABLE_REMOVED)
-                .variable("inputVariable");
-        Assert.assertNotNull("Returned process variable removed finder should not not be NULL", processVariableRemovedFinder);
-        BPMEngineEvent processVariableRemovedEvent = processVariableRemovedFinder.uniqueEvent();
-        Assert.assertNotNull("Returned process variable removed event should not not be NULL", processVariableRemovedEvent);
-
-        BPMEngineEventFinder processVariableCreatedFinder = eventSubscription.eventFinder()
-                .eventType(BPMEngineEventType.VARIABLE_CREATED)
-                .variable("outputVariable");
-        Assert.assertNotNull("Returned process variable created finder should not not be NULL", processVariableCreatedFinder);
-        BPMEngineEvent processVariableCreatedEvent = processVariableCreatedFinder.uniqueEvent();
-        Assert.assertNotNull("Returned process variable removed event should not not be NULL", processVariableCreatedEvent);
-        Assert.assertEquals("outputVariable value should be increased by one", 1 + 1, processVariableCreatedEvent.getVariableValue());
+        Assert.assertEquals("One events should returned", 1, engineEvents.size());
     }
 
 }

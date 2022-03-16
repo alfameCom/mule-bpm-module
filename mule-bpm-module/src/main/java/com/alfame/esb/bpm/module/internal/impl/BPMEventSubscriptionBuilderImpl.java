@@ -80,7 +80,9 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
                 FlowableProcessEngineEvent flowableEngineEvent = (FlowableProcessEngineEvent) flowableEvent;
                 LOGGER.trace("Received engine event {} for instance {}", flowableEngineEvent.getType(), flowableEngineEvent.getProcessInstanceId());
                 if (flowableEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_CREATED)
-                        || flowableEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_COMPLETED)) {
+                        || flowableEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_COMPLETED)
+                        || flowableEngineEvent.getType().equals(FlowableEngineEventType.ENGINE_CREATED)
+                        || flowableEngineEvent.getType().equals(FlowableEngineEventType.ENGINE_CLOSED)) {
                     engineEvent = new BPMEventProxy(flowableEngineEvent);
                 }
                 if (flowableEngineEvent.getType().equals(FlowableEngineEventType.ACTIVITY_STARTED)

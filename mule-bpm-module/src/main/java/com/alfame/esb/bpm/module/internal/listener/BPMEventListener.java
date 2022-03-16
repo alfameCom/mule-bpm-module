@@ -286,7 +286,6 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
                 } catch (InterruptedException e) {
 
                     LOGGER.debug("Consumer for <bpm:event-listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                    stop();
                     cancel(ctx);
 
                 } catch (Exception e) {
@@ -335,7 +334,7 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
         }
 
         private boolean isAlive() {
-            return !stop.get() && !currentThread().isInterrupted();
+            return this.eventSubscription.hasEvents() || (!stop.get() && !currentThread().isInterrupted());
         }
 
         public void stop() {

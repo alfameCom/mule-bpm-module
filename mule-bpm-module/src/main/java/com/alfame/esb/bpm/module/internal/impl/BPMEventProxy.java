@@ -21,6 +21,10 @@ public class BPMEventProxy extends BPMEngineEvent {
             type = BPMEngineEventType.PROCESS_INSTANCE_CREATED;
         } else if (this.processEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_COMPLETED)) {
             type = BPMEngineEventType.PROCESS_INSTANCE_ENDED;
+        } else if (this.processEngineEvent.getType().equals(FlowableEngineEventType.ENGINE_CREATED)) {
+            type = BPMEngineEventType.ENGINE_STARTED;
+        } else if (this.processEngineEvent.getType().equals(FlowableEngineEventType.ENGINE_CLOSED)) {
+            type = BPMEngineEventType.ENGINE_STOPPED;
         } else {
             type = BPMEngineEventType.UNKNOWN;
         }
@@ -30,7 +34,11 @@ public class BPMEventProxy extends BPMEngineEvent {
 
     @Override
     public String getProcessDefinitionKey() {
-        return this.processEngineEvent.getProcessDefinitionId().replaceFirst(":.*", "");
+        String processDefinitionKey = processEngineEvent.getProcessDefinitionId();
+        if (processDefinitionKey != null) {
+            processDefinitionKey = processDefinitionKey.replaceFirst(":.*", "");
+        }
+        return processDefinitionKey;
     }
 
     @Override
