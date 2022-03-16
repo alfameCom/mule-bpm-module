@@ -2,9 +2,7 @@ package com.alfame.esb.bpm.module.internal.listener;
 
 import com.alfame.esb.bpm.api.BPMTaskInstance;
 import com.alfame.esb.bpm.module.internal.BPMExtension;
-import com.alfame.esb.bpm.module.internal.connection.BPMEventConnectionProvider;
-import com.alfame.esb.bpm.module.internal.connection.BPMTaskConnection;
-import com.alfame.esb.bpm.module.internal.connection.BPMTaskConnectionProvider;
+import com.alfame.esb.bpm.module.internal.connection.BPMConnection;
 import com.alfame.esb.bpm.taskqueue.*;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -18,8 +16,6 @@ import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
@@ -49,7 +45,6 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Alias("task-listener")
-@Sources(BPMTaskListener.class)
 @MetadataScope(outputResolver = BPMTaskListenerOutputMetadataResolver.class, attributesResolver = BPMTaskListenerAttributesMetadataResolver.class)
 @EmitsResponse
 @MediaType(value = ANY, strict = false)
@@ -68,7 +63,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
     private BPMExtension config;
 
     @Connection
-    private ConnectionProvider<BPMTaskConnection> connectionProvider;
+    private ConnectionProvider<BPMConnection> connectionProvider;
 
     @Parameter
     private SourceTransactionalAction action;
@@ -113,7 +108,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
         LOGGER.debug("Submitting response after successful execution: " + responseValueAsString(responseBuilder.getValue()));
         BPMTaskResponse response = new BPMTaskResponse(responseValue(responseBuilder.getValue()));
 
-        BPMTaskConnection connection = ctx.getConnection();
+        BPMConnection connection = ctx.getConnection();
 
         response.setVariablesToUpdate(connection.getVariablesToUpdate());
         response.setVariablesToRemove(connection.getVariablesToRemove());
@@ -136,7 +131,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
         BPMTaskResponse response = new BPMTaskResponse(responseValue(errorResponseBuilder.getValue()),
                 error != null ? error.getCause() : null);
 
-        BPMTaskConnection connection = ctx.getConnection();
+        BPMConnection connection = ctx.getConnection();
         connection.getResponseCallback().submitResponse(response);
 
     }
@@ -235,7 +230,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                         }
 
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                        final BPMTaskConnection connection = connect(ctx, task);
+                        final BPMConnection connection = connect(ctx, task);
                         if (connection == null) {
                             LOGGER.warn("Consumer for <bpm:task-listener> on flow '{}' no connection provider available. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
                             stop();
@@ -315,8 +310,8 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
             semaphore.release();
         }
 
-        private BPMTaskConnection connect(SourceCallbackContext ctx, BPMTask task) throws ConnectionException, TransactionException {
-            BPMTaskConnection connection = connectionProvider.connect();
+        private BPMConnection connect(SourceCallbackContext ctx, BPMTask task) throws ConnectionException, TransactionException {
+            BPMConnection connection = connectionProvider.connect();
             connection.setTask(task);
             TransactionHandle transactionHandle = ctx.bindConnection(connection);
             task.setRollbackCallback(new TaskRollback(transactionHandle));

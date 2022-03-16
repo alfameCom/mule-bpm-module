@@ -14,26 +14,26 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.success
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Alias("task-listener")
-public class BPMTaskConnectionProvider implements ConnectionProvider<BPMTaskConnection>, NoConnectivityTest {
+public class BPMConnectionProvider implements ConnectionProvider<BPMConnection>, NoConnectivityTest {
 
-    private static final Logger LOGGER = getLogger(BPMTaskConnectionProvider.class);
+    private static final Logger LOGGER = getLogger(BPMConnectionProvider.class);
 
-    private static Map<String, BPMTaskConnection> connectionCache = new ConcurrentHashMap<>();
+    private static Map<String, BPMConnection> connectionCache = new ConcurrentHashMap<>();
 
     @Override
-    public BPMTaskConnection connect() throws ConnectionException {
-        BPMTaskConnection connection = new BPMTaskConnection(connectionCache);
+    public BPMConnection connect() throws ConnectionException {
+        BPMConnection connection = new BPMConnection(connectionCache);
         LOGGER.debug("BPMTaskConnectionProvider created connection {}", connection);
         return connection;
     }
 
     @Override
-    public void disconnect(BPMTaskConnection bpmConnection) {
+    public void disconnect(BPMConnection bpmConnection) {
         LOGGER.debug("BPMTaskConnectionProvider disconnecting connection {}", bpmConnection);
     }
 
     @Override
-    public ConnectionValidationResult validate(BPMTaskConnection bpmConnection) {
+    public ConnectionValidationResult validate(BPMConnection bpmConnection) {
         return success();
     }
 

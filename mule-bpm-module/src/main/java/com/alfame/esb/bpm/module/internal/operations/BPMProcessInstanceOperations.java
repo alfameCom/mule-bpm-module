@@ -5,7 +5,7 @@ import com.alfame.esb.bpm.api.BPMProcessInstanceQuery;
 import com.alfame.esb.bpm.api.BPMProcessInstanceQueryBuilder;
 import com.alfame.esb.bpm.module.api.config.*;
 import com.alfame.esb.bpm.module.internal.BPMExtension;
-import com.alfame.esb.bpm.module.internal.connection.BPMTaskConnection;
+import com.alfame.esb.bpm.module.internal.connection.BPMConnection;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -26,7 +26,7 @@ public class BPMProcessInstanceOperations {
     @Alias("delete-process-instance")
     public void deleteProcessInstance(
             @Config BPMExtension config,
-            @Connection BPMTaskConnection connection,
+            @Connection BPMConnection connection,
             @DisplayName("Process instance Id") String processInstanceId,
             @Optional @DisplayName("Delete reason") String deleteReason) {
         
@@ -40,7 +40,7 @@ public class BPMProcessInstanceOperations {
     @OutputResolver(output = BPMProcessInstanceQueryOutputMetadataResolver.class)
     public BPMProcessInstanceQuery buildProcessInstanceQuery(
             @Config BPMExtension engine,
-            @Connection BPMTaskConnection connection,
+            @Connection BPMConnection connection,
             @Optional @Alias("process-instance-filters") List<BPMProcessInstanceFilter> processInstanceFilters) {
 
         LOGGER.debug("Creating query for process instances");
@@ -113,7 +113,7 @@ public class BPMProcessInstanceOperations {
     @OutputResolver(output = BPMProcessInstanceOutputMetadataResolver.class)
     public List<BPMProcessInstance> fetchProcessInstances(
             @Config BPMExtension engine,
-            @Connection BPMTaskConnection connection,
+            @Connection BPMConnection connection,
             @Alias("query") BPMProcessInstanceQuery processInstanceQuery,
             @Optional(defaultValue = "0") int firstResult,
             @Optional(defaultValue = "100") int maxResults) {
@@ -128,7 +128,7 @@ public class BPMProcessInstanceOperations {
     @OutputResolver(output = BPMProcessInstanceOutputMetadataResolver.class)
     public BPMProcessInstance fetchUniqueProcessInstance(
             @Config BPMExtension engine,
-            @Connection BPMTaskConnection connection,
+            @Connection BPMConnection connection,
             @Alias("query") BPMProcessInstanceQuery processInstanceQuery) {
 
         LOGGER.debug("Fetching unique process instance");

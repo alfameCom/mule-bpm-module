@@ -2,13 +2,8 @@ package com.alfame.esb.bpm.module.internal.listener;
 
 import com.alfame.esb.bpm.api.BPMEngineEvent;
 import com.alfame.esb.bpm.api.BPMEngineEventType;
-import com.alfame.esb.bpm.api.BPMTaskInstance;
 import com.alfame.esb.bpm.module.internal.BPMExtension;
-import com.alfame.esb.bpm.module.internal.connection.BPMEventConnection;
-import com.alfame.esb.bpm.module.internal.connection.BPMEventConnectionProvider;
-import com.alfame.esb.bpm.module.internal.connection.BPMTaskConnection;
-import com.alfame.esb.bpm.module.internal.connection.BPMTaskConnectionProvider;
-import com.alfame.esb.bpm.taskqueue.*;
+import com.alfame.esb.bpm.module.internal.connection.BPMConnection;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -18,15 +13,13 @@ import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.*;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
-import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -40,8 +33,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Alias("event-listener")
-@Sources(BPMEventListener.class)
-//@MetadataScope(outputResolver = BPMTaskListenerOutputMetadataResolver.class, attributesResolver = BPMTaskListenerAttributesMetadataResolver.class)
+@MetadataScope(outputResolver = BPMEventListenerOutputMetadataResolver.class, attributesResolver = BPMEventListenerAttributesMetadataResolver.class)
 @EmitsResponse
 @MediaType(value = ANY, strict = false)
 public class BPMEventListener extends Source<Object, BPMEngineEvent> {
@@ -59,7 +51,7 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
     private BPMExtension config;
 
     @Connection
-    private ConnectionProvider<BPMEventConnection> connectionProvider;
+    private ConnectionProvider<BPMConnection> connectionProvider;
 /*
     @Parameter
     private SourceTransactionalAction action;
@@ -190,6 +182,7 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
                 SourceCallbackContext ctx = null;
 
                 try {
+                    Thread.sleep(500);
                     // TODO: Get events according to endpointDescription configs
                     BPMEngineEvent event = new BPMEngineEvent() {
                         @Override
@@ -265,7 +258,7 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
                         }*/
 
                         LOGGER.trace("Consumer for <bpm:event-listener> on flow '{}' acquiring activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                        final BPMEventConnection connection = connect(ctx, event);
+                        final BPMConnection connection = connect(ctx, event);
                         if (connection == null) {
                             LOGGER.warn("Consumer for <bpm:event-listener> on flow '{}' no connection provider available. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
                             stop();
@@ -345,9 +338,9 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
             //semaphore.release();
         }
 
-        private BPMEventConnection connect(SourceCallbackContext ctx, BPMEngineEvent event) throws ConnectionException, TransactionException {
-            BPMEventConnection connection = connectionProvider.connect();
-            connection.setEvent(event);
+        private BPMConnection connect(SourceCallbackContext ctx, BPMEngineEvent event) throws ConnectionException, TransactionException {
+            BPMConnection connection = connectionProvider.connect();
+            // TODO: connection.setEvent(event);
             /*TransactionHandle transactionHandle = */ctx.bindConnection(connection);
             return connection;
         }
