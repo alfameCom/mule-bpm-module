@@ -11,9 +11,9 @@ import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BPMConnection implements TransactionalConnection {
+public class BPMTaskConnection implements TransactionalConnection {
 
-    private static final Logger LOGGER = getLogger(BPMConnection.class);
+    private static final Logger LOGGER = getLogger(BPMTaskConnection.class);
 
     private BPMTaskResponseCallback responseCallback;
     private Map<String, Object> variablesToUpdate = new HashMap<>();
@@ -21,9 +21,9 @@ public class BPMConnection implements TransactionalConnection {
 
     private BPMTask task;
 
-    private final Map<String, BPMConnection> connectionCache;
+    private final Map<String, BPMTaskConnection> connectionCache;
 
-    public BPMConnection(Map<String, BPMConnection> connectionCache) {
+    public BPMTaskConnection(Map<String, BPMTaskConnection> connectionCache) {
         this.connectionCache = connectionCache;
     }
 
@@ -55,10 +55,10 @@ public class BPMConnection implements TransactionalConnection {
     	return task;
     }
 
-    public BPMConnection joinIfForked(CorrelationInfo correlationInfo) {
-        BPMConnection connection = this;
+    public BPMTaskConnection joinIfForked(CorrelationInfo correlationInfo) {
+        BPMTaskConnection connection = this;
         if (connection.getTask() == null) {
-            BPMConnection cachedConnection = this.connectionCache.get(correlationInfo.getCorrelationId());
+            BPMTaskConnection cachedConnection = this.connectionCache.get(correlationInfo.getCorrelationId());
             if (cachedConnection != null && cachedConnection.getTask() != null) {
                 connection = cachedConnection;
                 LOGGER.debug("{} of activity {} joined {} for instance {}", this, connection.getTask().getActivityId(), connection, connection.getTask().getProcessInstanceId());

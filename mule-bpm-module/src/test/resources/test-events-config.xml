@@ -1,0 +1,42 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+
+    <bpm:config name="engineConfig" tenantId="com.alfame.esb">
+        <bpm:data-source>
+            <bpm:generic-data-source driverClassName="org.hsqldb.jdbcDriver"
+                                     jdbcUrl="jdbc:hsqldb:mem:flowable"
+                                     username="sa"
+                                     password="sa"
+                                     type="HSQL"/>
+        </bpm:data-source>
+        <bpm:definitions>
+            <bpm:classpath-definition resourceClasspath="processes/VariableProcess.bpmn20.xml"/>
+        </bpm:definitions>
+        <bpm:async-executor-factory>
+            <bpm:default-async-executor-factory/>
+        </bpm:async-executor-factory>
+    </bpm:config>
+
+    <flow name="modifyVariablesTaskFlow">
+        <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://modify.variables" transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN"/>
+
+        <bpm:get-variable config-ref="engineConfig" variableName="inputVariable" target="inputVariable"/>
+
+        <bpm:remove-variable config-ref="engineConfig" variableName="inputVariable"/>
+
+        <bpm:set-variable config-ref="engineConfig" variableName="outputVariable">
+            <bpm:variable-content>#[vars.inputVariable + 1]</bpm:variable-content>
+        </bpm:set-variable>
+
+        <set-payload value="true"/>
+    </flow>
+
+    <flow name="handleEventFlow">
+        <bpm:event-listener config-ref="engineConfig" />
+
+        <logger level="INFO" message="" />
+    </flow>
+</mule>

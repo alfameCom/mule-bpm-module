@@ -7,33 +7,28 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.slf4j.Logger;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.slf4j.LoggerFactory.getLogger;
 
-@Alias("task-listener")
-public class BPMConnectionProvider implements ConnectionProvider<BPMConnection>, NoConnectivityTest {
+@Alias("event-listener")
+public class BPMEventConnectionProvider implements ConnectionProvider<BPMEventConnection>, NoConnectivityTest {
 
-    private static final Logger LOGGER = getLogger(BPMConnectionProvider.class);
-
-    private static Map<String, BPMConnection> connectionCache = new ConcurrentHashMap<>();
+    private static final Logger LOGGER = getLogger(BPMEventConnectionProvider.class);
 
     @Override
-    public BPMConnection connect() throws ConnectionException {
-        BPMConnection connection = new BPMConnection(connectionCache);
+    public BPMEventConnection connect() throws ConnectionException {
+        BPMEventConnection connection = new BPMEventConnection();
         LOGGER.debug("BPMConnectionProvider created connection {}", connection);
         return connection;
     }
 
     @Override
-    public void disconnect(BPMConnection bpmConnection) {
+    public void disconnect(BPMEventConnection bpmConnection) {
         LOGGER.debug("BPMConnectionProvider disconnecting connection {}", bpmConnection);
     }
 
     @Override
-    public ConnectionValidationResult validate(BPMConnection bpmConnection) {
+    public ConnectionValidationResult validate(BPMEventConnection bpmConnection) {
         return success();
     }
 

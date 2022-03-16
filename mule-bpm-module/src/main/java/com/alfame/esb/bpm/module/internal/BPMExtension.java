@@ -2,8 +2,10 @@ package com.alfame.esb.bpm.module.internal;
 
 import com.alfame.esb.bpm.api.*;
 import com.alfame.esb.bpm.module.api.config.*;
-import com.alfame.esb.bpm.module.internal.connection.BPMConnectionProvider;
+import com.alfame.esb.bpm.module.internal.connection.BPMEventConnectionProvider;
+import com.alfame.esb.bpm.module.internal.connection.BPMTaskConnectionProvider;
 import com.alfame.esb.bpm.module.internal.impl.*;
+import com.alfame.esb.bpm.module.internal.listener.BPMEventListener;
 import com.alfame.esb.bpm.module.internal.listener.BPMTaskListener;
 import com.alfame.esb.bpm.module.internal.operations.*;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -52,8 +54,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 @Xml(prefix = "bpm")
 @Extension(name = "BPM", vendor = "Alfame Systems")
-@Sources(BPMTaskListener.class)
-@ConnectionProviders(BPMConnectionProvider.class)
+//@Sources({BPMTaskListener.class, BPMEventListener.class})
+@ConnectionProviders({BPMTaskConnectionProvider.class, BPMEventConnectionProvider.class})
 @Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class, BPMAttachmentOperations.class, BPMProcessInstanceOperations.class})
 @SubTypeMapping(baseType = BPMDefinition.class,
         subTypes = {BPMClasspathDefinition.class, BPMStreamDefinition.class})
@@ -164,6 +166,7 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         } else if (this.asyncExecutorFactory != null) {
             this.processEngineConfiguration.setAsyncExecutor(this.asyncExecutorFactory.createAsyncExecutor());
         }
+
     }
 
     @Override

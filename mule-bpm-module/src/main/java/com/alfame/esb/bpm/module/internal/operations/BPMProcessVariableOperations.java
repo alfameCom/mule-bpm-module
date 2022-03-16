@@ -3,7 +3,7 @@ package com.alfame.esb.bpm.module.internal.operations;
 import com.alfame.esb.bpm.api.BPMVariableAttributes;
 import com.alfame.esb.bpm.api.BPMVariableInstance;
 import com.alfame.esb.bpm.module.internal.BPMExtension;
-import com.alfame.esb.bpm.module.internal.connection.BPMConnection;
+import com.alfame.esb.bpm.module.internal.connection.BPMTaskConnection;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -29,7 +29,7 @@ public class BPMProcessVariableOperations {
     @OutputResolver(output = BPMProcessVariableOutputMetadataResolver.class, attributes = BPMProcessVariableAttributesMetadataResolver.class)
     public Result<Object, BPMVariableAttributes> getVariable(
             @Config BPMExtension config,
-            @Connection BPMConnection connection,
+            @Connection BPMTaskConnection connection,
             @Optional @DisplayName("Process instance id") String processInstanceId,
             @DisplayName("Variable name") String variableName,
             CorrelationInfo correlationInfo) {
@@ -66,7 +66,7 @@ public class BPMProcessVariableOperations {
     @Alias("set-variable")
     public void setVariable(
             @Config BPMExtension config,
-            @Connection BPMConnection connection,
+            @Connection BPMTaskConnection connection,
             @DisplayName("Variable name") String variableName,
             @Alias("variable-content") @Content @Summary("Content for variable") TypedValue<Serializable> variableContent,
             CorrelationInfo correlationInfo) {
@@ -81,7 +81,7 @@ public class BPMProcessVariableOperations {
     @MediaType(value = ANY, strict = false)
     public void removeVariable(
             @Config BPMExtension config,
-            @Connection BPMConnection connection,
+            @Connection BPMTaskConnection connection,
             @DisplayName("Variable name") String variableName,
             CorrelationInfo correlationInfo) {
         connection = connection.joinIfForked(correlationInfo);
