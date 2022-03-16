@@ -1,9 +1,15 @@
 package com.alfame.esb.bpm.module.internal.listener;
 
 import com.alfame.esb.bpm.api.BPMEngineEvent;
+import com.alfame.esb.bpm.api.BPMEngineEventSubscription;
+import com.alfame.esb.bpm.api.BPMEngineEventSubscriptionBuilder;
 import com.alfame.esb.bpm.api.BPMEngineEventType;
+import com.alfame.esb.bpm.module.api.config.BPMEventSubscriptionEventTypeFilter;
+import com.alfame.esb.bpm.module.api.config.BPMEventSubscriptionFilter;
+import com.alfame.esb.bpm.module.api.param.BPMEventType;
 import com.alfame.esb.bpm.module.internal.BPMExtension;
 import com.alfame.esb.bpm.module.internal.connection.BPMConnection;
+import com.alfame.esb.bpm.module.internal.impl.BPMEventSubscriptionBuilderImpl;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -74,8 +80,26 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
     @Override
     public void onStart(SourceCallback<Object, BPMEngineEvent> sourceCallback) throws MuleException {
 
-        // TODO: Subscribe for all supported events on this.config
-        startConsumers(sourceCallback);
+        // TODO: Subscribe for all configured events
+        BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder = this.config.eventSubscriptionBuilder();
+
+        List<BPMEventSubscriptionFilter> eventSubscriptionFilters = this.endpointDescriptor.getEventSubscriptionFilters();
+        if (eventSubscriptionFilters != null) {
+            for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
+                if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
+                    BPMEventSubscriptionEventTypeFilter eventTypeFilter = (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
+                    BPMEventType eventType = eventTypeFilter.getEventType();
+                    if (eventType == BPMEventType.PROCESS_INSTANCE_CREATED) {
+                        eventSubscriptionBuilder.eventType(BPMEngineEventType.PROCESS_INSTANCE_CREATED);
+                    } else if (eventType == BPMEventType.PROCESS_INSTANCE_ENDED) {
+                        eventSubscriptionBuilder.eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED);
+                    }
+                }
+            }
+        }
+        BPMEngineEventSubscription eventSubscription = eventSubscriptionBuilder.subscribeForEvents();
+
+        startConsumers(eventSubscription, sourceCallback);
 
     }
 
@@ -133,12 +157,12 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
         }
     }*/
 
-    private void startConsumers(SourceCallback<Object, BPMEngineEvent> sourceCallback) {
+    private void startConsumers(BPMEngineEventSubscription eventSubscription, SourceCallback<Object, BPMEngineEvent> sourceCallback) {
         createScheduler();
         consumers = new ArrayList<>(numberOfConsumers);
         //semaphore = new Semaphore(1, false);
         for (int i = 0; i < numberOfConsumers; i++) {
-            final Consumer consumer = new Consumer(config, endpointDescriptor, sourceCallback);
+            final Consumer consumer = new Consumer(config, endpointDescriptor, eventSubscription, sourceCallback);
             consumers.add(consumer);
             scheduler.submit(consumer::start);
         }
@@ -165,12 +189,14 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
 
         private final BPMExtension config;
         private final BPMEventListenerEndpointDescriptor endpointDescription;
+        private final BPMEngineEventSubscription eventSubscription;
         private final SourceCallback<Object, BPMEngineEvent> sourceCallback;
         private final AtomicBoolean stop = new AtomicBoolean(false);
 
-        public Consumer(BPMExtension config, BPMEventListenerEndpointDescriptor endpointDescription, SourceCallback<Object, BPMEngineEvent> sourceCallback) {
+        public Consumer(BPMExtension config, BPMEventListenerEndpointDescriptor endpointDescription, BPMEngineEventSubscription eventSubscription, SourceCallback<Object, BPMEngineEvent> sourceCallback) {
             this.config = config;
             this.endpointDescription = endpointDescription;
+            this.eventSubscription = eventSubscription;
             this.sourceCallback = sourceCallback;
         }
 
@@ -182,46 +208,9 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
                 SourceCallbackContext ctx = null;
 
                 try {
-                    Thread.sleep(500);
-                    // TODO: Get events according to endpointDescription configs
-                    BPMEngineEvent event = new BPMEngineEvent() {
-                        @Override
-                        public BPMEngineEventType getEventType() {
-                            return null;
-                        }
-
-                        @Override
-                        public String getProcessDefinitionKey() {
-                            return null;
-                        }
-
-                        @Override
-                        public String getProcessInstanceId() {
-                            return null;
-                        }
-
-                        @Override
-                        public String getVariableName() {
-                            return null;
-                        }
-
-                        @Override
-                        public Object getVariableValue() {
-                            return null;
-                        }
-
-                        @Override
-                        public String getActivityName() {
-                            return null;
-                        }
-
-                        @Override
-                        public String getExceptionMessage() {
-                            return null;
-                        }
-                    };
-                    //final BPMTaskQueue queue = BPMTaskQueueFactory.getInstance(endpointDescriptor.getEndpointUrl());
-                    //BPMTask task = queue.pop(endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit());
+                    // TODO: handle all events in cache!
+                    BPMEngineEvent event = this.eventSubscription.
+                            waitAndPopEvent(endpointDescription.getTimeout(), endpointDescriptor.getTimeoutUnit());
 
                     if (event == null) {
                         LOGGER.trace("Consumer for <bpm:event-listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
@@ -294,13 +283,13 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
                     LOGGER.warn("Consumer for <bpm:event-listener> on flow '{}' is unable to connect. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName(), e);
                     stop();
                     cancel(ctx);
-                } /*catch (InterruptedException e) {
+                } catch (InterruptedException e) {
 
                     LOGGER.debug("Consumer for <bpm:event-listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
                     stop();
                     cancel(ctx);
 
-                }*/ catch (Exception e) {
+                } catch (Exception e) {
 
                     LOGGER.error("Consumer for <bpm:task-listener> on flow '{}' found unexpected exception. Consuming will continue for thread '{}'", location.getRootContainerName(), currentThread().getName(), e);
                     cancel(ctx);
@@ -340,8 +329,8 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
 
         private BPMConnection connect(SourceCallbackContext ctx, BPMEngineEvent event) throws ConnectionException, TransactionException {
             BPMConnection connection = connectionProvider.connect();
-            // TODO: connection.setEvent(event);
-            /*TransactionHandle transactionHandle = */ctx.bindConnection(connection);
+            connection.setEvent(event);
+            ctx.bindConnection(connection);
             return connection;
         }
 

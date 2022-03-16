@@ -35,7 +35,12 @@
     </flow>
 
     <flow name="handleEventFlow">
-        <bpm:event-listener config-ref="engineConfig" />
+        <bpm:event-listener config-ref="engineConfig">
+            <bpm:event-filters >
+                <bpm:event-type-filter eventType="PROCESS_INSTANCE_CREATED" />
+                <bpm:event-type-filter eventType="PROCESS_INSTANCE_ENDED" />
+            </bpm:event-filters>
+        </bpm:event-listener>
 
         <logger level="INFO" message="" />
     </flow>

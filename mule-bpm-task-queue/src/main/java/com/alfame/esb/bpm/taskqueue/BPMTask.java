@@ -3,7 +3,7 @@ package com.alfame.esb.bpm.taskqueue;
 import com.alfame.esb.bpm.api.BPMProcessInstance;
 import com.alfame.esb.bpm.api.BPMTaskInstance;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +15,9 @@ public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallbac
 
     private long requestTimeoutMillis = 300000;
     private BPMTaskRollbackCallback rollbackCallback;
+    private BPMTaskResponseCallback responseCallback;
+    private Map<String, Object> variablesToUpdate = new HashMap<>();
+    private List<String> variablesToRemove = new ArrayList<>();
 
     abstract public BPMProcessInstance getProcessInstance();
 
@@ -38,6 +41,38 @@ public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallbac
 
     public void setRollbackCallback(BPMTaskRollbackCallback rollbackCallback) {
         this.rollbackCallback = rollbackCallback;
+    }
+
+    public BPMTaskResponseCallback getResponseCallback() {
+        return responseCallback;
+    }
+
+    public void setResponseCallback(BPMTaskResponseCallback responseCallback) {
+        this.responseCallback = responseCallback;
+    }
+
+    public Map<String, Object> getVariablesToUpdate() {
+        return variablesToUpdate;
+    }
+
+    public void setVariablesToUpdate(Map<String, Object> variablesToUpdate) {
+        this.variablesToUpdate = variablesToUpdate;
+    }
+
+    public List<String> getVariablesToRemove() {
+        return variablesToRemove;
+    }
+
+    public void setVariablesToRemove(List<String> variablesToRemove) {
+        this.variablesToRemove = variablesToRemove;
+    }
+
+    public CompletableFuture<BPMTaskResponse> getCompletableFuture() {
+        return completableFuture;
+    }
+
+    public void setCompletableFuture(CompletableFuture<BPMTaskResponse> completableFuture) {
+        this.completableFuture = completableFuture;
     }
 
     public BPMTaskResponse waitForResponse() throws InterruptedException, ExecutionException, TimeoutException {

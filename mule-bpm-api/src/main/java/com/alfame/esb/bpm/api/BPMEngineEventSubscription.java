@@ -9,6 +9,8 @@ public interface BPMEngineEventSubscription {
 
     public List<BPMEngineEvent> waitForEvents(int numberOfEvents, long timeout, TimeUnit timeUnit) throws InterruptedException;
 
+    public BPMEngineEvent waitAndPopEvent(long timeout, TimeUnit timeUnit) throws InterruptedException;
+
     public BPMEngineEventFinder eventFinder();
 
 }
