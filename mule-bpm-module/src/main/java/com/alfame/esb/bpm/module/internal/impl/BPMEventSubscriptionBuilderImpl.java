@@ -8,7 +8,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
-import org.flowable.engine.delegate.event.impl.FlowableEntityEventImpl;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.slf4j.Logger;
 
