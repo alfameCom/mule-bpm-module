@@ -25,6 +25,8 @@ public class BPMEventProxy extends BPMEngineEvent {
             type = BPMEngineEventType.ENGINE_STARTED;
         } else if (this.processEngineEvent.getType().equals(FlowableEngineEventType.ENGINE_CLOSED)) {
             type = BPMEngineEventType.ENGINE_STOPPED;
+        } else if (this.processEngineEvent.getType().equals(FlowableEngineEventType.TASK_CREATED)) {
+            type = BPMEngineEventType.TASK_CREATED;
         } else {
             type = BPMEngineEventType.UNKNOWN;
         }

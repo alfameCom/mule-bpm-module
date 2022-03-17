@@ -31,7 +31,7 @@
             <bpm:variable-content>#[vars.inputVariable + 1]</bpm:variable-content>
         </bpm:set-variable>
 
-        <set-payload value="true"/>
+        <raise-error type="ANY" description="SOME_TEST_ERROR"/>
     </flow>
 
     <flow name="handleEventFlow">
