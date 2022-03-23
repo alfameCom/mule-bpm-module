@@ -17,6 +17,7 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.Execution;
+import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
@@ -148,6 +149,8 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         this.processEngineConfiguration.setDatabaseType(this.dataSource.getType().getFlowableTypeValue());
         this.processEngineConfiguration.setDataSource(this.dataSource.getDataSource());
         this.processEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+
+        this.processEngineConfiguration.addConfigurator(new FormEngineConfigurator());
 
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
         if (this.asyncExecutorFactory instanceof BPMDefaultAsyncExecutorFactory) {
