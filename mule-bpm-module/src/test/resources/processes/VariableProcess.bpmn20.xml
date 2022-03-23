@@ -21,12 +21,7 @@
     <sequenceFlow id="sid-7088B640-2185-4B52-B767-CEB6EA040FF8" sourceRef="startEvent1" targetRef="sid-1A7695B1-C2F7-494A-A7FD-482325E00C2E"></sequenceFlow>
     <exclusiveGateway id="sid-A25DD50A-C39A-4E8A-B4D1-24C90BAD3C94"></exclusiveGateway>
     <userTask id="sid-7B57B411-B90B-4B3D-952E-25270D0AF07B" name="Try again?" flowable:formKey="tryAgain" flowable:formFieldValidation="true">
-      <extensionElements>
-        <flowable:formProperty id="tryAgain" name="Try again?" type="enum">
-          <flowable:value id="true" name="Try again"></flowable:value>
-          <flowable:value id="false" name="Give up"></flowable:value>
-        </flowable:formProperty>
-      </extensionElements>
+      <documentation>Caught error ${muleExceptionMessage}</documentation>
     </userTask>
     <sequenceFlow id="sid-E68DE8AE-5BC5-49C8-961C-6A746ECD369D" sourceRef="sid-1A7695B1-C2F7-494A-A7FD-482325E00C2E" targetRef="sid-A25DD50A-C39A-4E8A-B4D1-24C90BAD3C94"></sequenceFlow>
     <exclusiveGateway id="sid-3EC7D5A9-D90B-483D-960F-2C49B3401002"></exclusiveGateway>

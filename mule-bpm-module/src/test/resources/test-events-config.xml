@@ -14,6 +14,7 @@
         </bpm:data-source>
         <bpm:definitions>
             <bpm:classpath-definition resourceClasspath="processes/VariableProcess.bpmn20.xml"/>
+            <bpm:classpath-definition resourceClasspath="forms/TryAgain.form"/>
         </bpm:definitions>
         <bpm:async-executor-factory>
             <bpm:default-async-executor-factory/>
