@@ -1,0 +1,33 @@
+{
+    "name": "Try again form",
+    "key": "tryAgain",
+    "description": "Form for trying again or giving up after some error(s)",
+    "editorJson": {
+        "name": "Try again form editor",
+        "key": "tryAgainEditor",
+        "version": 1,
+        "fields": [
+            {
+                "fieldType": "OptionFormField",
+                "id": "tryAgain",
+                "name": "Try again?",
+                "type": "dropdown",
+                "value": "Please choose one...",
+                "required": true,
+                "readOnly": false,
+                "hasEmptyValue": true,
+                "options": [
+                    {
+                        "name": "Please choose one..."
+                    },
+                    {
+                        "name": "true"
+                    },
+                    {
+                        "name": "false"
+                    }
+                ]
+            }
+        ]
+    }
+}
