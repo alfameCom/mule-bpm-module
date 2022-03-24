@@ -1,0 +1,26 @@
+{
+    "name": "Try again form",
+    "key": "tryAgain",
+    "description": "Form for trying again or giving up after some error(s)",
+    "fields": [
+        {
+            "fieldType": "OptionFormField",
+            "id": "tryAgain",
+            "name": "Try again?",
+            "type": "dropdown",
+            "required": true,
+            "readOnly": false,
+            "hasEmptyValue": false,
+            "options": [
+                {
+                    "id": "true",
+                    "name": "Try again"
+                },
+                {
+                    "id": "false",
+                    "name": "Give up"
+                }
+            ]
+        }
+    ]
+}

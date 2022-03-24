@@ -39,6 +39,14 @@
 							<groupId>org.flowable</groupId>
 							<artifactId>flowable-engine</artifactId>
 						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.flowable</groupId>
+							<artifactId>flowable-form-engine</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.flowable</groupId>
+							<artifactId>flowable-form-engine-configurator</artifactId>
+						</sharedLibrary>
 					</sharedLibraries>
 				</configuration>
 			</plugin>
@@ -96,6 +104,16 @@
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-engine</artifactId>
+			<version>6.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-form-engine</artifactId>
+			<version>6.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-form-engine-configurator</artifactId>
 			<version>6.6.0</version>
 		</dependency>
 		<dependency>

@@ -16,6 +16,7 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.Execution;
+import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
@@ -68,6 +69,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 @SubTypeMapping(baseType = BPMAttachmentFilter.class,
         subTypes = {BPMAttachmentNameFilter.class})
 @ExternalLib(name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.6.0", requiredClassName = "org.flowable.engine.RuntimeService")
+@ExternalLib(name = "Flowable Form Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-form-engine:6.6.0", requiredClassName = "org.flowable.form.engine.FormEngine")
+@ExternalLib(name = "Flowable Form Engine Configurator", type = DEPENDENCY, coordinates = "org.flowable:flowable-form-engine-configurator:6.6.0", requiredClassName = "org.flowable.form.engine.configurator.FormEngineConfigurator")
 @ExternalLib(name = "BPM Flowable Activity", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-flowable-activity:${project.version}", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 @ExternalLib(name = "BPM Task Queue", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-task-queue:${project.version}", requiredClassName = "com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory")
 @ExternalLib(name = "BPM API", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-api:${project.version}", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
@@ -147,6 +150,8 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         this.processEngineConfiguration.setDatabaseType(this.dataSource.getType().getFlowableTypeValue());
         this.processEngineConfiguration.setDataSource(this.dataSource.getDataSource());
         this.processEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+
+        this.processEngineConfiguration.addConfigurator(new FormEngineConfigurator());
 
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
         if (this.asyncExecutorFactory instanceof BPMDefaultAsyncExecutorFactory) {
