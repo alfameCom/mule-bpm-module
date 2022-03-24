@@ -39,6 +39,11 @@ public abstract class BPMEngineEvent {
      */
     public abstract String getExceptionMessage();
 
+    /**
+     * Entity included in event, or null.
+     */
+    public abstract Object getEntity();
+
     @Override
     public String toString() {
         return MessageFormat.format(

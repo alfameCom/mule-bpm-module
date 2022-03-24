@@ -35,14 +35,40 @@
         <raise-error type="ANY" description="SOME_TEST_ERROR"/>
     </flow>
 
-    <flow name="handleEventFlow">
+    <flow name="handleProcessEventFlow">
         <bpm:event-listener config-ref="engineConfig">
-            <bpm:event-filters >
+            <bpm:event-filters>
                 <bpm:event-type-filter eventType="PROCESS_INSTANCE_CREATED" />
                 <bpm:event-type-filter eventType="PROCESS_INSTANCE_ENDED" />
+                <bpm:process-definition-filter key="variableProcess"/>
             </bpm:event-filters>
         </bpm:event-listener>
 
         <logger level="INFO" message="" />
+        <logger level="INFO" message="#[payload.processInstanceId]" />
+    </flow>
+
+    <flow name="handleTaskEventFlow">
+        <bpm:event-listener config-ref="engineConfig">
+            <bpm:event-filters>
+                <bpm:event-type-filter eventType="TASK_CREATED" />
+                <bpm:process-definition-filter key="variableProcess"/>
+            </bpm:event-filters>
+        </bpm:event-listener>
+
+        <logger level="INFO" message="" />
+        <logger level="INFO" message="#[payload.description]" />
+    </flow>
+
+    <flow name="handleTaskCompletionEventFlow">
+        <bpm:event-listener config-ref="engineConfig">
+            <bpm:event-filters>
+                <bpm:event-type-filter eventType="TASK_COMPLETED" />
+                <bpm:process-definition-filter key="variableProcess"/>
+            </bpm:event-filters>
+        </bpm:event-listener>
+
+        <logger level="INFO" message="" />
+        <logger level="INFO" message="#[payload.description]" />
     </flow>
 </mule>

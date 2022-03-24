@@ -4,29 +4,26 @@ import com.alfame.esb.bpm.api.BPMEngineEvent;
 import com.alfame.esb.bpm.api.BPMEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
-import org.flowable.common.engine.impl.event.FlowableEntityExceptionEventImpl;
-import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
-public class BPMJobEntityEventProxy extends BPMEngineEvent {
+public class BPMTaskEntityEventProxy extends BPMEngineEvent {
 
     private final FlowableEntityEvent entityEvent;
-    private final JobEntity jobEntity;
+    private final TaskEntity taskEntity;
 
-    public BPMJobEntityEventProxy(FlowableEntityEvent entityEvent) {
+    public BPMTaskEntityEventProxy(FlowableEntityEvent entityEvent) {
         this.entityEvent = entityEvent;
-        this.jobEntity = (JobEntity) entityEvent.getEntity();
-        // FlowableEntityExceptionEventImpl.getEntity().getExceptionMessage() is null after first failure, need to set it manually
-        if (entityEvent instanceof FlowableEntityExceptionEventImpl) {
-            this.jobEntity.setExceptionMessage(((FlowableEntityExceptionEventImpl) entityEvent).getCause().getMessage());
-        }
+        this.taskEntity = (TaskEntity) entityEvent.getEntity();
     }
 
     @Override
     public BPMEngineEventType getEventType() {
         BPMEngineEventType type = null;
 
-        if (this.entityEvent.getType().equals(FlowableEngineEventType.JOB_EXECUTION_FAILURE)) {
-            type = BPMEngineEventType.ACTIVITY_FAILURE;
+        if (this.entityEvent.getType().equals(FlowableEngineEventType.TASK_CREATED)) {
+            type = BPMEngineEventType.TASK_CREATED;
+        } else if (this.entityEvent.getType().equals(FlowableEngineEventType.TASK_COMPLETED)) {
+            type = BPMEngineEventType.TASK_COMPLETED;
         } else {
             type = BPMEngineEventType.UNKNOWN;
         }
@@ -36,12 +33,12 @@ public class BPMJobEntityEventProxy extends BPMEngineEvent {
 
     @Override
     public String getProcessDefinitionKey() {
-        return this.jobEntity.getProcessDefinitionId().replaceFirst(":.*", "");
+        return this.taskEntity.getProcessDefinitionId().replaceFirst(":.*", "");
     }
 
     @Override
     public String getProcessInstanceId() {
-        return this.jobEntity.getProcessInstanceId();
+        return this.taskEntity.getProcessInstanceId();
     }
 
     @Override
@@ -56,12 +53,12 @@ public class BPMJobEntityEventProxy extends BPMEngineEvent {
 
     @Override
     public String getActivityName() {
-        return this.jobEntity.getElementId();
+        return null;
     }
 
     @Override
     public String getExceptionMessage() {
-        return this.jobEntity.getExceptionMessage();
+        return null;
     }
 
     @Override

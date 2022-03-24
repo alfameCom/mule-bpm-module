@@ -6,7 +6,9 @@ public enum BPMEventType {
     PROCESS_INSTANCE_ENDED,
     VARIABLE_CREATED,
     VARIABLE_UPDATED,
-    VARIABLE_REMOVED;
+    VARIABLE_REMOVED,
+    TASK_CREATED,
+    TASK_COMPLETED;
 
     public String getValue() {
         return this.toString();
