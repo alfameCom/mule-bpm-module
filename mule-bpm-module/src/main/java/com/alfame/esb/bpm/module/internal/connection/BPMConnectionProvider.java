@@ -23,13 +23,13 @@ public class BPMConnectionProvider implements ConnectionProvider<BPMConnection>,
     @Override
     public BPMConnection connect() throws ConnectionException {
         BPMConnection connection = new BPMConnection(connectionCache);
-        LOGGER.debug("BPMConnectionProvider created connection {}", connection);
+        LOGGER.debug("Created connection {}", connection);
         return connection;
     }
 
     @Override
     public void disconnect(BPMConnection bpmConnection) {
-        LOGGER.debug("BPMConnectionProvider disconnecting connection {}", bpmConnection);
+        LOGGER.debug("Disconnecting connection {}", bpmConnection);
     }
 
     @Override

@@ -110,10 +110,16 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
         BPMConnection connection = ctx.getConnection();
 
-        response.setVariablesToUpdate(connection.getVariablesToUpdate());
-        response.setVariablesToRemove(connection.getVariablesToRemove());
+        BPMTask task = connection.getTask();
+        if (task != null) {
+            response.setVariablesToUpdate(task.getVariablesToUpdate());
+            response.setVariablesToRemove(task.getVariablesToRemove());
 
-        connection.getResponseCallback().submitResponse(response);
+            task.submitResponse(response);
+        } else {
+            LOGGER.warn("Cannot submit response due to missing task");
+        }
+
 
     }
 
@@ -132,7 +138,12 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                 error != null ? error.getCause() : null);
 
         BPMConnection connection = ctx.getConnection();
-        connection.getResponseCallback().submitResponse(response);
+        BPMTask task = connection.getTask();
+        if (task != null) {
+            task.submitResponse(response);
+        } else {
+            LOGGER.warn("Cannot submit error response due to missing task");
+        }
 
     }
 
@@ -158,7 +169,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
     private void createScheduler() {
         scheduler = schedulerService.customScheduler(schedulerConfig
                 .withMaxConcurrentTasks(numberOfConsumers)
-                .withName("bpm-listener-flow" + location.getRootContainerName())
+                .withName("bpm-task-flow" + location.getRootContainerName())
                 .withWaitAllowed(true)
                 .withShutdownTimeout(endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit()));
     }
@@ -239,13 +250,13 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                         }
 
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                        connection.setResponseCallback(task);
+                        task.setResponseCallback(task);
 
                         Result.Builder<Object, BPMTaskInstance> resultBuilder = Result.<Object, BPMTaskInstance>builder();
+                        resultBuilder.mediaType(APPLICATION_JAVA);
                         resultBuilder.output(task.getPayload());
-                        resultBuilder.mediaType(APPLICATION_JAVA);
+                        resultBuilder.attributesMediaType(APPLICATION_JAVA);
                         resultBuilder.attributes(task);
-                        resultBuilder.mediaType(APPLICATION_JAVA);
 
                         task.applyCommandContext();
                         semaphore.release();

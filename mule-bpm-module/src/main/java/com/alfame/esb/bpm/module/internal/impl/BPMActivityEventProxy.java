@@ -58,4 +58,9 @@ public class BPMActivityEventProxy extends BPMEngineEvent {
         return null;
     }
 
+    @Override
+    public Object getEntity() {
+        return this.engineEvent.getExecution();
+    }
+
 }

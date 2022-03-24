@@ -70,6 +70,50 @@ public class BPMEventSubscriptionImpl implements BPMEngineEventSubscription {
     }
 
     @Override
+    public BPMEngineEvent waitAndPopEvent(long timeout, TimeUnit timeUnit) throws InterruptedException {
+        BPMEngineEvent event = null;
+        int numberOfEvents = 1;
+
+        try {
+            this.connection.open();
+
+            try {
+                this.cacheLock.lock();
+                this.countDownLatch = new CountDownLatch(Math.max(numberOfEvents - this.cachedEvents.size(), 0));
+            } finally {
+                this.cacheLock.unlock();
+            }
+
+            LOGGER.debug("Awaiting {} events", countDownLatch.getCount());
+            if (this.countDownLatch.await(timeout, timeUnit) != true) {
+                LOGGER.warn("Waiting of {} events timed out, after receiving {} events in {} ms",
+                        numberOfEvents, numberOfEvents - countDownLatch.getCount(), TimeUnit.MILLISECONDS.convert(timeout, timeUnit));
+            }
+        } catch (InterruptedException exception) {
+            LOGGER.warn("Waiting of {} events was interrupted, after receiving {} events in {} ms",
+                    numberOfEvents, numberOfEvents - countDownLatch.getCount(), TimeUnit.MILLISECONDS.convert(timeout, timeUnit));
+            Thread.currentThread().interrupt();
+        } finally {
+            try {
+                this.cacheLock.lock();
+                if (this.cachedEvents.size() > 0) {
+                    event = this.cachedEvents.get(0);
+                    this.cachedEvents.remove(0);
+                }
+            } finally {
+                this.cacheLock.unlock();
+            }
+        }
+
+        return event;
+    }
+
+    @Override
+    public boolean hasEvents() {
+        return !this.cachedEvents.isEmpty();
+    }
+
+    @Override
     public BPMEngineEventFinder eventFinder() {
         return new BPMEventSubscriptionEventFinder(this.cachedEvents);
     }

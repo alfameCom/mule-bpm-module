@@ -4,6 +4,7 @@ import com.alfame.esb.bpm.api.*;
 import com.alfame.esb.bpm.module.api.config.*;
 import com.alfame.esb.bpm.module.internal.connection.BPMConnectionProvider;
 import com.alfame.esb.bpm.module.internal.impl.*;
+import com.alfame.esb.bpm.module.internal.listener.BPMEventListener;
 import com.alfame.esb.bpm.module.internal.listener.BPMTaskListener;
 import com.alfame.esb.bpm.module.internal.operations.*;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -16,7 +17,8 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.form.engine.configurator.FormEngineConfigurator;
+import org.flowable.form.api.FormDefinition;
+import org.flowable.form.engine.FormEngine;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
@@ -41,6 +43,7 @@ import org.slf4j.Logger;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExternalLibraryType.DEPENDENCY;
@@ -53,7 +56,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 @Xml(prefix = "bpm")
 @Extension(name = "BPM", vendor = "Alfame Systems")
-@Sources(BPMTaskListener.class)
+@Sources({BPMTaskListener.class, BPMEventListener.class})
 @ConnectionProviders(BPMConnectionProvider.class)
 @Operations({BPMProcessFactoryOperations.class, BPMProcessVariableOperations.class, BPMEventSubscriptionOperations.class, BPMAttachmentOperations.class, BPMProcessInstanceOperations.class})
 @SubTypeMapping(baseType = BPMDefinition.class,
@@ -139,6 +142,9 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
     private BPMStandaloneProcessEngineSchemaConfiguration processEngineConfiguration;
     private ProcessEngine processEngine;
 
+    private BPMStandaloneFormEngineConfigurator formEngineConfigurator;
+    private FormEngine formEngine;
+
     @Override
     public void initialise() throws InitialisationException {
         this.processEngineConfiguration = new BPMStandaloneProcessEngineSchemaConfiguration();
@@ -151,7 +157,8 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         this.processEngineConfiguration.setDataSource(this.dataSource.getDataSource());
         this.processEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
-        this.processEngineConfiguration.addConfigurator(new FormEngineConfigurator());
+        this.formEngineConfigurator = new BPMStandaloneFormEngineConfigurator();
+        this.processEngineConfiguration.addConfigurator(this.formEngineConfigurator);
 
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
         if (this.asyncExecutorFactory instanceof BPMDefaultAsyncExecutorFactory) {
@@ -169,11 +176,14 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         } else if (this.asyncExecutorFactory != null) {
             this.processEngineConfiguration.setAsyncExecutor(this.asyncExecutorFactory.createAsyncExecutor());
         }
+
     }
 
     @Override
     public void start() throws MuleException {
         this.processEngine = this.processEngineConfiguration.buildProcessEngine();
+
+        this.formEngine = this.formEngineConfigurator.getFormEngine();
 
         this.deployDefinitions(this.definitions, this.tenantId);
 
@@ -336,4 +346,10 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         } 
     }
 
+    @Override
+    public void completeTask(String taskId, String formKey, String outcome, Map<String, Object> variables) {
+        FormDefinition formDefinition = this.formEngine.getFormRepositoryService().createFormDefinitionQuery().formDefinitionKey(formKey).singleResult();
+        LOGGER.info("Completing task with id {}, form key {} and form definition id {}", taskId, formKey, formDefinition.getId());
+        this.processEngine.getTaskService().completeTaskWithForm(taskId, formDefinition.getId(), outcome, variables);
+    }
 }
