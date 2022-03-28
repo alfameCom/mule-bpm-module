@@ -63,18 +63,32 @@ public class BPMEventTestCase extends BPMAbstractTestCase {
         String formKey = FieldUtils.readField(taskEntity, "formKey", true).toString();
         Assert.assertNotNull("Returned form key should not not be NULL", formKey);
 
+        final int attempts = 10;
         Map<String, Object> variables = new HashMap<>();
         variables.put("tryAgain", "false");
-        engine.completeTask(taskId, formKey, "Done!", variables);
+        for (int attempt = 0; attempt < attempts; attempt++) {
+            try {
+                engine.completeTask(taskId, formKey, "Done!", variables);
+                break;
+            } catch (Exception e) {
+                if (attempt < (attempts - 1)) {
+                    int ms = 100 + (100 * attempt);
+                    LOGGER.info("Waiting for transaction to commit for {} ms", ms);
+                    Thread.sleep(ms);
+                } else {
+                    throw e;
+                }
+            }
+        }
 
         List<BPMEngineEvent> taskCompletionEvents = taskCompletionEventSubscription
-                .waitForEvents(1, 10, TimeUnit.SECONDS);
+                .waitForEvents(1, 15, TimeUnit.SECONDS);
         taskCompletionEventSubscription.unsubscribeForEvents();
         Assert.assertNotNull("Returned task completion events should not not be NULL", taskCompletionEvents);
         Assert.assertEquals("One task completion event should returned", 1, taskCompletionEvents.size());
 
         List<BPMEngineEvent> processEvents = processEventSubscription
-                .waitForEvents(1, 15, TimeUnit.SECONDS);
+                .waitForEvents(1, 20, TimeUnit.SECONDS);
         processEventSubscription.unsubscribeForEvents();
         Assert.assertNotNull("Returned process events should not not be NULL", processEvents);
         Assert.assertEquals("One process event should returned", 1, processEvents.size());
