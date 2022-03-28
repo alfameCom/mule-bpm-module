@@ -1,11 +1,13 @@
 package com.alfame.esb.bpm.module.internal.impl;
 
 import com.alfame.esb.bpm.api.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.slf4j.Logger;
@@ -67,7 +69,7 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
         if (this.subscribedForEvents == true) {
             BPMEngineEvent engineEvent = null;
 
-
+            LOGGER.trace("Received event of class {} with contents {}", flowableEvent.getClass().getCanonicalName(), ToStringBuilder.reflectionToString(flowableEvent));
             if (flowableEvent instanceof FlowableVariableEvent) {
                 FlowableVariableEvent flowableVariableEvent = (FlowableVariableEvent) flowableEvent;
                 LOGGER.trace("Received variable event {} for instance {}", flowableVariableEvent.getType(), flowableVariableEvent.getProcessInstanceId());
@@ -76,11 +78,19 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
                         || flowableVariableEvent.getType().equals(FlowableEngineEventType.VARIABLE_DELETED)) {
                     engineEvent = new BPMVariableEventProxy(flowableVariableEvent);
                 }
+            } else if (flowableEvent instanceof FlowableEntityWithVariablesEvent) {
+                FlowableEntityWithVariablesEvent flowableEntityWithVariablesEvent = (FlowableEntityWithVariablesEvent) flowableEvent;
+                LOGGER.trace("Received entity with variables event {}", flowableEntityWithVariablesEvent.getType());
+                if (flowableEntityWithVariablesEvent.getType().equals(FlowableEngineEventType.TASK_COMPLETED)) {
+                    engineEvent = new BPMTaskEntityEventProxy(flowableEntityWithVariablesEvent);
+                }
             } else if (flowableEvent instanceof FlowableProcessEngineEvent) {
                 FlowableProcessEngineEvent flowableEngineEvent = (FlowableProcessEngineEvent) flowableEvent;
                 LOGGER.trace("Received engine event {} for instance {}", flowableEngineEvent.getType(), flowableEngineEvent.getProcessInstanceId());
                 if (flowableEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_CREATED)
-                        || flowableEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_COMPLETED)) {
+                        || flowableEngineEvent.getType().equals(FlowableEngineEventType.PROCESS_COMPLETED)
+                        || flowableEngineEvent.getType().equals(FlowableEngineEventType.ENGINE_CREATED)
+                        || flowableEngineEvent.getType().equals(FlowableEngineEventType.ENGINE_CLOSED)) {
                     engineEvent = new BPMEventProxy(flowableEngineEvent);
                 }
                 if (flowableEngineEvent.getType().equals(FlowableEngineEventType.ACTIVITY_STARTED)
@@ -92,6 +102,10 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
                 LOGGER.trace("Received entity event {}", flowableEntityEvent.getType());
                 if (flowableEntityEvent.getType().equals(FlowableEngineEventType.JOB_EXECUTION_FAILURE)) {
                     engineEvent = new BPMJobEntityEventProxy(flowableEntityEvent);
+                }
+                if (flowableEntityEvent.getType().equals(FlowableEngineEventType.TASK_CREATED)
+                        || flowableEntityEvent.getType().equals(FlowableEngineEventType.TASK_COMPLETED)) {
+                    engineEvent = new BPMTaskEntityEventProxy(flowableEntityEvent);
                 }
             } else {
                 LOGGER.trace("Received event {} of type {}", flowableEvent.getType(), flowableEvent.getClass().getCanonicalName());

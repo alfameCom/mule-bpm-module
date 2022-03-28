@@ -72,7 +72,7 @@ public class BPMProcessVariableOperations {
             CorrelationInfo correlationInfo) {
         connection = connection.joinIfForked(correlationInfo);
 
-        connection.getVariablesToUpdate().put(variableName, variableContent.getValue());
+        connection.getTask().getVariablesToUpdate().put(variableName, variableContent.getValue());
 
         LOGGER.debug("Variable {} set to be updated for process {}", variableName, connection.getTask().getProcessInstanceId());
     }
@@ -86,7 +86,7 @@ public class BPMProcessVariableOperations {
             CorrelationInfo correlationInfo) {
         connection = connection.joinIfForked(correlationInfo);
 
-        connection.getVariablesToRemove().add(variableName);
+        connection.getTask().getVariablesToRemove().add(variableName);
 
         LOGGER.debug("Variable {} set to be removed for process {}", variableName, connection.getTask().getProcessInstanceId());
     }

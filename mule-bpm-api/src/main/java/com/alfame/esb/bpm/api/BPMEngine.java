@@ -1,6 +1,7 @@
 package com.alfame.esb.bpm.api;
 
 import java.io.InputStream;
+import java.util.Map;
 
 public interface BPMEngine {
 
@@ -23,4 +24,6 @@ public interface BPMEngine {
 
     void triggerSignal(String executionId, String signalName);
     void deleteProcessInstance(String processInstanceId, String deleteReason);
+
+    void completeTask(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables);
 }

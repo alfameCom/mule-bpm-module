@@ -60,4 +60,9 @@ public class BPMVariableEventProxy extends BPMEngineEvent {
         return null;
     }
 
+    @Override
+    public Object getEntity() {
+        return null;
+    }
+
 }
