@@ -51,18 +51,21 @@
     <flow name="handleTaskEventFlow">
         <bpm:event-listener config-ref="engineConfig">
             <bpm:event-filters>
+                <bpm:activity-name-filter activityName="sid-7B57B411-B90B-4B3D-952E-25270D0AF07B"/>
                 <bpm:event-type-filter eventType="TASK_CREATED" />
                 <bpm:process-definition-filter key="variableProcess"/>
             </bpm:event-filters>
         </bpm:event-listener>
 
         <logger level="INFO" message="" />
+        <logger level="INFO" message="#[payload]" />
         <logger level="INFO" message="#[payload.description]" />
     </flow>
 
     <flow name="handleTaskCompletionEventFlow">
         <bpm:event-listener config-ref="engineConfig">
             <bpm:event-filters>
+                <bpm:activity-name-filter activityName="sid-7B57B411-B90B-4B3D-952E-25270D0AF07B"/>
                 <bpm:event-type-filter eventType="TASK_COMPLETED" />
                 <bpm:process-definition-filter key="variableProcess"/>
             </bpm:event-filters>
