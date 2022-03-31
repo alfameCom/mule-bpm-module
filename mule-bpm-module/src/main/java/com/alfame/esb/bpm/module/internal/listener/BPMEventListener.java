@@ -4,8 +4,7 @@ import com.alfame.esb.bpm.api.BPMEngineEvent;
 import com.alfame.esb.bpm.api.BPMEngineEventSubscription;
 import com.alfame.esb.bpm.api.BPMEngineEventSubscriptionBuilder;
 import com.alfame.esb.bpm.api.BPMEngineEventType;
-import com.alfame.esb.bpm.module.api.config.BPMEventSubscriptionEventTypeFilter;
-import com.alfame.esb.bpm.module.api.config.BPMEventSubscriptionFilter;
+import com.alfame.esb.bpm.module.api.config.*;
 import com.alfame.esb.bpm.module.api.param.BPMEventType;
 import com.alfame.esb.bpm.module.internal.BPMExtension;
 import com.alfame.esb.bpm.module.internal.connection.BPMConnection;
@@ -82,16 +81,30 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
                     BPMEventSubscriptionEventTypeFilter eventTypeFilter = (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
                     BPMEventType eventType = eventTypeFilter.getEventType();
                     if (eventType == BPMEventType.PROCESS_INSTANCE_CREATED) {
+                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.PROCESS_INSTANCE_CREATED);
                         eventSubscriptionBuilder.eventType(BPMEngineEventType.PROCESS_INSTANCE_CREATED);
                     } else if (eventType == BPMEventType.PROCESS_INSTANCE_ENDED) {
+                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.PROCESS_INSTANCE_ENDED);
                         eventSubscriptionBuilder.eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED);
                     } else if (eventType == BPMEventType.TASK_CREATED) {
+                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.TASK_CREATED);
                         eventSubscriptionBuilder.eventType(BPMEngineEventType.TASK_CREATED);
                     } else if (eventType == BPMEventType.TASK_COMPLETED) {
+                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.TASK_COMPLETED);
                         eventSubscriptionBuilder.eventType(BPMEngineEventType.TASK_COMPLETED);
                     } else {
                         LOGGER.warn("Unsupported event type {}", eventType);
                     }
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
+                    BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =
+                            (BPMEventSubscriptionProcessDefinitionFilter) eventSubscriptionFilter;
+                    LOGGER.debug("Filtering events without process definition key {}", processDefinitionFilter.getKey());
+                    eventSubscriptionBuilder.processDefinitionKey(processDefinitionFilter.getKey());
+                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionActivityNameFilter) {
+                    BPMEventSubscriptionActivityNameFilter activityNameFilter =
+                            (BPMEventSubscriptionActivityNameFilter) eventSubscriptionFilter;
+                    LOGGER.info("Filtering events without activity name {}", activityNameFilter.getActivityName());
+                    eventSubscriptionBuilder.activityName(activityNameFilter.getActivityName());
                 }
             }
         }

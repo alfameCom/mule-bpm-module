@@ -53,7 +53,7 @@ public class BPMTaskEntityEventProxy extends BPMEngineEvent {
 
     @Override
     public String getActivityName() {
-        return null;
+        return this.taskEntity.getTaskDefinitionKey();
     }
 
     @Override
