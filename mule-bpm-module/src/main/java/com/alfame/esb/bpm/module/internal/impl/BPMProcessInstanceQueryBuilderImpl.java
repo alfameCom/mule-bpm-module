@@ -95,6 +95,11 @@ public class BPMProcessInstanceQueryBuilderImpl extends BPMProcessInstanceQueryB
             LOGGER.debug("Adding filter criteria for unfinished instances only");
         }
 
+        if (this.includeProcessVariables) {
+            query.includeProcessVariables();
+            LOGGER.debug("Including process variables");
+        }
+
         return new BPMProcessInstanceQueryImpl(engine, query);
     }
 
