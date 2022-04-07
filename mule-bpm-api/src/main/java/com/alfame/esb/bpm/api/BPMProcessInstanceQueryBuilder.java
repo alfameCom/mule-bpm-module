@@ -18,6 +18,7 @@ public abstract class BPMProcessInstanceQueryBuilder {
     protected Map<String, String> variablesLike = new HashMap<>();
     protected boolean onlyUnfinished = false;
     protected boolean onlyFinished = false;
+    protected boolean includeProcessVariables = false;
 
     public BPMProcessInstanceQueryBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
@@ -81,6 +82,11 @@ public abstract class BPMProcessInstanceQueryBuilder {
 
     public BPMProcessInstanceQueryBuilder onlyFinished(boolean onlyFinished) {
         this.onlyFinished = onlyFinished;
+        return this;
+    }
+
+    public BPMProcessInstanceQueryBuilder includeProcessVariables(boolean includeProcessVariables) {
+        this.includeProcessVariables = includeProcessVariables;
         return this;
     }
 
