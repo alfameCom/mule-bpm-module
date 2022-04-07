@@ -6,6 +6,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.cfg.TransactionState;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 import org.flowable.engine.delegate.event.FlowableProcessEngineEvent;
@@ -128,12 +129,12 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
 
     @Override
     public boolean isFireOnTransactionLifecycleEvent() {
-        return false;
+        return true;
     }
 
     @Override
     public String getOnTransaction() {
-        return null;
+        return TransactionState.COMMITTED.name();
     }
 
 }
