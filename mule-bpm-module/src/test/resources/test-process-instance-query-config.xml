@@ -54,6 +54,7 @@
                 <bpm:process-instance-started-after-filter startedAfter="2000-01-01" />
                 <bpm:process-instance-started-before-filter startedBefore="2050-01-01" />
                 <bpm:process-instance-only-unfinished-filter />
+                <bpm:process-instance-include-process-variables />
             </bpm:process-instance-filters>
         </bpm:process-instance-query-builder>
         <bpm:get-unique-process-instance config-ref="engineConfig" query="#[vars.sleeperProcessQuery]" target="sleeperProcess" />
