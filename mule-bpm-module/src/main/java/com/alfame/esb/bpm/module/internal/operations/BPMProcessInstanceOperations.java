@@ -99,6 +99,9 @@ public class BPMProcessInstanceOperations {
                         LOGGER.debug("Filtering instances with variables: {}", variableLikeFilter.getVariableName());
                         processInstanceQueryBuilder.variable(variableLikeFilter.getVariableName());
                     }
+                } else if (processInstanceFilter instanceof BPMProcessInstanceIncludeProcessVariables) {
+                    LOGGER.debug("Including process variables");
+                    processInstanceQueryBuilder.includeProcessVariables(true);
                 } else {
                     throw new IllegalArgumentException("Unsupported filter");
                 }
