@@ -407,4 +407,54 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         Assert.assertTrue("One end event must be present", endEvents.size() == 1);
     }
 
+    @Test
+    public void testQueryWithIncludeProcessVariables() throws Exception {
+        BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+        Assert.assertNotNull("Engine should not be NULL", engine);
+
+        BPMEngineEventSubscription activitySubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.ACTIVITY_STARTED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+        BPMEngineEventSubscription endSubscription = engine.eventSubscriptionBuilder()
+                .eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED)
+                .processDefinitionKey("signalSleeperProcess").subscribeForEvents();
+
+        String message = "This is a test variable with a String value";
+
+        BPMProcessInstanceBuilder instanceBuilder = engine.processInstanceBuilder()
+                .processDefinitionKey("signalSleeperProcess")
+                .variableWithValue("testVar", message);
+        Assert.assertNotNull("Process instance builder should not be NULL", instanceBuilder);
+
+        BPMProcessInstance startedInstance = instanceBuilder.startProcessInstance();
+        Assert.assertNotNull("Returned process instance should not not be NULL", startedInstance);
+
+        activitySubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+
+        engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
+
+        List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
+        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+
+        BPMProcessInstanceQuery historicQuery = engine.processInstanceQueryBuilder()
+                .processInstanceId(startedInstance.getProcessInstanceId())
+                .buildProcessInstanceQuery();
+        BPMProcessInstance historicInstance = historicQuery.uniqueInstance();
+        Assert.assertNotNull("Ended instance must be found", historicInstance);
+        Assert.assertNotNull("Ended instance must be ended", historicInstance.getEndTime());
+
+        BPMProcessInstanceQuery historicQueryWithVariables = engine.processInstanceQueryBuilder()
+                .processInstanceId(startedInstance.getProcessInstanceId())
+                .includeProcessVariables(true)
+                .buildProcessInstanceQuery();
+        BPMProcessInstance historicInstanceWithVariables = historicQueryWithVariables.uniqueInstance();
+
+        BPMVariableInstance nullVariableInstance = historicInstance.getVariableInstance("testVar");
+        Assert.assertNull("Variable instance should be NULL", nullVariableInstance);
+
+        BPMVariableInstance variableInstance = historicInstanceWithVariables.getVariableInstance("testVar");
+        Assert.assertNotNull("Variable instance should not be NULL", variableInstance);
+        Assert.assertEquals("Variable instance should have value", message, variableInstance.getValue());
+    }
+
 }
