@@ -50,7 +50,7 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
 
         List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+        Assert.assertEquals("One end event must be present", 1, endEvents.size());
 
         BPMProcessInstanceQuery historicQuery = engine.processInstanceQueryBuilder().buildProcessInstanceQuery();
         List<BPMProcessInstance> historicInstances = historicQuery.instances(0, 10);
@@ -95,7 +95,7 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
 
         List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+        Assert.assertEquals("One end event must be present", 1, endEvents.size());
 
         BPMProcessInstanceQuery historicQuery = engine.processInstanceQueryBuilder()
                 .processInstanceId(startedInstance.getProcessInstanceId())
@@ -137,7 +137,7 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
 
         List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+        Assert.assertEquals("One end event must be present", 1, endEvents.size());
 
         BPMProcessInstanceQuery historicQuery = engine.processInstanceQueryBuilder()
                 .uniqueBusinessKeyLike("bond%")
@@ -172,7 +172,7 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
 
         List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+        Assert.assertEquals("One end event must be present",1 ,endEvents.size());
 
         BPMProcessInstanceQuery defaultTenantQuery = engine.processInstanceQueryBuilder()
                 .tenantId("com.alfame.esb")
@@ -214,7 +214,7 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
 
         List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+        Assert.assertEquals("One end event must be present", 1, endEvents.size());
 
         BPMProcessInstanceQuery existingNameQuery = engine.processInstanceQueryBuilder()
                 .processInstanceNameLike("%superior%")
@@ -256,7 +256,7 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
 
         List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+        Assert.assertEquals("One end event must be present", 1, endEvents.size());
 
         BPMProcessInstanceQuery instanceQueryWithVariable = engine.processInstanceQueryBuilder()
                 .variable("agent")
@@ -310,7 +310,7 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
 
         List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+        Assert.assertEquals("One end event must be present", 1, endEvents.size());
 
         BPMProcessInstanceQuery historicQuery = engine.processInstanceQueryBuilder()
                 .processInstanceId(startedInstance.getProcessInstanceId())
@@ -361,7 +361,7 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
 
         List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+        Assert.assertEquals("One end event must be present", 1, endEvents.size());
 
         BPMProcessInstanceQuery historicUnfinishedQuery = engine.processInstanceQueryBuilder()
                 .processInstanceId(startedInstance.getProcessInstanceId())
@@ -401,10 +401,10 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
 
         List<BPMEngineEvent> successEndActivityEvents =
                 successEndActivitySubscription.waitForEvents(1, 10, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", successEndActivityEvents.size() == 1);
+        Assert.assertEquals("One end event must be present", 1, successEndActivityEvents.size());
 
         List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 10, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+        Assert.assertEquals("One end event must be present", 1, endEvents.size());
     }
 
     @Test
@@ -434,7 +434,7 @@ public class BPMProcessInstanceQueryTestCase extends BPMAbstractTestCase {
         engine.triggerSignal(startedInstance.getProcessInstanceId(), "wakeUp");
 
         List<BPMEngineEvent> endEvents = endSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event must be present", endEvents.size() == 1);
+        Assert.assertEquals("One end event must be present", 1, endEvents.size());
 
         BPMProcessInstanceQuery historicQuery = engine.processInstanceQueryBuilder()
                 .processInstanceId(startedInstance.getProcessInstanceId())
