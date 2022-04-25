@@ -41,11 +41,9 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
         LOGGER.debug("Finding expired timer jobs for tenant {}", tenantId);
 
         List<TimerJobEntity> timerJobs = getDbSqlSession().selectList("selectTenantAwareExpiredTimerJobs", params, page);
-        if (LOGGER.isDebugEnabled()) {
-            if (timerJobs != null) {
-                for (TimerJobEntity timerJob : timerJobs) {
-                    LOGGER.debug("Found expired timer job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(timerJob));
-                }
+        if (LOGGER.isDebugEnabled() && timerJobs != null) {
+            for (TimerJobEntity timerJob : timerJobs) {
+                LOGGER.debug("Found expired timer job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(timerJob));
             }
         }
 
@@ -70,11 +68,9 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
         LOGGER.debug("Finding timer jobs for tenant {}", tenantId);
 
         List<TimerJobEntity> timerJobs = getDbSqlSession().selectList("selectTenantAwareTimerJobsToExecute", params, page);
-        if (LOGGER.isDebugEnabled()) {
-            if (timerJobs != null) {
-                for (TimerJobEntity timerJob : timerJobs) {
-                    LOGGER.debug("Found timer job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(timerJob));
-                }
+        if (LOGGER.isDebugEnabled() && timerJobs != null) {
+            for (TimerJobEntity timerJob : timerJobs) {
+                LOGGER.debug("Found timer job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(timerJob));
             }
         }
 
