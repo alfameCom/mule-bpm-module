@@ -96,7 +96,7 @@ public class BPMEventSubscriptionImpl implements BPMEngineEventSubscription {
         } finally {
             try {
                 this.cacheLock.lock();
-                if (this.cachedEvents.size() > 0) {
+                if (!this.cachedEvents.isEmpty()) {
                     event = this.cachedEvents.get(0);
                     this.cachedEvents.remove(0);
                 }

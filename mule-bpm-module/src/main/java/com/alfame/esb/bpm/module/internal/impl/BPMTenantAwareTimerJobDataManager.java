@@ -33,7 +33,7 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
         params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
         Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
-        if (enabledCategories != null && enabledCategories.size() > 0) {
+        if (enabledCategories != null && !enabledCategories.isEmpty()) {
             params.put("enabledCategories", enabledCategories);
         }
 
@@ -60,7 +60,7 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
         Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
 
-        if (enabledCategories != null && enabledCategories.size() > 0) {
+        if (enabledCategories != null && !enabledCategories.isEmpty()) {
             params.put("enabledCategories", enabledCategories);
         }
 
