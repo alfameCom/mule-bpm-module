@@ -378,4 +378,25 @@ sequenceDiagram
 
 Awaiting events is really useful for Munit tests. However, event subscription is fully production grade implementation, which can be used inside actual Mule BPM Applications.
 
-Events can be filtered by adding nested `<bpm:event-filters />` tag inside `<bpm:event-subscription-builder />`, `<bpm:get-unique-event />` and `<bpm:get-events />` tags. By default, all matched events are returned. After adding filters, only matching events are qualified. Multiple filters of a same type may be added.
+
+### Event filters
+
+Events can be filtered by adding nested `<bpm:event-filters />` tag inside `<bpm:event-subscription-builder />`, `<bpm:get-unique-event />` and `<bpm:get-events />` or `<bpm:event-listener />` tags. By default, all matched events are returned. After adding filters, only matching events are qualified. 
+
+Multiple filters of a same or different type may be added. Filters of the same type have a logical OR relationship and filters of a different type have a logical AND relationship. 
+
+For example, this would filter  `(foo OR bar) AND baz AND TASK_CREATED`.
+
+```
+<bpm:event-filters>
+    <bpm:activity-name-filter activityName="foo" />
+    <bpm:activity-name-filter activityName="bar" />
+    <bpm:process-definition-filter key="baz" />
+    <bpm:event-type-filter eventType="TASK_CREATED" />
+</bpm:event-filters>
+```
+
+Types of filters:
+`<bpm:process-definition-filter key="foo">` filters for `<process id="foo">` in the process .bpmn20.xml file.
+`<bpm:activity-name-filter activityName="bar">` filters for example `<userTask id="bar">`
+`<bpm:event-type-filter eventType="TASK_CREATED" />` filters for event type such as TASK_CREATED, PROCESS_INSTANCE_CREATED, PROCESS_INSTANCE_ENDED
