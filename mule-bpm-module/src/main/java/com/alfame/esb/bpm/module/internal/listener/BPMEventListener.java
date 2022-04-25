@@ -211,16 +211,7 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
 
                         LOGGER.trace("Consumer for <bpm:event-listener> on flow '{}' acquired activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
 
-                        Object entity = event.getEntity();
-                        Result.Builder<Object, BPMEngineEvent> resultBuilder = Result.<Object, BPMEngineEvent>builder();
-                        if (entity != null) {
-                            resultBuilder.mediaType(APPLICATION_JAVA);
-                            resultBuilder.output(entity);
-                        }
-                        resultBuilder.attributesMediaType(APPLICATION_JAVA);
-                        resultBuilder.attributes(event);
-
-                        Result<Object, BPMEngineEvent> result = resultBuilder.build();
+                        Result<Object, BPMEngineEvent> result = buildResult(event);
 
                         if (isAlive()) {
                             sourceCallback.handle(result, ctx);
@@ -290,6 +281,21 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
             stop.set(true);
         }
 
+    }
+
+    private Result<Object, BPMEngineEvent> buildResult(BPMEngineEvent event) {
+        Object entity = event.getEntity();
+        Result.Builder<Object, BPMEngineEvent> resultBuilder = Result.<Object, BPMEngineEvent>builder();
+        if (entity != null) {
+            resultBuilder.mediaType(APPLICATION_JAVA);
+            resultBuilder.output(entity);
+        }
+        resultBuilder.attributesMediaType(APPLICATION_JAVA);
+        resultBuilder.attributes(event);
+
+        Result<Object, BPMEngineEvent> result = resultBuilder.build();
+
+        return result;
     }
 
 }
