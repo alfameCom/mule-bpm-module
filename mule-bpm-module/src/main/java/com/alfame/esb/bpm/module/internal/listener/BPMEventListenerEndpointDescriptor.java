@@ -26,9 +26,6 @@ public class BPMEventListenerEndpointDescriptor {
     @Optional(defaultValue = "SECONDS")
     private TimeUnit timeoutUnit = SECONDS;
 
-    public BPMEventListenerEndpointDescriptor() {
-    }
-
     public int getTimeout() {
         return timeout;
     }
