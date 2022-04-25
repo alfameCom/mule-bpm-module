@@ -174,7 +174,6 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
 
                     if (event == null) {
                         LOGGER.trace("Consumer for <bpm:event-listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                        continue;
                     } else {
 
                         ctx = sourceCallback.createContext();
