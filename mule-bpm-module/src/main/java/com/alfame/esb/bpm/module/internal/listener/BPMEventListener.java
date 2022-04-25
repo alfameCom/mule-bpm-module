@@ -75,43 +75,59 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
         BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder = this.config.eventSubscriptionBuilder();
 
         List<BPMEventSubscriptionFilter> eventSubscriptionFilters = this.endpointDescriptor.getEventSubscriptionFilters();
+
         if (eventSubscriptionFilters != null) {
-            for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
-                if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
-                    BPMEventSubscriptionEventTypeFilter eventTypeFilter = (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
-                    BPMEventType eventType = eventTypeFilter.getEventType();
-                    if (eventType == BPMEventType.PROCESS_INSTANCE_CREATED) {
-                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.PROCESS_INSTANCE_CREATED);
-                        eventSubscriptionBuilder.eventType(BPMEngineEventType.PROCESS_INSTANCE_CREATED);
-                    } else if (eventType == BPMEventType.PROCESS_INSTANCE_ENDED) {
-                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.PROCESS_INSTANCE_ENDED);
-                        eventSubscriptionBuilder.eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED);
-                    } else if (eventType == BPMEventType.TASK_CREATED) {
-                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.TASK_CREATED);
-                        eventSubscriptionBuilder.eventType(BPMEngineEventType.TASK_CREATED);
-                    } else if (eventType == BPMEventType.TASK_COMPLETED) {
-                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.TASK_COMPLETED);
-                        eventSubscriptionBuilder.eventType(BPMEngineEventType.TASK_COMPLETED);
-                    } else {
-                        LOGGER.warn("Unsupported event type {}", eventType);
-                    }
-                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
-                    BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =
-                            (BPMEventSubscriptionProcessDefinitionFilter) eventSubscriptionFilter;
-                    LOGGER.debug("Filtering events without process definition key {}", processDefinitionFilter.getKey());
-                    eventSubscriptionBuilder.processDefinitionKey(processDefinitionFilter.getKey());
-                } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionActivityNameFilter) {
-                    BPMEventSubscriptionActivityNameFilter activityNameFilter =
-                            (BPMEventSubscriptionActivityNameFilter) eventSubscriptionFilter;
-                    LOGGER.info("Filtering events without activity name {}", activityNameFilter.getActivityName());
-                    eventSubscriptionBuilder.activityName(activityNameFilter.getActivityName());
-                }
-            }
+            handleEventSubscriptionFilters(eventSubscriptionBuilder, eventSubscriptionFilters);
         }
+
+
         BPMEngineEventSubscription eventSubscription = eventSubscriptionBuilder.subscribeForEvents();
 
         startConsumers(eventSubscription, sourceCallback);
 
+    }
+
+    private void handleEventSubscriptionFilters(BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder, List<BPMEventSubscriptionFilter> eventSubscriptionFilters ) {
+        for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
+            if (eventSubscriptionFilter instanceof BPMEventSubscriptionEventTypeFilter) {
+                BPMEventSubscriptionEventTypeFilter eventTypeFilter = (BPMEventSubscriptionEventTypeFilter) eventSubscriptionFilter;
+                BPMEventType eventType = eventTypeFilter.getEventType();
+                switch (eventType) {
+                    case PROCESS_INSTANCE_CREATED: {
+                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.PROCESS_INSTANCE_CREATED);
+                        eventSubscriptionBuilder.eventType(BPMEngineEventType.PROCESS_INSTANCE_CREATED);
+                        break;
+                    }
+                    case PROCESS_INSTANCE_ENDED: {
+                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.PROCESS_INSTANCE_ENDED);
+                        eventSubscriptionBuilder.eventType(BPMEngineEventType.PROCESS_INSTANCE_ENDED);
+                        break;
+                    }
+                    case TASK_CREATED: {
+                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.TASK_CREATED);
+                        eventSubscriptionBuilder.eventType(BPMEngineEventType.TASK_CREATED);
+                        break;
+                    }
+                    case TASK_COMPLETED: {
+                        LOGGER.debug("Filtering events without event type {}", BPMEngineEventType.TASK_COMPLETED);
+                        eventSubscriptionBuilder.eventType(BPMEngineEventType.TASK_COMPLETED);
+                        break;
+                    }
+                    default:
+                        LOGGER.warn("Unsupported event type {}", eventType);
+                }
+            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
+                BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =
+                        (BPMEventSubscriptionProcessDefinitionFilter) eventSubscriptionFilter;
+                LOGGER.debug("Filtering events without process definition key {}", processDefinitionFilter.getKey());
+                eventSubscriptionBuilder.processDefinitionKey(processDefinitionFilter.getKey());
+            } else if (eventSubscriptionFilter instanceof BPMEventSubscriptionActivityNameFilter) {
+                BPMEventSubscriptionActivityNameFilter activityNameFilter =
+                        (BPMEventSubscriptionActivityNameFilter) eventSubscriptionFilter;
+                LOGGER.info("Filtering events without activity name {}", activityNameFilter.getActivityName());
+                eventSubscriptionBuilder.activityName(activityNameFilter.getActivityName());
+            }
+        }
     }
 
     @Override
