@@ -293,7 +293,7 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
         resultBuilder.attributesMediaType(APPLICATION_JAVA);
         resultBuilder.attributes(event);
 
-        Result<Object, BPMEngineEvent> result = resultBuilder.build();
+        return resultBuilder.build();
 
         return result;
     }
