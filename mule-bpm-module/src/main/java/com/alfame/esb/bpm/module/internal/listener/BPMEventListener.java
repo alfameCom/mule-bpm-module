@@ -162,6 +162,8 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
                 .withShutdownTimeout(endpointDescriptor.getTimeout(), endpointDescriptor.getTimeoutUnit()));
     }
 
+
+
     private class Consumer {
 
         private final BPMExtension config;
@@ -281,21 +283,23 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
             stop.set(true);
         }
 
-    }
+        private Result<Object, BPMEngineEvent> buildResult(BPMEngineEvent event) {
 
-    private Result<Object, BPMEngineEvent> buildResult(BPMEngineEvent event) {
-        Object entity = event.getEntity();
-        Result.Builder<Object, BPMEngineEvent> resultBuilder = Result.<Object, BPMEngineEvent>builder();
-        if (entity != null) {
-            resultBuilder.mediaType(APPLICATION_JAVA);
-            resultBuilder.output(entity);
+            Object entity = event.getEntity();
+            Result.Builder<Object, BPMEngineEvent> resultBuilder = Result.<Object, BPMEngineEvent>builder();
+
+            if (entity != null) {
+                resultBuilder.mediaType(APPLICATION_JAVA);
+                resultBuilder.output(entity);
+            }
+
+            resultBuilder.attributesMediaType(APPLICATION_JAVA);
+            resultBuilder.attributes(event);
+
+            return resultBuilder.build();
         }
-        resultBuilder.attributesMediaType(APPLICATION_JAVA);
-        resultBuilder.attributes(event);
 
-        return resultBuilder.build();
-
-        return result;
+        
     }
 
 }
