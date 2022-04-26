@@ -74,6 +74,14 @@ The core BPM engine implementation used by this Mule BPM Module. It is not curre
 
 ## Features
 
+### UniqueDeploymentName
+
+When 'duplicateDeploymentFiltering' is set to true and 'uniqueDeploymentName' is provided, 
+Example:
+```
+<bpm:config name="myConfig" tenantId="com.alfame.esb" uniqueDeploymentName="unique-deployment" duplicateDeploymentFiltering="true">
+```
+
 ### Process factory
 
 `<bpm:process-factory />` can be used to instantiate new processes:
