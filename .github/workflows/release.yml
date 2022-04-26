@@ -31,8 +31,7 @@ jobs:
 
       - name: Set project version to release version and commit
         run: |
-          mvn -B versions:set -DnewVersion=$VERSION versions:commit
-          mvn -f ./mule-bpm-module/pom.xml -B versions:set -DnewVersion=$VERSION versions:commit
+          mvn -B versions:set -DnewVersion=$VERSION -DprocessAllModules versions:commit
           find . -name "pom.xml" | xargs git add
           git commit -m "Automated release commit"
           git push origin HEAD:master
@@ -41,8 +40,7 @@ jobs:
 
       - name: Set project version to next snapshot version and commit
         run: |
-          mvn -B versions:set -DnextSnapshot=true versions:commit
-          mvn -f ./mule-bpm-module/pom.xml -B versions:set -DnextSnapshot=true versions:commit
+          mvn -B versions:set -DnextSnapshot=true -DprocessAllModules versions:commit
           find . -name "pom.xml" | xargs git add
           git commit -m "Automated snapshot commit"
           git push origin HEAD:master
