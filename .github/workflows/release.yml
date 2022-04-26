@@ -32,7 +32,7 @@ jobs:
         run: |
           mvn -B versions:set -DnewVersion=$VERSION versions:commit
           mvn -f ./mule-bpm-module/pom.xml -B versions:set -DnewVersion=$VERSION versions:commit
-          git add */*.pom
+          git add "**/pom.xml"
           git commit -m "Automated release commit"
           git push origin HEAD:master
 
@@ -40,7 +40,7 @@ jobs:
         run: |
           mvn -B versions:set -DnextSnapshot=true versions:commit
           mvn -f ./mule-bpm-module/pom.xml -B versions:set -DnextSnapshot=true versions:commit
-          git add */*.pom
+          git add "**/pom.xml"
           git commit -m "Automated snapshot commit"
           git push origin HEAD:master
 
