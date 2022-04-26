@@ -35,6 +35,8 @@ jobs:
           git add "**/pom.xml"
           git commit -m "Automated release commit"
           git push origin HEAD:master
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
 
       - name: Set project version to next snapshot version and commit
         run: |
