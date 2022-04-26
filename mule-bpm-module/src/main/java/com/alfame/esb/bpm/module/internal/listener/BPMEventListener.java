@@ -299,7 +299,7 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
             return resultBuilder.build();
         }
 
-        
+
     }
 
 }

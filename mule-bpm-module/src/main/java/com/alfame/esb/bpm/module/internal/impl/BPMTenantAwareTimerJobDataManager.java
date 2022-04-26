@@ -30,15 +30,7 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
     @SuppressWarnings("unchecked")
     public List<TimerJobEntity> findExpiredJobs(List<String> enabledCategories, Page page) {
         Map<String, Object> params = new HashMap<>();
-        params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
-        Date now = jobServiceConfiguration.getClock().getCurrentTime();
-        params.put("now", now);
-        if (enabledCategories != null && !enabledCategories.isEmpty()) {
-            params.put("enabledCategories", enabledCategories);
-        }
-
-        params.put("tenantId", tenantId);
-        LOGGER.debug("Finding expired timer jobs for tenant {}", tenantId);
+        params = getParams(enabledCategories);
 
         List<TimerJobEntity> timerJobs = getDbSqlSession().selectList("selectTenantAwareExpiredTimerJobs", params, page);
         if (LOGGER.isDebugEnabled() && timerJobs != null) {
@@ -54,18 +46,7 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
     @SuppressWarnings("unchecked")
     public List<TimerJobEntity> findJobsToExecute(List<String> enabledCategories, Page page) {
         Map<String, Object> params = new HashMap<>(2);
-        String jobExecutionScope = jobServiceConfiguration.getJobExecutionScope();
-        params.put("jobExecutionScope", jobExecutionScope);
-
-        Date now = jobServiceConfiguration.getClock().getCurrentTime();
-        params.put("now", now);
-
-        if (enabledCategories != null && !enabledCategories.isEmpty()) {
-            params.put("enabledCategories", enabledCategories);
-        }
-
-        params.put("tenantId", tenantId);
-        LOGGER.debug("Finding timer jobs for tenant {}", tenantId);
+        params = getParams(enabledCategories);
 
         List<TimerJobEntity> timerJobs = getDbSqlSession().selectList("selectTenantAwareTimerJobsToExecute", params, page);
         if (LOGGER.isDebugEnabled() && timerJobs != null) {
@@ -76,5 +57,23 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
 
         return timerJobs;
     }
+
+private Map<String, Object> getParams(List<String> enabledCategories) {
+    Map<String, Object> params = new HashMap<>();
+
+    params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
+
+    Date now = jobServiceConfiguration.getClock().getCurrentTime();
+    params.put("now", now);
+
+    if (enabledCategories != null && !enabledCategories.isEmpty()) {
+        params.put("enabledCategories", enabledCategories);
+    }
+
+    params.put("tenantId", tenantId);
+    LOGGER.debug("Finding expired timer jobs for tenant {}", tenantId);
+
+    return params;
+}
 
 }
