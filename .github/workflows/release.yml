@@ -12,6 +12,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v2
         with:
+          fetch-depth: 0
           token: ${{ secrets.DEVOPS_TOKEN }}
 
       - name: Get version from release if valid
@@ -32,7 +33,7 @@ jobs:
         run: |
           mvn -B versions:set -DnewVersion=$VERSION versions:commit
           mvn -f ./mule-bpm-module/pom.xml -B versions:set -DnewVersion=$VERSION versions:commit
-          git add "**/pom.xml"
+          find . -name "pom.xml" | xargs git add
           git commit -m "Automated release commit"
           git push origin HEAD:master
         env:
@@ -42,12 +43,12 @@ jobs:
         run: |
           mvn -B versions:set -DnextSnapshot=true versions:commit
           mvn -f ./mule-bpm-module/pom.xml -B versions:set -DnextSnapshot=true versions:commit
-          git add "**/pom.xml"
+          find . -name "pom.xml" | xargs git add
           git commit -m "Automated snapshot commit"
           git push origin HEAD:master
 
       - name: Merge changes to develop
         run: |
           git checkout develop
-          git merge master --commit --no-edit
+          git merge origin/master --commit --no-edit
           git push origin HEAD:develop
