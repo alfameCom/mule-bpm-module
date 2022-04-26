@@ -6,7 +6,7 @@ import org.flowable.job.service.JobServiceConfiguration;
 
 public class BPMStandaloneProcessEngineSchemaConfiguration extends StandaloneProcessEngineConfiguration {
 
-    static private final String CUSTOM_MYBATIS_JOB_MAPPING_FILE = "db/mapping/mappings.xml";
+    private static final String CUSTOM_MYBATIS_JOB_MAPPING_FILE = "db/mapping/mappings.xml";
 
     public BPMStandaloneProcessEngineSchemaConfiguration() {
         mybatisMappingFile = CUSTOM_MYBATIS_JOB_MAPPING_FILE;
