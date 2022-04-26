@@ -104,6 +104,40 @@ Process factory allows adding variables to process, by using nested `<bpm:proces
 
 By setting `uniqueBusinessKey` attribute, the instance is guaranteed to be the only instance carrying the key.
 
+
+### Process querying & deletion
+
+Processes can be queried and deleted from Java.
+deleteProcessInstance(processInstance.getProcessInstanceId(), "Test delete")
+
+Sample code to test that instance is created and deleted:
+
+```
+BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
+Assert.assertNotNull("Engine should not be NULL", engine);
+
+BPMProcessInstanceBuilder processInstanceBuilder = engine.processInstanceBuilder()
+        .processDefinitionKey("signalSleeperProcess");
+Assert.assertNotNull("Process instance builder should not be NULL", processInstanceBuilder);
+
+BPMProcessInstance processInstance = processInstanceBuilder.startProcessInstance();
+Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
+
+BPMProcessInstanceQuery runningQuery = engine.processInstanceQueryBuilder()
+        .processInstanceId(processInstance.getProcessInstanceId())
+        .buildProcessInstanceQuery();
+processInstance = runningQuery.uniqueInstance();
+Assert.assertNotNull("Running instance must be found", processInstance);
+Assert.assertNull("Running instance must be actually running", processInstance.getEndTime());
+
+engine.deleteProcessInstance(processInstance.getProcessInstanceId(), "Test delete");
+
+processInstance = runningQuery.uniqueInstance();
+Assert.assertNotNull("Running instance should be shutdown and ended", processInstance.getEndTime());
+
+```
+    
+
 ### Mule task listener
 
 Mule tasks are Mule flows using `<bpm:task-listener />` as a source. Process instances can be set to call such flows by adding `<serviceTask flowable:type="mule" />`, with matching Endpoint URL.
