@@ -31,8 +31,7 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
     public List<TimerJobEntity> findExpiredJobs(List<String> enabledCategories, Page page) {
         LOGGER.debug("Finding expired timer jobs for tenant {}", tenantId);
 
-        Map<String, Object> params = new HashMap<>();
-        params = getParams(enabledCategories);
+        Map<String, Object> params = getParams(enabledCategories);
 
         List<TimerJobEntity> timerJobs = getDbSqlSession().selectList("selectTenantAwareExpiredTimerJobs", params, page);
         if (LOGGER.isDebugEnabled() && timerJobs != null) {
@@ -49,8 +48,7 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
     public List<TimerJobEntity> findJobsToExecute(List<String> enabledCategories, Page page) {
         LOGGER.debug("Finding timer jobs for tenant {}", tenantId);
 
-        Map<String, Object> params = new HashMap<>(2);
-        params = getParams(enabledCategories);
+        Map<String, Object> params = getParams(enabledCategories);
 
         List<TimerJobEntity> timerJobs = getDbSqlSession().selectList("selectTenantAwareTimerJobsToExecute", params, page);
         if (LOGGER.isDebugEnabled() && timerJobs != null) {
