@@ -5,7 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+import org.slf4j.Logger;
+import static org.slf4j.LoggerFactory.getLogger;
+
+
+import static java.util.logging.Logger.getLogger;
+
 public abstract class BPMEngineEventFilter<T> {
+
+    private static final Logger LOGGER = getLogger(BPMEngineEventFilter.class);
 
     protected List<BPMEngineEventType> eventTypes = new ArrayList<>();
     protected List<String> processDefinitionKeys = new ArrayList<>();
@@ -67,6 +76,8 @@ public abstract class BPMEngineEventFilter<T> {
     }
 
     private boolean isUnfilteredEvent(List<Object> filterKeys, Object eventKey) {
+        LOGGER.info("entering isUnfilteredEvent: " + filterKeys.toString() + " / " + eventKey.toString());
+
         boolean isUnfiltered = true;
 
         // Some filters of this type have been set?
@@ -77,6 +88,7 @@ public abstract class BPMEngineEventFilter<T> {
             isUnfiltered = filterKeys.contains(eventKey);
         }
 
+        LOGGER.info("exiting isUnfilteredEvent: " + isUnfiltered);
         return isUnfiltered;
     }
 
