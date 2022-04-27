@@ -29,6 +29,8 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
     @Override
     @SuppressWarnings("unchecked")
     public List<TimerJobEntity> findExpiredJobs(List<String> enabledCategories, Page page) {
+        LOGGER.debug("Finding expired timer jobs for tenant {}", tenantId);
+
         Map<String, Object> params = new HashMap<>();
         params = getParams(enabledCategories);
 
@@ -45,6 +47,8 @@ public class BPMTenantAwareTimerJobDataManager extends MybatisTimerJobDataManage
     @Override
     @SuppressWarnings("unchecked")
     public List<TimerJobEntity> findJobsToExecute(List<String> enabledCategories, Page page) {
+        LOGGER.debug("Finding timer jobs for tenant {}", tenantId);
+
         Map<String, Object> params = new HashMap<>(2);
         params = getParams(enabledCategories);
 
@@ -71,7 +75,6 @@ private Map<String, Object> getParams(List<String> enabledCategories) {
     }
 
     params.put("tenantId", tenantId);
-    LOGGER.debug("Finding expired timer jobs for tenant {}", tenantId);
 
     return params;
 }
