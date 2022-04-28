@@ -116,36 +116,43 @@ By setting `uniqueBusinessKey` attribute, the instance is guaranteed to be the o
 
 ### Process querying & deletion
 
-Processes can be queried and deleted from Java.
-deleteProcessInstance(processInstance.getProcessInstanceId(), "Test delete")
+Use `<bpm:process-instance-query-builder>` to query for a process.
+Use `<bpm:delete-process-instance>` to delete a process with processInstanceId and optional deleteReason.
 
-Sample code to test that instance is created and deleted:
-
+Example:
 ```
-BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
-Assert.assertNotNull("Engine should not be NULL", engine);
+<flow name="checkForSleepFlow">
+    <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://checkForSleep" transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN" />
 
-BPMProcessInstanceBuilder processInstanceBuilder = engine.processInstanceBuilder()
-        .processDefinitionKey("signalSleeperProcess");
-Assert.assertNotNull("Process instance builder should not be NULL", processInstanceBuilder);
+    <bpm:get-variable config-ref="engineConfig" variableName="sleeperProcessInstanceId" target="sleeperProcessInstanceId" />
+    <logger level="INFO" message="Sleeper process instance id: #[vars.sleeperProcessInstanceId]" />
 
-BPMProcessInstance processInstance = processInstanceBuilder.startProcessInstance();
-Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
+    <bpm:process-instance-query-builder config-ref="engineConfig" target="sleeperProcessQuery">
+        <bpm:process-instance-filters>
+            <bpm:process-instance-tenant-filter tenantId="com.alfame.esb" />
+            <bpm:process-instance-id-filter processInstanceId="#[vars.sleeperProcessInstanceId]" />
+            <bpm:process-instance-name-like-filter nameLike="sleep%" />
+            <bpm:process-instance-variable-like-filter variableName="sleeperName"  valueLike="patient%" />
+            <bpm:process-instance-variable-like-filter variableName="targetAmount" />
+            <bpm:process-instance-started-after-filter startedAfter="2000-01-01" />
+            <bpm:process-instance-started-before-filter startedBefore="2050-01-01" />
+            <bpm:process-instance-only-unfinished-filter />
+            <bpm:process-instance-include-process-variables />
+        </bpm:process-instance-filters>
+    </bpm:process-instance-query-builder>
+    <bpm:get-unique-process-instance config-ref="engineConfig" query="#[vars.sleeperProcessQuery]" target="sleeperProcess" />
 
-BPMProcessInstanceQuery runningQuery = engine.processInstanceQueryBuilder()
-        .processInstanceId(processInstance.getProcessInstanceId())
-        .buildProcessInstanceQuery();
-processInstance = runningQuery.uniqueInstance();
-Assert.assertNotNull("Running instance must be found", processInstance);
-Assert.assertNull("Running instance must be actually running", processInstance.getEndTime());
-
-engine.deleteProcessInstance(processInstance.getProcessInstanceId(), "Test delete");
-
-processInstance = runningQuery.uniqueInstance();
-Assert.assertNotNull("Running instance should be shutdown and ended", processInstance.getEndTime());
-
+    <choice>
+        <when expression="#[vars.sleeperProcess != null and vars.sleeperProcess.processInstanceId == vars.sleeperProcessInstanceId]">
+            <bpm:delete-process-instance config-ref="engineConfig" processInstanceId="#[vars.sleeperProcess.processInstanceId]" deleteReason="Deleted unneeded process" />
+            <logger level="INFO" message="Unfinished sleeper found and deleted: #[vars.sleeperProcess.processInstanceId]" />
+        </when>
+        <otherwise>
+            <raise-error type="ANY" description="Sleeper not found"/>
+        </otherwise>
+    </choice>
+</flow>
 ```
-    
 
 ### Mule task listener
 
