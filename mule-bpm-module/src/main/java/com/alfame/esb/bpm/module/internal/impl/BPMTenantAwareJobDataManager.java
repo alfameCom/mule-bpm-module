@@ -39,11 +39,9 @@ public class BPMTenantAwareJobDataManager extends MybatisJobDataManager {
         LOGGER.debug("Finding jobs for tenant {}", tenantId);
 
         List<JobEntity> jobs = getDbSqlSession().selectList("selectTenantAwareJobsToExecute", params, page);
-        if (LOGGER.isDebugEnabled()) {
-            if (jobs != null) {
-                for (JobEntity job : jobs) {
-                    LOGGER.debug("Found job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(job));
-                }
+        if (LOGGER.isDebugEnabled() && jobs != null) {
+            for (JobEntity job : jobs) {
+                LOGGER.debug("Found job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(job));
             }
         }
 
@@ -69,11 +67,9 @@ public class BPMTenantAwareJobDataManager extends MybatisJobDataManager {
         LOGGER.debug("Finding expired jobs for tenant {} with max timeout {}", tenantId, maxTimeout);
 
         List<JobEntity> jobs = getDbSqlSession().selectList("selectTenantAwareExpiredJobs", params, page);
-        if (LOGGER.isDebugEnabled()) {
-            if (jobs != null) {
-                for (JobEntity job : jobs) {
-                    LOGGER.debug("Found expired job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(job));
-                }
+        if (LOGGER.isDebugEnabled() && jobs != null) {
+            for (JobEntity job : jobs) {
+                LOGGER.debug("Found expired job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(job));
             }
         }
 
