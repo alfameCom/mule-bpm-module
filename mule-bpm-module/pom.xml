@@ -74,8 +74,6 @@
                             <value>120</value>
                         </property>
                     </systemProperties>
-
-                    <argLine>-Djava.awt.headless=true</argLine>
                 </configuration>
             </plugin>
 
