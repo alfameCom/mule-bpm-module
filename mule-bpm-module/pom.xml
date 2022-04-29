@@ -43,7 +43,7 @@
 
     <properties>
         <gpg.skip>true</gpg.skip>
-        <argLine>-Djava.awt.headless=false</argLine>
+        <argLine>-Djava.awt.headless=true</argLine>
     </properties>
 
     <build>
