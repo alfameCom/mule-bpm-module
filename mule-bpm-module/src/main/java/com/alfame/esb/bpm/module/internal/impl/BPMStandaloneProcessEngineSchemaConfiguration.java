@@ -14,10 +14,8 @@ public class BPMStandaloneProcessEngineSchemaConfiguration extends StandalonePro
 
     @Override
     public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new BPMSchemaOperationsProcessEngineBuild();
-            }
+        if (schemaManagementCmd == null && usingRelationalDatabase && databaseSchemaUpdate != null) {
+            this.schemaManagementCmd = new BPMSchemaOperationsProcessEngineBuild();
         }
     }
 
