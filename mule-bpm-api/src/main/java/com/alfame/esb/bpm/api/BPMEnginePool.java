@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BPMEnginePool {
 
+    private BPMEnginePool() {}
+
     private static final Log logger = LogFactory.getLog(BPMEnginePool.class);
 
     private static Map<String, BPMEngine> engines = new ConcurrentHashMap<>();
