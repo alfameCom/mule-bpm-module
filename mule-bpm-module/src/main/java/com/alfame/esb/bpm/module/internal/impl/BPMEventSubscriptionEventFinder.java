@@ -11,8 +11,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class BPMEventSubscriptionEventFinder extends BPMEngineEventFinder {
 
-    private static final Logger LOGGER = getLogger(BPMEventSubscriptionEventFinder.class);
-
     private final List<BPMEngineEvent> cachedEvents;
 
     public BPMEventSubscriptionEventFinder(List<BPMEngineEvent> cachedEvents) {
