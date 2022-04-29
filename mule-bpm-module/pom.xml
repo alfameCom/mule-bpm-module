@@ -75,7 +75,7 @@
                         </property>
                     </systemProperties>
 
-                    <argLine>-Djava.awt.headless=true</argLine>
+                    <argLine>-Djava.awt.headless=false</argLine>
                 </configuration>
             </plugin>
 

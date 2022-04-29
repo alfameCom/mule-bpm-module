@@ -38,7 +38,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_PGP_PASSPHRASE }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn -B -Pexamples clean org.jacoco:jacoco-maven-plugin:prepare-agent install verify org.jacoco:jacoco-maven-plugin:merge org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dgpg.skip=false -Djava.awt.headless=false --file pom.xml
+      run: mvn -B -Pexamples clean org.jacoco:jacoco-maven-plugin:prepare-agent install verify org.jacoco:jacoco-maven-plugin:merge org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dgpg.skip=false --file pom.xml
 
     - name: Deploy with Maven
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
