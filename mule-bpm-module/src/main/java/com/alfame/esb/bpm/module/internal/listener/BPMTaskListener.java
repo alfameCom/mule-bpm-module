@@ -131,13 +131,31 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
     public void onError(@ParameterGroup(name = "Error Response", showInDsl = true) BPMTaskListenerErrorResponseBuilder errorResponseBuilder, Error error, CorrelationInfo correlationInfo, SourceCallbackContext ctx) {
 
         final ErrorType errorType = error != null ? error.getErrorType() : null;
-        final String namespace = errorType != null ? (errorType.getNamespace() != null ? errorType.getNamespace() : "null") : "null";
-        final String identifier = errorType != null ? (errorType.getIdentifier() != null ? errorType.getIdentifier() : "null") : "null";
-        final String description = error != null ? (error.getDescription() != null ? error.getDescription() : "null") : "null";
-        String msg = "" + namespace + ": " + identifier + ": " + description;
-        LOGGER.error(msg);
 
-        LOGGER.debug("Submitting response after erroneous execution: " + responseValueAsString(errorResponseBuilder.getValue()));
+        String namespace = "null";
+        String identifier = "null";
+        String description = "null";
+
+        if (errorType != null) {
+            if (errorType.getNamespace() != null) {
+                namespace = errorType.getNamespace();
+            }
+            if (errorType.getIdentifier() != null) {
+                identifier = errorType.getIdentifier();
+            }
+        }
+
+        if (error != null && error.getDescription() != null) {
+            description = error.getDescription();
+        }
+
+        LOGGER.error("{}: {}: {}", namespace, identifier, description);
+
+        if (LOGGER.isDebugEnabled()) {
+            String responseValue = responseValueAsString(errorResponseBuilder.getValue());
+            LOGGER.debug("Submitting response after erroneous execution: {}", responseValue);
+        }
+
         BPMTaskResponse response = new BPMTaskResponse(responseValue(errorResponseBuilder.getValue()),
                 error != null ? error.getCause() : null);
 
