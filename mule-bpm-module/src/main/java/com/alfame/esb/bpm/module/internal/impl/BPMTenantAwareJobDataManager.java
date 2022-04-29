@@ -31,7 +31,7 @@ public class BPMTenantAwareJobDataManager extends MybatisJobDataManager {
         HashMap<String, Object> params = new HashMap<>();
         params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
 
-        if (enabledCategories != null && enabledCategories.size() > 0) {
+        if (enabledCategories != null && !enabledCategories.isEmpty()) {
             params.put("enabledCategories", enabledCategories);
         }
 
@@ -59,7 +59,7 @@ public class BPMTenantAwareJobDataManager extends MybatisJobDataManager {
         Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
         params.put("maxTimeout", maxTimeout);
 
-        if (enabledCategories != null && enabledCategories.size() > 0) {
+        if (enabledCategories != null && !enabledCategories.isEmpty()) {
             params.put("enabledCategories", enabledCategories);
         }
 

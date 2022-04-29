@@ -47,7 +47,7 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
 
     @Override
     public BPMEngineEventSubscription subscribeForEvents(BPMEngineEventListener engineEventListener) {
-        if (this.subscribedForEvents != true) {
+        if (!this.subscribedForEvents) {
             this.engineEventListener = engineEventListener;
             this.runtimeService.addEventListener(this);
             this.eventSubscription = new BPMEventSubscriptionImpl(this.engine, this);
@@ -58,7 +58,7 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
     }
 
     public void unsubscribeForEvents() {
-        if (this.subscribedForEvents == true) {
+        if (this.subscribedForEvents) {
             this.engineEventListener = null;
             this.runtimeService.removeEventListener(this);
             this.subscribedForEvents = false;

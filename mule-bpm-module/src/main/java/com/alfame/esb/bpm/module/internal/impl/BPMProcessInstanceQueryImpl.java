@@ -27,7 +27,7 @@ public class BPMProcessInstanceQueryImpl implements BPMProcessInstanceQuery {
 
     @Override
     public List<BPMProcessInstance> instances(int firstResult, int maxResults) {
-        List<BPMProcessInstance> instanceProxies = new ArrayList<BPMProcessInstance>();
+        List<BPMProcessInstance> instanceProxies = new ArrayList<>();
 
         long startTime = System.currentTimeMillis();
         List<HistoricProcessInstance> instances = query.listPage(firstResult, maxResults);

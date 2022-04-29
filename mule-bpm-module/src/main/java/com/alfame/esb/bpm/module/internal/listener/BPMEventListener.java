@@ -260,9 +260,7 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
                 if (ctx != null) {
                     connectionProvider.disconnect(ctx.getConnection());
                 }
-            } catch (IllegalStateException e) {
-                // Not connected
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalStateException | IllegalArgumentException e) {
                 // Not connected
             } catch (Exception e) {
                 if (LOGGER.isWarnEnabled()) {
