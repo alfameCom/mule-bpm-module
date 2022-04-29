@@ -2,12 +2,9 @@ package com.alfame.esb.bpm.module.internal.impl;
 
 import com.alfame.esb.bpm.api.BPMEngineEvent;
 import com.alfame.esb.bpm.api.BPMEngineEventFinder;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class BPMEventSubscriptionEventFinder extends BPMEngineEventFinder {
 
