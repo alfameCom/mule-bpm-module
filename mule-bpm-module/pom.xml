@@ -67,14 +67,13 @@
                 <configuration>
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
-
                     <systemProperties>
                         <property>
                             <name>mule.test.timeoutSecs</name>
                             <value>120</value>
                         </property>
                     </systemProperties>
-
+                    <argLine>${surefire.jacoco.args}</argLine>
                     <argLine>-Djava.awt.headless=false</argLine>
                 </configuration>
             </plugin>
@@ -104,6 +103,7 @@
                             </includes>
                         </fileSet>
                     </fileSets>
+                    <propertyName>surefire.jacoco.args</propertyName>
                 </configuration>
             </plugin>
             <plugin>
