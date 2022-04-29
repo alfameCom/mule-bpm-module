@@ -50,15 +50,15 @@ public abstract class BPMEngineEventFilter<T> {
             isUnfilteredEvent = false;
         } else {
             // Filter events, if filter of any single type has been set, and any of those are not matching the event
-            if (!isUnfilteredEvent((List) this.eventTypes, engineEvent.getEventType())) {
+            if (!isUnfilteredEventKey((List) this.eventTypes, engineEvent.getEventType())) {
                 isUnfilteredEvent = false;
-            } else if (!isUnfilteredEvent((List) this.processDefinitionKeys, engineEvent.getProcessDefinitionKey())) {
+            } else if (!isUnfilteredEventKey((List) this.processDefinitionKeys, engineEvent.getProcessDefinitionKey())) {
                 isUnfilteredEvent = false;
-            } else if (!isUnfilteredEvent((List) this.processInstanceIds, engineEvent.getProcessInstanceId())) {
+            } else if (!isUnfilteredEventKey((List) this.processInstanceIds, engineEvent.getProcessInstanceId())) {
                 isUnfilteredEvent = false;
-            } else if (!isUnfilteredEvent((List) this.activityNames, engineEvent.getActivityName())) {
+            } else if (!isUnfilteredEventKey((List) this.activityNames, engineEvent.getActivityName())) {
                 isUnfilteredEvent = false;
-            } else if (!isUnfilteredEvent((Map) this.variableValues, engineEvent.getVariableName(), engineEvent.getVariableValue())) {
+            } else if (!isUnfilteredEventValue((Map) this.variableValues, engineEvent.getVariableName(), engineEvent.getVariableValue())) {
                 isUnfilteredEvent = false;
             }
         }
@@ -66,7 +66,7 @@ public abstract class BPMEngineEventFilter<T> {
         return isUnfilteredEvent;
     }
 
-    private boolean isUnfilteredEvent(List<Object> filterKeys, Object eventKey) {
+    private boolean isUnfilteredEventKey(List<Object> filterKeys, Object eventKey) {
         boolean isUnfiltered = true;
 
         // Some filters of this type have been set?
@@ -80,7 +80,7 @@ public abstract class BPMEngineEventFilter<T> {
         return isUnfiltered;
     }
 
-    private boolean isUnfilteredEvent(Map<Object, Object> filterMap, Object eventKey, Object eventValue) {
+    private boolean isUnfilteredEventValue(Map<Object, Object> filterMap, Object eventKey, Object eventValue) {
         boolean isUnfiltered = true;
 
         // Some filters of this type have been set?
