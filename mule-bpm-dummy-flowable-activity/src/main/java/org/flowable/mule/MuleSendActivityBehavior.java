@@ -12,12 +12,12 @@
  */
 package org.flowable.mule;
 
-import java.util.concurrent.RejectedExecutionException;
-
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.slf4j.Logger;
+
+import java.util.concurrent.RejectedExecutionException;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
