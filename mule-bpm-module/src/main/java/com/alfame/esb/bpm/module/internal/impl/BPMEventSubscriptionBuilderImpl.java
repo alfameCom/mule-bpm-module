@@ -67,10 +67,14 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
 
     @Override
     public void onEvent(FlowableEvent flowableEvent) {
-        if (this.subscribedForEvents == true) {
+        if (this.subscribedForEvents) {
             BPMEngineEvent engineEvent = null;
 
-            LOGGER.trace("Received event of class {} with contents {}", flowableEvent.getClass().getCanonicalName(), ToStringBuilder.reflectionToString(flowableEvent));
+            if (LOGGER.isTraceEnabled()) {
+                String flowableEventToString = ToStringBuilder.reflectionToString(flowableEvent);
+                LOGGER.trace("Received event of class {} with contents {}", flowableEvent.getClass().getCanonicalName(), flowableEventToString);
+            }
+
             if (flowableEvent instanceof FlowableVariableEvent) {
                 FlowableVariableEvent flowableVariableEvent = (FlowableVariableEvent) flowableEvent;
                 LOGGER.trace("Received variable event {} for instance {}", flowableVariableEvent.getType(), flowableVariableEvent.getProcessInstanceId());
