@@ -222,9 +222,9 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
                         long taskTimeoutMillis = task.getRequestTimeoutMillis();
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' uses activity timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), taskTimeoutMillis, currentThread().getName());
-                        LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' uses async executor timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), config.getAsyncExecutor(task.getTenantId()).getAsyncJobLockTimeInMillis(), currentThread().getName());
+                        LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' uses async executor timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), config.getAsyncExecutor().getAsyncJobLockTimeInMillis(), currentThread().getName());
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' uses endpoint timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), TimeUnit.MILLISECONDS.convert(endpointDescription.getTimeout(), endpointDescription.getTimeoutUnit()), currentThread().getName());
-                        if (taskTimeoutMillis > config.getAsyncExecutor(task.getTenantId()).getAsyncJobLockTimeInMillis()) {
+                        if (taskTimeoutMillis > config.getAsyncExecutor().getAsyncJobLockTimeInMillis()) {
                             LOGGER.error("Consumer for <bpm:task-listener> on flow '{}' uses longer timeout than async executor supports. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
                             cancel(ctx);
                             continue;
