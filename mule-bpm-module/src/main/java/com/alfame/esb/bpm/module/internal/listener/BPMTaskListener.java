@@ -105,7 +105,11 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
     @OnSuccess
     public void onSuccess(@ParameterGroup(name = "Response", showInDsl = true) BPMTaskListenerSuccessResponseBuilder responseBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx) {
 
-        LOGGER.debug("Submitting response after successful execution: " + responseValueAsString(responseBuilder.getValue()));
+        if (LOGGER.isDebugEnabled()) {
+            String responseValue = responseValueAsString(responseBuilder.getValue());
+            LOGGER.debug("Submitting response after successful execution: {}", responseValue);
+        }
+
         BPMTaskResponse response = new BPMTaskResponse(responseValue(responseBuilder.getValue()));
 
         BPMConnection connection = ctx.getConnection();
