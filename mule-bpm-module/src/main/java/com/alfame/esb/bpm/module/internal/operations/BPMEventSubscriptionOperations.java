@@ -97,7 +97,7 @@ public class BPMEventSubscriptionOperations {
 
         BPMEngineEventSubscriptionBuilder eventSubscriptionBuilder = engine.eventSubscriptionBuilder();
 
-        if (eventSubscriptionFilters != null && eventSubscriptionFilters.size() > 0) {
+        if (eventSubscriptionFilters != null && !eventSubscriptionFilters.isEmpty()) {
             for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
                 if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
                     BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =
@@ -145,7 +145,7 @@ public class BPMEventSubscriptionOperations {
 
         BPMEngineEventFinder eventFinder = eventSubscription.eventFinder();
 
-        if (eventSubscriptionFilters != null && eventSubscriptionFilters.size() > 0) {
+        if (eventSubscriptionFilters != null && !eventSubscriptionFilters.isEmpty()) {
             for (BPMEventSubscriptionFilter eventSubscriptionFilter : eventSubscriptionFilters) {
                 if (eventSubscriptionFilter instanceof BPMEventSubscriptionProcessDefinitionFilter) {
                     BPMEventSubscriptionProcessDefinitionFilter processDefinitionFilter =

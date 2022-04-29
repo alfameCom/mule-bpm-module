@@ -46,7 +46,7 @@ public class BPMProcessInstanceOperations {
         LOGGER.debug("Creating query for process instances");
         BPMProcessInstanceQueryBuilder processInstanceQueryBuilder = engine.processInstanceQueryBuilder();
 
-        if (processInstanceFilters != null && processInstanceFilters.size() > 0) {
+        if (processInstanceFilters != null && !processInstanceFilters.isEmpty()) {
             for (BPMProcessInstanceFilter processInstanceFilter : processInstanceFilters) {
                 if (processInstanceFilter instanceof BPMProcessInstanceIdFilter) {
                     BPMProcessInstanceIdFilter idFilter = (BPMProcessInstanceIdFilter) processInstanceFilter;

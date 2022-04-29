@@ -8,8 +8,6 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
-;
-
 public class BPMEventSubscriptionEventsOutputMetadataResolver implements OutputTypeResolver<BPMEngineEvent> {
 
     private static MetadataType loadMetadataType(Class<?> classType) {

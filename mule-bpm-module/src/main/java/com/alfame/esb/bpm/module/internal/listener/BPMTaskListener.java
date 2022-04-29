@@ -230,7 +230,6 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
                     if (task == null) {
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                        continue;
                     } else {
 
                         semaphore.acquire();
@@ -330,9 +329,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                 if (ctx != null) {
                     connectionProvider.disconnect(ctx.getConnection());
                 }
-            } catch (IllegalStateException e) {
-                // Not connected
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalStateException | IllegalArgumentException e) {
                 // Not connected
             } catch (Exception e) {
                 if (LOGGER.isWarnEnabled()) {
@@ -363,7 +360,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
     public class TaskRollback implements BPMTaskRollbackCallback {
 
-        final private TransactionHandle transactionHandle;
+        private final TransactionHandle transactionHandle;
 
         public TaskRollback(TransactionHandle transactionHandle) {
             this.transactionHandle = transactionHandle;
