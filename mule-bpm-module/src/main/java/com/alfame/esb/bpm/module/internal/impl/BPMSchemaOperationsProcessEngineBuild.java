@@ -69,13 +69,7 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
                 } catch (Exception exception) {
                     LOGGER.error("error on Flyway migration", exception);
                 } finally {
-                    if (connection != null) {
-                        try {
-                            connection.close();
-                        } catch (SQLException sqlException) {
-                            LOGGER.error("error while closing database connection", sqlException);
-                        }
-                    }
+                    closeConnection(connection);
                 }
             } else {
                 LOGGER.warn("no data source defined");
@@ -83,6 +77,16 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
         }
 
         return returnValue;
+    }
+
+    private void closeConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException sqlException) {
+                LOGGER.error("error while closing database connection", sqlException);
+            }
+        }
     }
 
     protected void commitDbSqlContext(CommandContext commandContext) throws SQLException {

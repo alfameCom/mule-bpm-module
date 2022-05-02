@@ -145,7 +145,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
             }
 
         } else {
-            LOGGER.error("<<<<< process definition {}: instance {}: activity {}: execution cannot find task queue URL in {} ms", processDefinitionKey, processInstanceId, currentActivityId, endpointUrlValue, System.currentTimeMillis() - startTime);
+            LOGGER.error("<<<<< process definition {}: instance {}: activity {}: execution cannot find task queue URL in {} ms", processDefinitionKey, processInstanceId, currentActivityId, endpointUrlValue, (System.currentTimeMillis() - startTime));
             throw new RuntimeException("Missing endpoint URL, cannot queue Mule Task!");
         }
 
