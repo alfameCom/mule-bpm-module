@@ -46,10 +46,10 @@ public class BPMMultiTenancyTestCase extends BPMAbstractTestCase {
 
         List<BPMEngineEvent> processEndEvents =
                 otherProcessEndSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event for process must be present", processEndEvents.size() == 1);
+        Assert.assertEquals("One end event for process must be present", 1, processEndEvents.size());
         List<BPMEngineEvent> otherProcessEndEvents =
                 otherProcessEndSubscription.waitForEvents(1, 5, TimeUnit.SECONDS);
-        Assert.assertTrue("One end event for other process must be present", otherProcessEndEvents.size() == 1);
+        Assert.assertEquals("One end event for other process must be present", 1, otherProcessEndEvents.size());
 
         BPMVariableInstance otherResultVariable = otherEngine.getHistoricVariableInstance(
                 otherProcessInstance.getProcessInstanceId(), "result");

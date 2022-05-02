@@ -61,8 +61,8 @@ public class BPMProcessInstanceTestCase extends BPMAbstractTestCase {
         Assert.assertEquals("Result variable should be set to true", "true", resultVariable.getValue());
     }
 
-    @Test(expected = java.lang.RuntimeException.class)
-    public void testUniqueBusinessKeysFlow() throws Exception {
+    @Test
+    public void testUniqueBusinessKeysFlow() {
         BPMEngine engine = BPMEnginePool.getInstance("engineConfig");
         Assert.assertNotNull("Engine should not be NULL", engine);
 
@@ -79,7 +79,10 @@ public class BPMProcessInstanceTestCase extends BPMAbstractTestCase {
         BPMProcessInstance processInstance = processInstanceBuilder.startProcessInstance();
         Assert.assertNotNull("Returned process instance should not not be NULL", processInstance);
 
-        otherProcessInstanceBuilder.startProcessInstance();
+        try {
+            otherProcessInstanceBuilder.startProcessInstance();
+            Assert.fail("Expected a RuntimeException to be thrown");
+        } catch (RuntimeException ignored) {}
     }
 
     @Test

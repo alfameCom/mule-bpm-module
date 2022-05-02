@@ -105,7 +105,11 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
     @OnSuccess
     public void onSuccess(@ParameterGroup(name = "Response", showInDsl = true) BPMTaskListenerSuccessResponseBuilder responseBuilder, CorrelationInfo correlationInfo, SourceCallbackContext ctx) {
 
-        LOGGER.debug("Submitting response after successful execution: " + responseValueAsString(responseBuilder.getValue()));
+        if (LOGGER.isDebugEnabled()) {
+            String responseValue = responseValueAsString(responseBuilder.getValue());
+            LOGGER.debug("Submitting response after successful execution: {}", responseValue);
+        }
+
         BPMTaskResponse response = new BPMTaskResponse(responseValue(responseBuilder.getValue()));
 
         BPMConnection connection = ctx.getConnection();
@@ -127,13 +131,31 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
     public void onError(@ParameterGroup(name = "Error Response", showInDsl = true) BPMTaskListenerErrorResponseBuilder errorResponseBuilder, Error error, CorrelationInfo correlationInfo, SourceCallbackContext ctx) {
 
         final ErrorType errorType = error != null ? error.getErrorType() : null;
-        final String namespace = errorType != null ? (errorType.getNamespace() != null ? errorType.getNamespace() : "null") : "null";
-        final String identifier = errorType != null ? (errorType.getIdentifier() != null ? errorType.getIdentifier() : "null") : "null";
-        final String description = error != null ? (error.getDescription() != null ? error.getDescription() : "null") : "null";
-        String msg = "" + namespace + ": " + identifier + ": " + description;
-        LOGGER.error(msg);
 
-        LOGGER.debug("Submitting response after erroneous execution: " + responseValueAsString(errorResponseBuilder.getValue()));
+        String namespace = "null";
+        String identifier = "null";
+        String description = "null";
+
+        if (errorType != null) {
+            if (errorType.getNamespace() != null) {
+                namespace = errorType.getNamespace();
+            }
+            if (errorType.getIdentifier() != null) {
+                identifier = errorType.getIdentifier();
+            }
+        }
+
+        if (error != null && error.getDescription() != null) {
+            description = error.getDescription();
+        }
+
+        LOGGER.error("{}: {}: {}", namespace, identifier, description);
+
+        if (LOGGER.isDebugEnabled()) {
+            String responseValue = responseValueAsString(errorResponseBuilder.getValue());
+            LOGGER.debug("Submitting response after erroneous execution: {}", responseValue);
+        }
+
         BPMTaskResponse response = new BPMTaskResponse(responseValue(errorResponseBuilder.getValue()),
                 error != null ? error.getCause() : null);
 
@@ -208,7 +230,6 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
                     if (task == null) {
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' acquired no activities. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                        continue;
                     } else {
 
                         semaphore.acquire();
@@ -222,9 +243,9 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
                         long taskTimeoutMillis = task.getRequestTimeoutMillis();
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' uses activity timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), taskTimeoutMillis, currentThread().getName());
-                        LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' uses async executor timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), config.getAsyncExecutor(task.getTenantId()).getAsyncJobLockTimeInMillis(), currentThread().getName());
+                        LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' uses async executor timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), config.getAsyncExecutor().getAsyncJobLockTimeInMillis(), currentThread().getName());
                         LOGGER.trace("Consumer for <bpm:task-listener> on flow '{}' uses endpoint timeout {} ms. Consuming for thread '{}'", location.getRootContainerName(), TimeUnit.MILLISECONDS.convert(endpointDescription.getTimeout(), endpointDescription.getTimeoutUnit()), currentThread().getName());
-                        if (taskTimeoutMillis > config.getAsyncExecutor(task.getTenantId()).getAsyncJobLockTimeInMillis()) {
+                        if (taskTimeoutMillis > config.getAsyncExecutor().getAsyncJobLockTimeInMillis()) {
                             LOGGER.error("Consumer for <bpm:task-listener> on flow '{}' uses longer timeout than async executor supports. Consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
                             cancel(ctx);
                             continue;
@@ -308,9 +329,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                 if (ctx != null) {
                     connectionProvider.disconnect(ctx.getConnection());
                 }
-            } catch (IllegalStateException e) {
-                // Not connected
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalStateException | IllegalArgumentException e) {
                 // Not connected
             } catch (Exception e) {
                 if (LOGGER.isWarnEnabled()) {
@@ -341,7 +360,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
 
     public class TaskRollback implements BPMTaskRollbackCallback {
 
-        final private TransactionHandle transactionHandle;
+        private final TransactionHandle transactionHandle;
 
         public TaskRollback(TransactionHandle transactionHandle) {
             this.transactionHandle = transactionHandle;

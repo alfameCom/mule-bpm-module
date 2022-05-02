@@ -208,7 +208,7 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         this.processEngine.close();
     }
 
-    public AsyncExecutor getAsyncExecutor(String tenantId) {
+    public AsyncExecutor getAsyncExecutor() {
         return this.processEngineConfiguration.getAsyncExecutor();
     }
 
