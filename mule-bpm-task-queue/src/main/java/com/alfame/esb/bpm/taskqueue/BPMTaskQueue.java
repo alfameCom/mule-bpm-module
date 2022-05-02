@@ -18,7 +18,7 @@ public class BPMTaskQueue {
         this.queueName = queueName;
     }
 
-    public boolean publish(BPMTask task) throws InterruptedException {
+    public boolean publish(BPMTask task) {
         logger.debug("Pushing to queue " + this.queueName);
         return taskQueue.offer(task);
     }
