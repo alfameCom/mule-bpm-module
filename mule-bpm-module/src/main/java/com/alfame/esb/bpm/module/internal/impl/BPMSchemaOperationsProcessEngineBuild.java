@@ -16,6 +16,8 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import static org.flywaydb.core.internal.jdbc.JdbcUtils.closeConnection;
+
 public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProcessEngineBuild {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BPMSchemaOperationsProcessEngineBuild.class);
@@ -69,13 +71,7 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
                 } catch (Exception exception) {
                     LOGGER.error("error on Flyway migration", exception);
                 } finally {
-                    if (connection != null) {
-                        try {
-                            connection.close();
-                        } catch (SQLException sqlException) {
-                            LOGGER.error("error while closing database connection", sqlException);
-                        }
-                    }
+                    closeConnection(connection);
                 }
             } else {
                 LOGGER.warn("no data source defined");
@@ -83,6 +79,19 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
         }
 
         return returnValue;
+    }
+
+    private void closeConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException sqlException) {
+                LOGGER.error("error while closing database connection", sqlException);
+            }
+        }
+    }
+
+    private void createConnection() {
     }
 
     protected void commitDbSqlContext(CommandContext commandContext) throws SQLException {
