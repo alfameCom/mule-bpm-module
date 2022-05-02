@@ -14,6 +14,8 @@ public class BPMTaskQueueFactory {
     private static Map<String, BPMTaskQueue> instances = new ConcurrentHashMap<>();
     private static Semaphore semaphore = new Semaphore(1);
 
+    private BPMTaskQueueFactory() {}
+
     public static BPMTaskQueue getInstance(String queueName) {
         BPMTaskQueue taskQueue = null;
 
