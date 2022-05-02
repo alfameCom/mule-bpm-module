@@ -16,8 +16,6 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import static org.flywaydb.core.internal.jdbc.JdbcUtils.closeConnection;
-
 public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProcessEngineBuild {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BPMSchemaOperationsProcessEngineBuild.class);
@@ -89,9 +87,6 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
                 LOGGER.error("error while closing database connection", sqlException);
             }
         }
-    }
-
-    private void createConnection() {
     }
 
     protected void commitDbSqlContext(CommandContext commandContext) throws SQLException {
