@@ -44,7 +44,7 @@
         <mule.api.version>1.2.0</mule.api.version>
         <flowable.version>6.6.0</flowable.version>
         <hikari.version>3.4.5</hikari.version>
-        <hsql.version>2.5.1</hsql.version>
+        <hsql.version>2.6.1</hsql.version>
         <flyway.version>6.5.7</flyway.version>
         <commons.logging.version>1.2</commons.logging.version>
 
