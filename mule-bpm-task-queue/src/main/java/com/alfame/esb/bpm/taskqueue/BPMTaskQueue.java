@@ -23,12 +23,6 @@ public class BPMTaskQueue {
         return taskQueue.offer(task);
     }
 
-    @Deprecated
-    public BPMTask pop() throws InterruptedException {
-        logger.debug("Popping from queue " + this.queueName);
-        return taskQueue.take();
-    }
-
     public BPMTask pop(long timeout, TimeUnit unit) throws InterruptedException {
         logger.debug("Popping from queue " + this.queueName);
         return taskQueue.poll(timeout, unit);
