@@ -210,13 +210,12 @@ sequenceDiagram
 
 ### Mule event listener
 
-Mule events are Mule flows using `<bpm:event-listener />` as a source. Process instances can be set to call such flows by adding `<userTask id="foobar" />`.
-Event filters are used to select the correct event.
+Flowable events can be used as flow sources with `<bpm:event-listener />`. Event filters can be used to filter the events that trigger flows.
 
 Example:
 
 ```
-<flow name="myFlow" >
+<flow name="myFlow">
     <bpm:event-listener config-ref="myConfigRef">
         <bpm:event-filters>
             <bpm:activity-name-filter activityName="foobar"/>
