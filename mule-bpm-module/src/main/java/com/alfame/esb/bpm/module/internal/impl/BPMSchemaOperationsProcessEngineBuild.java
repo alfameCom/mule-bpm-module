@@ -34,7 +34,7 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
                 Connection connection = null;
                 try {
                     connection = dataSource.getConnection();
-                    if (connection != null && connection.isValid(5)) {
+                    if (connection.isValid(5)) {
                         String schema = connection.getSchema();
                         LOGGER.info("managing database schema {} on {}", schema, connection.getMetaData().getURL());
                         Flyway flyway = Flyway.configure()
