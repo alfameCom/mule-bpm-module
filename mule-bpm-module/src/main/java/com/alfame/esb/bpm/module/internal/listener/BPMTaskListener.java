@@ -303,6 +303,7 @@ public class BPMTaskListener extends Source<Object, BPMTaskInstance> {
                     LOGGER.debug("Consumer for <bpm:task-listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
                     stop();
                     cancel(ctx);
+                    Thread.currentThread().interrupt();
 
                 } catch (Exception e) {
 
