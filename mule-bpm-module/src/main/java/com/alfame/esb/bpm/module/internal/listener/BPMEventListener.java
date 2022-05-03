@@ -233,7 +233,7 @@ public class BPMEventListener extends Source<Object, BPMEngineEvent> {
                 } catch (InterruptedException e) {
 
                     LOGGER.debug("Consumer for <bpm:event-listener> on flow '{}' was interrupted. No more consuming for thread '{}'", location.getRootContainerName(), currentThread().getName());
-                    Thread.currentThread().interrupt();
+                    cancel(ctx);
 
                 } catch (Exception e) {
 
