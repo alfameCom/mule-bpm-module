@@ -29,6 +29,12 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
+    private Expression endpointUrl;
+    private Expression language;
+    private Expression payloadExpression;
+    private Expression resultVariable;
+    private Expression requestTimeout;
+    private Expression errorVariable;
 
     @Override
     public void execute(DelegateExecution execution) {
@@ -41,5 +47,27 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
         throw new RejectedExecutionException("Dummy implementation cannot execute activities");
     }
 
+    public void setEndpointUrl(Expression endpointUrl) {
+        this.endpointUrl = endpointUrl;
+    }
 
+    public void setLanguage(Expression language) {
+        this.language = language;
+    }
+
+    public void setPayloadExpression(Expression payloadExpression) {
+        this.payloadExpression = payloadExpression;
+    }
+
+    public void setResultVariable(Expression resultVariable) {
+        this.resultVariable = resultVariable;
+    }
+
+    public void setRequestTimeout(Expression requestTimeout) {
+        this.requestTimeout = requestTimeout;
+    }
+
+    public void setErrorVariable(Expression errorVariable) {
+        this.errorVariable = errorVariable;
+    }
 }
