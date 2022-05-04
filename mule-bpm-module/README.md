@@ -227,6 +227,31 @@ Example:
 See [Event filters](#event-filters) for examples. 
 
 
+
+[![
+    sequenceDiagram
+    autonumber
+    participant Mule BPM App
+    participant Mule BPM Module
+    participant BPMN 2.0
+    activate Mule BPM App
+    Mule BPM App->>Mule BPM Module: <bpm:process-factory />  
+    activate Mule BPM Module
+    Mule BPM Module->>BPMN 2.0: <startEvent />
+    activate BPMN 2.0
+    rect rgb(200, 200, 240)
+    BPMN 2.0->>Mule BPM Module: org.flowable.common.engine.api.delegate.event.FlowableEvent
+    alt isUnfilteredEvent(FlowableEvent)
+        Mule BPM Module->>Mule BPM App: <bpm:event-listener />
+        Mule BPM App->>Mule BPM App: execute flow
+    else
+    end
+    deactivate Mule BPM Module
+    deactivate BPMN 2.0
+    deactivate Mule BPM App
+    end
+](https://mermaid.ink/img/pako:eNp9U01rwzAM_SvGpw5aN5SdwghsrLt1DMZuuTi2khn8NcfuVkr_-5SPlrTrmkOQpaenJ1neU-Ek0Jy28JXACnhWvAnclJbgx1N0NpkKwnD2PEQllOc2kk3SQJ7eNuTR-xvRjZNo_gVg7JWsWDYWElFteYQrrFPPoiguiHPyUHmT--AEtO2iRiIXdmRZEPIf81TRhRP5j7qQuI2od70FVLssLtjO5QcQkYSmmq2ybE6G3312NwSP0GviXWhYrd03rzQw4YxxloFtlAXGvWISNDRYjkGngr2MyF7TKEhHotoPWysdIYDsQ7Mz4CjjervT6Y6z7GsttGojWAin1m_dRZ8MPyASjqbrZ0gB3Y5zBisHQ8LtC5nEz0d8LfG0I0hP59RAMFxJXOZ95y5p_AQDJc3RlFDzpGNJS3tAaPISmdZS4bbQPIYEc9ot-_vOiuN5wIzvYXAefgEokQWv)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNp9U01rwzAM_SvGpw5aN5SdwghsrLt1DMZuuTi2khn8NcfuVkr_-5SPlrTrmkOQpaenJ1neU-Ek0Jy28JXACnhWvAnclJbgx1N0NpkKwnD2PEQllOc2kk3SQJ7eNuTR-xvRjZNo_gVg7JWsWDYWElFteYQrrFPPoiguiHPyUHmT--AEtO2iRiIXdmRZEPIf81TRhRP5j7qQuI2od70FVLssLtjO5QcQkYSmmq2ybE6G3312NwSP0GviXWhYrd03rzQw4YxxloFtlAXGvWISNDRYjkGngr2MyF7TKEhHotoPWysdIYDsQ7Mz4CjjervT6Y6z7GsttGojWAin1m_dRZ8MPyASjqbrZ0gB3Y5zBisHQ8LtC5nEz0d8LfG0I0hP59RAMFxJXOZ95y5p_AQDJc3RlFDzpGNJS3tAaPISmdZS4bbQPIYEc9ot-_vOiuN5wIzvYXAefgEokQWv)
+
 ### Variable operations
 
 Variable operations `<bpm:get-variable />`, `<bpm:set-variable />` and `<bpm:remove-variable />` are available inside Mule tasks:
