@@ -34,7 +34,7 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
                 Connection connection = null;
                 try {
                     connection = dataSource.getConnection();
-                    if (connection != null && connection.isValid(5)) {
+                    if (connection.isValid(5)) {
                         returnValue = migrateDB(dataSource, connection, commandContext);
                     } else {
                         LOGGER.error("cannot establish database connection");
