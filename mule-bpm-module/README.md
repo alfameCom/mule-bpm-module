@@ -74,6 +74,15 @@ The core BPM engine implementation used by this Mule BPM Module. It is not curre
 
 ## Features
 
+### uniqueDeploymentName
+
+When 'duplicateDeploymentFiltering' is set to true and 'uniqueDeploymentName' is provided: prevents deploying same process and form definitions if there are no changes.
+
+Example:
+```
+<bpm:config name="myConfig" tenantId="com.alfame.esb" uniqueDeploymentName="unique-deployment" duplicateDeploymentFiltering="true">
+```
+
 ### Process factory
 
 `<bpm:process-factory />` can be used to instantiate new processes:
@@ -103,6 +112,47 @@ sequenceDiagram
 Process factory allows adding variables to process, by using nested `<bpm:process-variables />` tag.
 
 By setting `uniqueBusinessKey` attribute, the instance is guaranteed to be the only instance carrying the key.
+
+
+### Process querying & deletion
+
+Use `<bpm:process-instance-query-builder>` to query for a process.
+Use `<bpm:delete-process-instance>` to delete a process with processInstanceId and optional deleteReason.
+
+Example:
+```
+<flow name="checkForSleepFlow">
+    <bpm:task-listener config-ref="engineConfig" endpointUrl="bpm://checkForSleep" transactionType="LOCAL" transactionalAction="ALWAYS_BEGIN" />
+
+    <bpm:get-variable config-ref="engineConfig" variableName="sleeperProcessInstanceId" target="sleeperProcessInstanceId" />
+    <logger level="INFO" message="Sleeper process instance id: #[vars.sleeperProcessInstanceId]" />
+
+    <bpm:process-instance-query-builder config-ref="engineConfig" target="sleeperProcessQuery">
+        <bpm:process-instance-filters>
+            <bpm:process-instance-tenant-filter tenantId="com.alfame.esb" />
+            <bpm:process-instance-id-filter processInstanceId="#[vars.sleeperProcessInstanceId]" />
+            <bpm:process-instance-name-like-filter nameLike="sleep%" />
+            <bpm:process-instance-variable-like-filter variableName="sleeperName"  valueLike="patient%" />
+            <bpm:process-instance-variable-like-filter variableName="targetAmount" />
+            <bpm:process-instance-started-after-filter startedAfter="2000-01-01" />
+            <bpm:process-instance-started-before-filter startedBefore="2050-01-01" />
+            <bpm:process-instance-only-unfinished-filter />
+            <bpm:process-instance-include-process-variables />
+        </bpm:process-instance-filters>
+    </bpm:process-instance-query-builder>
+    <bpm:get-unique-process-instance config-ref="engineConfig" query="#[vars.sleeperProcessQuery]" target="sleeperProcess" />
+
+    <choice>
+        <when expression="#[vars.sleeperProcess != null and vars.sleeperProcess.processInstanceId == vars.sleeperProcessInstanceId]">
+            <bpm:delete-process-instance config-ref="engineConfig" processInstanceId="#[vars.sleeperProcess.processInstanceId]" deleteReason="Deleted unneeded process" />
+            <logger level="INFO" message="Unfinished sleeper found and deleted: #[vars.sleeperProcess.processInstanceId]" />
+        </when>
+        <otherwise>
+            <raise-error type="ANY" description="Sleeper not found"/>
+        </otherwise>
+    </choice>
+</flow>
+```
 
 ### Mule task listener
 
@@ -157,6 +207,50 @@ sequenceDiagram
     end
     deactivate Mule BPM App
 ](https://mermaid.ink/img/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgYXV0b251bWJlclxuICAgIHBhcnRpY2lwYW50IE11bGUgQlBNIEFwcFxuICAgIHBhcnRpY2lwYW50IE11bGUgQlBNIE1vZHVsZVxuICAgIHBhcnRpY2lwYW50IEJQTU4gMi4wXG4gICAgYWN0aXZhdGUgTXVsZSBCUE0gQXBwXG4gICAgTXVsZSBCUE0gQXBwLT4-TXVsZSBCUE0gTW9kdWxlOiA8YnBtOnByb2Nlc3MtZmFjdG9yeSAvPlxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIE11bGUgQlBNIE1vZHVsZS0-PkJQTU4gMi4wOiA8c3RhcnRFdmVudCAvPlxuICAgIGFjdGl2YXRlIEJQTU4gMi4wXG4gICAgcmVjdCByZ2IoMjAwLCAyMDAsIDI0MClcbiAgICBNdWxlIEJQTSBNb2R1bGUtPj5CUE1OIDIuMDogPHNlcnZpY2VUYXNrIGZsb3dhYmxlOnR5cGU9XCJtdWxlXCIgZmxvd2FibGU6YXN5bmM9XCJmYWxzZVwiIC8-XG4gICAgQlBNTiAyLjAtPj5NdWxlIEJQTSBNb2R1bGU6IG9yZy5mbG93YWJsZS5tdWxlLk11bGVTZW5kQWN0aXZpdHlCZWhhdmlvclxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIE11bGUgQlBNIE1vZHVsZS0-Pk11bGUgQlBNIEFwcDogPGJwbTp0YXNrLWxpc3RlbmVyIC8-XG4gICAgYWN0aXZhdGUgTXVsZSBCUE0gQXBwXG4gICAgTXVsZSBCUE0gQXBwLS0-Pk11bGUgQlBNIE1vZHVsZTogcmVzdWx0VmFyaWFibGVcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIEFwcFxuICAgIE11bGUgQlBNIE1vZHVsZS0tPj5CUE1OIDIuMDogcmVzdWx0VmFyaWFibGVcbiAgICBCUE1OIDIuMC0tPj5NdWxlIEJQTSBNb2R1bGU6IGRvbmVcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIGRlYWN0aXZhdGUgQlBNTiAyLjBcbiAgICBlbmRcbiAgICBNdWxlIEJQTSBNb2R1bGUtLT4-TXVsZSBCUE0gQXBwOiBjb20uYWxmYW1lLmVzYi5icG0uYXBpLkJQTVByb2Nlc3NJbnN0YW5jZVxuICAgIGRlYWN0aXZhdGUgTXVsZSBCUE0gTW9kdWxlXG4gICAgYWN0aXZhdGUgTXVsZSBCUE0gQXBwXG4gICAgTXVsZSBCUE0gQXBwLT4-TXVsZSBCUE0gQXBwOiBhdHRyaWJ1dGVzLnByb2Nlc3NJbnN0YW5jZUlkXG4gICAgZGVhY3RpdmF0ZSBNdWxlIEJQTSBBcHBcbiAgICByZWN0IHJnYigyMDAsIDIwMCwgMjQwKVxuICAgIE11bGUgQlBNIE1vZHVsZS0-PkJQTU4gMi4wOiA8c2VydmljZVRhc2sgZmxvd2FibGU6dHlwZT1cIm11bGVcIiBmbG93YWJsZTphc3luYz1cInRydWVcIiAvPlxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIGFjdGl2YXRlIEJQTU4gMi4wXG4gICAgQlBNTiAyLjAtPj5NdWxlIEJQTSBNb2R1bGU6IG9yZy5mbG93YWJsZS5tdWxlLk11bGVTZW5kQWN0aXZpdHlCZWhhdmlvclxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIE11bGUgQlBNIE1vZHVsZS0-Pk11bGUgQlBNIEFwcDogPGJwbTp0YXNrLWxpc3RlbmVyIC8-XG4gICAgYWN0aXZhdGUgTXVsZSBCUE0gQXBwXG4gICAgTXVsZSBCUE0gQXBwLS0-Pk11bGUgQlBNIE1vZHVsZTogcmVzdWx0VmFyaWFibGVcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIEFwcFxuICAgIE11bGUgQlBNIE1vZHVsZS0tPj5CUE1OIDIuMDogcmVzdWx0VmFyaWFibGVcbiAgICBCUE1OIDIuMC0tPj5NdWxlIEJQTSBNb2R1bGU6IGRvbmVcbiAgICBkZWFjdGl2YXRlIEJQTU4gMi4wXG4gICAgZGVhY3RpdmF0ZSBNdWxlIEJQTSBNb2R1bGVcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIGVuZFxuICAgIGRlYWN0aXZhdGUgTXVsZSBCUE0gQXBwIiwibWVybWFpZCI6eyJ0aGVtZSI6ImRlZmF1bHQifSwidXBkYXRlRWRpdG9yIjpmYWxzZX0)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgYXV0b251bWJlclxuICAgIHBhcnRpY2lwYW50IE11bGUgQlBNIEFwcFxuICAgIHBhcnRpY2lwYW50IE11bGUgQlBNIE1vZHVsZVxuICAgIHBhcnRpY2lwYW50IEJQTU4gMi4wXG4gICAgYWN0aXZhdGUgTXVsZSBCUE0gQXBwXG4gICAgTXVsZSBCUE0gQXBwLT4-TXVsZSBCUE0gTW9kdWxlOiA8YnBtOnByb2Nlc3MtZmFjdG9yeSAvPlxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIE11bGUgQlBNIE1vZHVsZS0-PkJQTU4gMi4wOiA8c3RhcnRFdmVudCAvPlxuICAgIGFjdGl2YXRlIEJQTU4gMi4wXG4gICAgcmVjdCByZ2IoMjAwLCAyMDAsIDI0MClcbiAgICBNdWxlIEJQTSBNb2R1bGUtPj5CUE1OIDIuMDogPHNlcnZpY2VUYXNrIGZsb3dhYmxlOnR5cGU9XCJtdWxlXCIgZmxvd2FibGU6YXN5bmM9XCJmYWxzZVwiIC8-XG4gICAgQlBNTiAyLjAtPj5NdWxlIEJQTSBNb2R1bGU6IG9yZy5mbG93YWJsZS5tdWxlLk11bGVTZW5kQWN0aXZpdHlCZWhhdmlvclxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIE11bGUgQlBNIE1vZHVsZS0-Pk11bGUgQlBNIEFwcDogPGJwbTp0YXNrLWxpc3RlbmVyIC8-XG4gICAgYWN0aXZhdGUgTXVsZSBCUE0gQXBwXG4gICAgTXVsZSBCUE0gQXBwLS0-Pk11bGUgQlBNIE1vZHVsZTogcmVzdWx0VmFyaWFibGVcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIEFwcFxuICAgIE11bGUgQlBNIE1vZHVsZS0tPj5CUE1OIDIuMDogcmVzdWx0VmFyaWFibGVcbiAgICBCUE1OIDIuMC0tPj5NdWxlIEJQTSBNb2R1bGU6IGRvbmVcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIGRlYWN0aXZhdGUgQlBNTiAyLjBcbiAgICBlbmRcbiAgICBNdWxlIEJQTSBNb2R1bGUtLT4-TXVsZSBCUE0gQXBwOiBjb20uYWxmYW1lLmVzYi5icG0uYXBpLkJQTVByb2Nlc3NJbnN0YW5jZVxuICAgIGRlYWN0aXZhdGUgTXVsZSBCUE0gTW9kdWxlXG4gICAgYWN0aXZhdGUgTXVsZSBCUE0gQXBwXG4gICAgTXVsZSBCUE0gQXBwLT4-TXVsZSBCUE0gQXBwOiBhdHRyaWJ1dGVzLnByb2Nlc3NJbnN0YW5jZUlkXG4gICAgZGVhY3RpdmF0ZSBNdWxlIEJQTSBBcHBcbiAgICByZWN0IHJnYigyMDAsIDIwMCwgMjQwKVxuICAgIE11bGUgQlBNIE1vZHVsZS0-PkJQTU4gMi4wOiA8c2VydmljZVRhc2sgZmxvd2FibGU6dHlwZT1cIm11bGVcIiBmbG93YWJsZTphc3luYz1cInRydWVcIiAvPlxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIGFjdGl2YXRlIEJQTU4gMi4wXG4gICAgQlBNTiAyLjAtPj5NdWxlIEJQTSBNb2R1bGU6IG9yZy5mbG93YWJsZS5tdWxlLk11bGVTZW5kQWN0aXZpdHlCZWhhdmlvclxuICAgIGFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIE11bGUgQlBNIE1vZHVsZS0-Pk11bGUgQlBNIEFwcDogPGJwbTp0YXNrLWxpc3RlbmVyIC8-XG4gICAgYWN0aXZhdGUgTXVsZSBCUE0gQXBwXG4gICAgTXVsZSBCUE0gQXBwLS0-Pk11bGUgQlBNIE1vZHVsZTogcmVzdWx0VmFyaWFibGVcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIEFwcFxuICAgIE11bGUgQlBNIE1vZHVsZS0tPj5CUE1OIDIuMDogcmVzdWx0VmFyaWFibGVcbiAgICBCUE1OIDIuMC0tPj5NdWxlIEJQTSBNb2R1bGU6IGRvbmVcbiAgICBkZWFjdGl2YXRlIEJQTU4gMi4wXG4gICAgZGVhY3RpdmF0ZSBNdWxlIEJQTSBNb2R1bGVcbiAgICBkZWFjdGl2YXRlIE11bGUgQlBNIE1vZHVsZVxuICAgIGVuZFxuICAgIGRlYWN0aXZhdGUgTXVsZSBCUE0gQXBwIiwibWVybWFpZCI6eyJ0aGVtZSI6ImRlZmF1bHQifSwidXBkYXRlRWRpdG9yIjpmYWxzZX0)
+
+### Mule event listener
+
+Flowable events can be used as flow sources with `<bpm:event-listener />`. Event filters can be used to filter the events that trigger flows.
+
+Example:
+
+```
+<flow name="myFlow">
+    <bpm:event-listener config-ref="myConfigRef">
+        <bpm:event-filters>
+            <bpm:activity-name-filter activityName="foobar"/>
+        </bpm:event-filters>
+    </bpm:event-listener>
+</flow>
+```
+
+See [Event filters](#event-filters) for examples. 
+
+
+
+[![
+    sequenceDiagram
+    autonumber
+    participant Mule BPM App
+    participant Mule BPM Module
+    participant BPMN 2.0
+    activate Mule BPM App
+    Mule BPM App->>Mule BPM Module: <bpm:process-factory />  
+    activate Mule BPM Module
+    Mule BPM Module->>BPMN 2.0: <startEvent />
+    activate BPMN 2.0
+    rect rgb(200, 200, 240)
+    BPMN 2.0->>Mule BPM Module: org.flowable.common.engine.api.delegate.event.FlowableEvent
+    alt isUnfilteredEvent(FlowableEvent)
+        Mule BPM Module->>Mule BPM App: <bpm:event-listener />
+        Mule BPM App->>Mule BPM App: execute flow
+    else
+    end
+    deactivate Mule BPM Module
+    deactivate BPMN 2.0
+    deactivate Mule BPM App
+    end
+](https://mermaid.ink/img/pako:eNp9U01rwzAM_SvGpw5aN5SdwghsrLt1DMZuuTi2khn8NcfuVkr_-5SPlrTrmkOQpaenJ1neU-Ek0Jy28JXACnhWvAnclJbgx1N0NpkKwnD2PEQllOc2kk3SQJ7eNuTR-xvRjZNo_gVg7JWsWDYWElFteYQrrFPPoiguiHPyUHmT--AEtO2iRiIXdmRZEPIf81TRhRP5j7qQuI2od70FVLssLtjO5QcQkYSmmq2ybE6G3312NwSP0GviXWhYrd03rzQw4YxxloFtlAXGvWISNDRYjkGngr2MyF7TKEhHotoPWysdIYDsQ7Mz4CjjervT6Y6z7GsttGojWAin1m_dRZ8MPyASjqbrZ0gB3Y5zBisHQ8LtC5nEz0d8LfG0I0hP59RAMFxJXOZ95y5p_AQDJc3RlFDzpGNJS3tAaPISmdZS4bbQPIYEc9ot-_vOiuN5wIzvYXAefgEokQWv)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNp9U01rwzAM_SvGpw5aN5SdwghsrLt1DMZuuTi2khn8NcfuVkr_-5SPlrTrmkOQpaenJ1neU-Ek0Jy28JXACnhWvAnclJbgx1N0NpkKwnD2PEQllOc2kk3SQJ7eNuTR-xvRjZNo_gVg7JWsWDYWElFteYQrrFPPoiguiHPyUHmT--AEtO2iRiIXdmRZEPIf81TRhRP5j7qQuI2od70FVLssLtjO5QcQkYSmmq2ybE6G3312NwSP0GviXWhYrd03rzQw4YxxloFtlAXGvWISNDRYjkGngr2MyF7TKEhHotoPWysdIYDsQ7Mz4CjjervT6Y6z7GsttGojWAin1m_dRZ8MPyASjqbrZ0gB3Y5zBisHQ8LtC5nEz0d8LfG0I0hP59RAMFxJXOZ95y5p_AQDJc3RlFDzpGNJS3tAaPISmdZS4bbQPIYEc9ot-_vOiuN5wIzvYXAefgEokQWv)
 
 ### Variable operations
 
@@ -378,4 +472,25 @@ sequenceDiagram
 
 Awaiting events is really useful for Munit tests. However, event subscription is fully production grade implementation, which can be used inside actual Mule BPM Applications.
 
-Events can be filtered by adding nested `<bpm:event-filters />` tag inside `<bpm:event-subscription-builder />`, `<bpm:get-unique-event />` and `<bpm:get-events />` tags. By default, all matched events are returned. After adding filters, only matching events are qualified. Multiple filters of a same type may be added.
+
+### Event filters
+
+Events can be filtered by adding nested `<bpm:event-filters />` tag inside `<bpm:event-subscription-builder />`, `<bpm:get-unique-event />` and `<bpm:get-events />` or `<bpm:event-listener />` tags. By default, all matched events are returned. After adding filters, only matching events are qualified. 
+
+Multiple filters of a same or different type may be added. Filters of the same type have a logical OR relationship and filters of a different type have a logical AND relationship. 
+
+For example, this would filter  `(foo OR bar) AND baz AND TASK_CREATED`.
+
+```
+<bpm:event-filters>
+    <bpm:activity-name-filter activityName="foo" />
+    <bpm:activity-name-filter activityName="bar" />
+    <bpm:process-definition-filter key="baz" />
+    <bpm:event-type-filter eventType="TASK_CREATED" />
+</bpm:event-filters>
+```
+
+Types of filters:
+`<bpm:process-definition-filter key="foo">` filters for `<process id="foo">` in the process .bpmn20.xml file.
+`<bpm:activity-name-filter activityName="bar">` filters for example `<userTask id="bar">`
+`<bpm:event-type-filter eventType="TASK_CREATED" />` filters for event type such as TASK_CREATED, PROCESS_INSTANCE_CREATED, PROCESS_INSTANCE_ENDED
