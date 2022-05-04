@@ -18,15 +18,9 @@ public class BPMTaskQueue {
         this.queueName = queueName;
     }
 
-    public boolean publish(BPMTask task) throws InterruptedException {
+    public boolean publish(BPMTask task) {
         logger.debug("Pushing to queue " + this.queueName);
         return taskQueue.offer(task);
-    }
-
-    @Deprecated
-    public BPMTask pop() throws InterruptedException {
-        logger.debug("Popping from queue " + this.queueName);
-        return taskQueue.take();
     }
 
     public BPMTask pop(long timeout, TimeUnit unit) throws InterruptedException {

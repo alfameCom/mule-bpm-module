@@ -59,7 +59,7 @@ public class BPMProcessFactoryOperations {
 
         processInstance = instanceBuilder.startProcessInstance();
 
-        LOGGER.debug("Started process instance " + processInstance.getProcessInstanceId());
+        LOGGER.debug("Started process instance {}", processInstance.getProcessInstanceId());
 
         return processInstance;
 
@@ -74,6 +74,6 @@ public class BPMProcessFactoryOperations {
 
         engine.triggerSignal(processInstanceId, signalName);
 
-        LOGGER.debug("Signaled process instance " + processInstanceId + " with " + signalName);
+        LOGGER.debug("Signaled process instance {} with {}", processInstanceId, signalName);
     }
 }
