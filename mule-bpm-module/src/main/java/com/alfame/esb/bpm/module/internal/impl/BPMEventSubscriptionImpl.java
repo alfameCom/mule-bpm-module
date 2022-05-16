@@ -49,7 +49,7 @@ public class BPMEventSubscriptionImpl implements BPMEngineEventSubscription {
             }
 
             LOGGER.debug("Awaiting {} events", countDownLatch.getCount());
-            if (this.countDownLatch.await(timeout, timeUnit) != true) {
+            if (!this.countDownLatch.await(timeout, timeUnit)) {
                 LOGGER.warn("Waiting of {} events timed out, after receiving {} events in {} ms",
                         numberOfEvents, numberOfEvents - countDownLatch.getCount(), TimeUnit.MILLISECONDS.convert(timeout, timeUnit));
             }
@@ -85,7 +85,7 @@ public class BPMEventSubscriptionImpl implements BPMEngineEventSubscription {
             }
 
             LOGGER.debug("Awaiting {} events", countDownLatch.getCount());
-            if (this.countDownLatch.await(timeout, timeUnit) != true) {
+            if (!this.countDownLatch.await(timeout, timeUnit)) {
                 LOGGER.warn("Waiting of {} events timed out, after receiving {} events in {} ms",
                         numberOfEvents, numberOfEvents - countDownLatch.getCount(), TimeUnit.MILLISECONDS.convert(timeout, timeUnit));
             }
@@ -96,7 +96,7 @@ public class BPMEventSubscriptionImpl implements BPMEngineEventSubscription {
         } finally {
             try {
                 this.cacheLock.lock();
-                if (this.cachedEvents.size() > 0) {
+                if (!this.cachedEvents.isEmpty()) {
                     event = this.cachedEvents.get(0);
                     this.cachedEvents.remove(0);
                 }

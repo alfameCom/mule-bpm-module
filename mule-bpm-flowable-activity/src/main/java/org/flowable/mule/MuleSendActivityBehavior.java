@@ -70,9 +70,9 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
         LOGGER.trace(">>>>> process definition {}: instance {}: activity {}: execution with payload expression {}", processDefinitionKey, processInstanceId, currentActivityId, payloadExpressionValue);
         LOGGER.trace(">>>>> process definition {}: instance {}: activity {}: execution with tenant {}", processDefinitionKey, processInstanceId, currentActivityId, execution.getTenantId());
 
-        boolean isFlowable5Execution = false;
-        Object attributes = execution;
         Object payload = null;
+        boolean isFlowable5Execution = false;
+
         if (payloadExpressionValue != null && !payloadExpressionValue.isEmpty()) {
             if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
                     (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
@@ -145,7 +145,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
             }
 
         } else {
-            LOGGER.error("<<<<< process definition {}: instance {}: activity {}: execution cannot find task queue URL in {} ms", processDefinitionKey, processInstanceId, currentActivityId, endpointUrlValue, System.currentTimeMillis() - startTime);
+            LOGGER.error("<<<<< process definition {}: instance {}: activity {}: execution cannot find task queue {} in {} ms", processDefinitionKey, processInstanceId, currentActivityId, endpointUrlValue, (System.currentTimeMillis() - startTime));
             throw new RuntimeException("Missing endpoint URL, cannot queue Mule Task!");
         }
 

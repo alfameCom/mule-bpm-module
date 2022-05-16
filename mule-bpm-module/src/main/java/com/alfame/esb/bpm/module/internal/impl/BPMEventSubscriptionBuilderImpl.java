@@ -47,7 +47,7 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
 
     @Override
     public BPMEngineEventSubscription subscribeForEvents(BPMEngineEventListener engineEventListener) {
-        if (this.subscribedForEvents != true) {
+        if (!this.subscribedForEvents) {
             this.engineEventListener = engineEventListener;
             this.runtimeService.addEventListener(this);
             this.eventSubscription = new BPMEventSubscriptionImpl(this.engine, this);
@@ -58,7 +58,7 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
     }
 
     public void unsubscribeForEvents() {
-        if (this.subscribedForEvents == true) {
+        if (this.subscribedForEvents) {
             this.engineEventListener = null;
             this.runtimeService.removeEventListener(this);
             this.subscribedForEvents = false;
@@ -67,10 +67,14 @@ public class BPMEventSubscriptionBuilderImpl extends BPMEngineEventSubscriptionB
 
     @Override
     public void onEvent(FlowableEvent flowableEvent) {
-        if (this.subscribedForEvents == true) {
+        if (this.subscribedForEvents) {
             BPMEngineEvent engineEvent = null;
 
-            LOGGER.trace("Received event of class {} with contents {}", flowableEvent.getClass().getCanonicalName(), ToStringBuilder.reflectionToString(flowableEvent));
+            if (LOGGER.isTraceEnabled()) {
+                String flowableEventToString = ToStringBuilder.reflectionToString(flowableEvent);
+                LOGGER.trace("Received event of class {} with contents {}", flowableEvent.getClass().getCanonicalName(), flowableEventToString);
+            }
+
             if (flowableEvent instanceof FlowableVariableEvent) {
                 FlowableVariableEvent flowableVariableEvent = (FlowableVariableEvent) flowableEvent;
                 LOGGER.trace("Received variable event {} for instance {}", flowableVariableEvent.getType(), flowableVariableEvent.getProcessInstanceId());

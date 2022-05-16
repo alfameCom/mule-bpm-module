@@ -1,0 +1,52 @@
+name: Increment project versions based on release
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.DEVOPS_TOKEN }}
+
+      - name: Get version from release if valid
+        id: get_version
+        run: |
+          if [[ ${{ github.ref }} =~ refs\/tags\/[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
+          else
+            exit 1
+          fi
+
+      - name: Set up git user
+        run: |
+          git config user.name alfamedevops
+          git config user.email alfamedevops@alfame.com
+
+      - name: Set project version to release version and commit
+        run: |
+          mvn -B versions:set -DnewVersion=$VERSION -DprocessAllModules versions:commit
+          find . -name "pom.xml" | xargs git add
+          git commit -m "Automated release commit"
+          git push origin HEAD:master
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
+
+      - name: Set project version to next snapshot version and commit
+        run: |
+          mvn -B versions:set -DnextSnapshot=true -DprocessAllModules versions:commit
+          find . -name "pom.xml" | xargs git add
+          git commit -m "Automated snapshot commit"
+          git push origin HEAD:master
+
+      - name: Merge changes to develop
+        run: |
+          git checkout develop
+          git merge origin/master --commit --no-edit
+          git push origin HEAD:develop

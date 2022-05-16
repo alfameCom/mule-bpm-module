@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - master
+      - develop
     paths-ignore:
       - .github/**
   pull_request:
@@ -21,6 +22,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Set up JDK 11
       uses: actions/setup-java@v1
@@ -31,6 +34,15 @@ jobs:
         server-password: MAVEN_PASSWORD
         gpg-private-key: ${{ secrets.OSSRH_PGP_PRIVATE_KEY }}
         gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+    - name: Set up Maven cache
+      uses: actions/cache@v1
+      if: github.event_name != 'push' || github.ref != 'refs/heads/master'
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
 
     - name: Build and verify with Maven
       env:

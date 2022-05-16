@@ -31,7 +31,7 @@ public class BPMTenantAwareJobDataManager extends MybatisJobDataManager {
         HashMap<String, Object> params = new HashMap<>();
         params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
 
-        if (enabledCategories != null && enabledCategories.size() > 0) {
+        if (enabledCategories != null && !enabledCategories.isEmpty()) {
             params.put("enabledCategories", enabledCategories);
         }
 
@@ -39,11 +39,9 @@ public class BPMTenantAwareJobDataManager extends MybatisJobDataManager {
         LOGGER.debug("Finding jobs for tenant {}", tenantId);
 
         List<JobEntity> jobs = getDbSqlSession().selectList("selectTenantAwareJobsToExecute", params, page);
-        if (LOGGER.isDebugEnabled()) {
-            if (jobs != null) {
-                for (JobEntity job : jobs) {
-                    LOGGER.debug("Found job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(job));
-                }
+        if (LOGGER.isDebugEnabled() && jobs != null) {
+            for (JobEntity job : jobs) {
+                LOGGER.debug("Found job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(job));
             }
         }
 
@@ -61,7 +59,7 @@ public class BPMTenantAwareJobDataManager extends MybatisJobDataManager {
         Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
         params.put("maxTimeout", maxTimeout);
 
-        if (enabledCategories != null && enabledCategories.size() > 0) {
+        if (enabledCategories != null && !enabledCategories.isEmpty()) {
             params.put("enabledCategories", enabledCategories);
         }
 
@@ -69,11 +67,9 @@ public class BPMTenantAwareJobDataManager extends MybatisJobDataManager {
         LOGGER.debug("Finding expired jobs for tenant {} with max timeout {}", tenantId, maxTimeout);
 
         List<JobEntity> jobs = getDbSqlSession().selectList("selectTenantAwareExpiredJobs", params, page);
-        if (LOGGER.isDebugEnabled()) {
-            if (jobs != null) {
-                for (JobEntity job : jobs) {
-                    LOGGER.debug("Found expired job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(job));
-                }
+        if (LOGGER.isDebugEnabled() && jobs != null) {
+            for (JobEntity job : jobs) {
+                LOGGER.debug("Found expired job for tenant {}: {}", tenantId, ReflectionToStringBuilder.toString(job));
             }
         }
 

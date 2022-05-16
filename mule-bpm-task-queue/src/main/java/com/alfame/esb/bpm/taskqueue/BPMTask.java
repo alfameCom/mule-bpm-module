@@ -19,13 +19,13 @@ public abstract class BPMTask implements BPMTaskInstance, BPMTaskResponseCallbac
     private Map<String, Object> variablesToUpdate = new HashMap<>();
     private List<String> variablesToRemove = new ArrayList<>();
 
-    abstract public BPMProcessInstance getProcessInstance();
+    public abstract BPMProcessInstance getProcessInstance();
 
-    abstract public Object getPayload();
+    public abstract Object getPayload();
 
-    abstract public Optional<String> getCorrelationId();
+    public abstract Optional<String> getCorrelationId();
 
-    abstract public void applyCommandContext();
+    public abstract void applyCommandContext();
 
     public long getRequestTimeoutMillis() {
         return this.requestTimeoutMillis;

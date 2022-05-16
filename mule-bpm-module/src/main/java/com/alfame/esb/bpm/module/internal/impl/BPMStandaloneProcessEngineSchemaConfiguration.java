@@ -6,7 +6,7 @@ import org.flowable.job.service.JobServiceConfiguration;
 
 public class BPMStandaloneProcessEngineSchemaConfiguration extends StandaloneProcessEngineConfiguration {
 
-    private final String CUSTOM_MYBATIS_JOB_MAPPING_FILE = "db/mapping/mappings.xml";
+    private static final String CUSTOM_MYBATIS_JOB_MAPPING_FILE = "db/mapping/mappings.xml";
 
     public BPMStandaloneProcessEngineSchemaConfiguration() {
         mybatisMappingFile = CUSTOM_MYBATIS_JOB_MAPPING_FILE;
@@ -14,10 +14,8 @@ public class BPMStandaloneProcessEngineSchemaConfiguration extends StandalonePro
 
     @Override
     public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new BPMSchemaOperationsProcessEngineBuild();
-            }
+        if (schemaManagementCmd == null && usingRelationalDatabase && databaseSchemaUpdate != null) {
+            this.schemaManagementCmd = new BPMSchemaOperationsProcessEngineBuild();
         }
     }
 

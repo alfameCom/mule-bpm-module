@@ -24,7 +24,7 @@ public class BPMMuleTaskTestCase extends BPMAbstractTestCase {
 
         BPMTask task = new BPMDummyMuleTask(null, "123");
         boolean publishResult = queue.publish(task);
-        Assert.assertEquals("Publish result should be true", true, publishResult);
+        Assert.assertTrue("Publish result should be true", publishResult);
 
         BPMTaskResponse response = task.waitForResponse();
         Assert.assertNotNull("Response should not be NULL", response);
@@ -44,7 +44,7 @@ public class BPMMuleTaskTestCase extends BPMAbstractTestCase {
 
         BPMTask task = new BPMDummyMuleTask(null, "456");
         boolean publishResult = queue.publish(task);
-        Assert.assertEquals("Publish result should be true", true, publishResult);
+        Assert.assertTrue("Publish result should be true", publishResult);
 
         BPMTaskResponse response = task.waitForResponse();
         Assert.assertNotNull("Response should not be NULL", response);

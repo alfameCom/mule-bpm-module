@@ -27,55 +27,22 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
         String databaseSchemaUpdate = CommandContextUtil.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
 
         if (!ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-            SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
+
             DataSource dataSource = CommandContextUtil.getProcessEngineConfiguration().getDataSource();
 
             if (dataSource != null) {
                 Connection connection = null;
                 try {
                     connection = dataSource.getConnection();
-                    if (connection != null && connection.isValid(5)) {
-                        String schema = connection.getSchema();
-                        LOGGER.info("managing database schema {} on {}", schema, connection.getMetaData().getURL());
-                        Flyway flyway = Flyway.configure()
-                                .locations("db/mule-bpm-flowable/migrations")
-                                .dataSource(dataSource)
-                                .schemas(schema)
-                                .load();
-
-                        if (flyway.info().current() == null) {
-                            LOGGER.info("database not created or baselined");
-                            returnValue = super.execute(commandContext);
-                            // Ensure database session has been committed prior to Flyaway operations
-                            commitDbSqlContext(commandContext);
-                            flyway.baseline();
-                        } else {
-                            try {
-                                schemaManager.schemaCheckVersion();
-                            } catch (FlowableWrongDbException flowableWrongDbException) {
-                                LOGGER.info("flowable database needs an update: {}", flowableWrongDbException.getMessage());
-                                returnValue = super.execute(commandContext);
-                                // Ensure database session has been committed prior to Flyaway operations
-                                commitDbSqlContext(commandContext);
-                                flyway.baseline();
-                            } finally {
-                            }
-                        }
-
-                        flyway.migrate();
+                    if (connection.isValid(5)) {
+                        returnValue = migrateDB(dataSource, connection, commandContext);
                     } else {
                         LOGGER.error("cannot establish database connection");
                     }
                 } catch (Exception exception) {
                     LOGGER.error("error on Flyway migration", exception);
                 } finally {
-                    if (connection != null) {
-                        try {
-                            connection.close();
-                        } catch (SQLException sqlException) {
-                            LOGGER.error("error while closing database connection", sqlException);
-                        }
-                    }
+                    closeConnection(connection);
                 }
             } else {
                 LOGGER.warn("no data source defined");
@@ -83,6 +50,52 @@ public class BPMSchemaOperationsProcessEngineBuild extends SchemaOperationsProce
         }
 
         return returnValue;
+    }
+
+    private Void migrateDB(DataSource dataSource, Connection connection, CommandContext commandContext) throws SQLException {
+        Void returnValue = null;
+        SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
+        String schema = connection.getSchema();
+
+        LOGGER.info("managing database schema {} on {}", schema, connection.getMetaData().getURL());
+
+        Flyway flyway = Flyway.configure()
+                .locations("db/mule-bpm-flowable/migrations")
+                .dataSource(dataSource)
+                .schemas(schema)
+                .load();
+
+        if (flyway.info().current() == null) {
+            LOGGER.info("database not created or baselined");
+            returnValue = super.execute(commandContext);
+            // Ensure database session has been committed prior to Flyaway operations
+            commitDbSqlContext(commandContext);
+            flyway.baseline();
+        } else {
+            try {
+                schemaManager.schemaCheckVersion();
+            } catch (FlowableWrongDbException flowableWrongDbException) {
+                LOGGER.info("flowable database needs an update: {}", flowableWrongDbException.getMessage());
+                returnValue = super.execute(commandContext);
+                // Ensure database session has been committed prior to Flyaway operations
+                commitDbSqlContext(commandContext);
+                flyway.baseline();
+            }
+        }
+
+        flyway.migrate();
+
+        return returnValue;
+    }
+
+    private void closeConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException sqlException) {
+                LOGGER.error("error while closing database connection", sqlException);
+            }
+        }
     }
 
     protected void commitDbSqlContext(CommandContext commandContext) throws SQLException {
