@@ -13,6 +13,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          token: ${{ secrets.DEVOPS_TOKEN }}
 
       - name: Get version from release if valid
         id: get_version
