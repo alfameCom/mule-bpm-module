@@ -8,7 +8,6 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.slf4j.Logger;
 
 import java.util.Date;
-import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

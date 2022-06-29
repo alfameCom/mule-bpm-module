@@ -1,6 +1,5 @@
 package com.alfame.esb.bpm.module.internal.operations;
 
-import com.alfame.esb.bpm.api.BPMEngineEventSubscription;
 import com.alfame.esb.bpm.api.BPMProcessInstanceQuery;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;

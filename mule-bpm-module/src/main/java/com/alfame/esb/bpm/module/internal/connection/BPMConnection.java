@@ -2,13 +2,13 @@ package com.alfame.esb.bpm.module.internal.connection;
 
 import com.alfame.esb.bpm.api.BPMEngineEvent;
 import com.alfame.esb.bpm.taskqueue.BPMTask;
-import com.alfame.esb.bpm.taskqueue.BPMTaskResponseCallback;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.slf4j.Logger;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

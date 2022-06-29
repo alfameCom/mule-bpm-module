@@ -1,7 +1,6 @@
 package com.alfame.esb.bpm.module;
 
 import com.alfame.esb.bpm.api.*;
-
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -23,8 +23,7 @@ public class BPMAttachmentFinderImpl extends BPMAttachmentFinder {
 
     @Override
     public List<BPMAttachmentInstance> attachments() {
-        List<BPMAttachmentInstance> filteredAttachments = new ArrayList<>();
-        List<Attachment> attachments = null;
+        List<Attachment> attachments;
 
         if (this.processInstanceId != null) {
             LOGGER.debug("Finding attachments for process {}", this.processInstanceId);
@@ -35,6 +34,8 @@ public class BPMAttachmentFinderImpl extends BPMAttachmentFinder {
         } else {
             throw new IllegalArgumentException("Either process instance id or task id required");
         }
+
+        List<BPMAttachmentInstance> filteredAttachments = new ArrayList<>();
 
         if (attachments != null) {
             for (Attachment attachment : attachments) {
@@ -61,13 +62,9 @@ public class BPMAttachmentFinderImpl extends BPMAttachmentFinder {
         List<BPMAttachmentInstance> filteredAttachments = attachments();
         BPMAttachmentInstance latestAttachment = null;
 
-        if (filteredAttachments != null) {
-            for (BPMAttachmentInstance filteredAttachment : filteredAttachments) {
-                if (latestAttachment != null && latestAttachment.getTime().before(filteredAttachment.getTime())) {
-                    latestAttachment = filteredAttachment;
-                } else if (latestAttachment == null) {
-                    latestAttachment = filteredAttachment;
-                }
+        for (BPMAttachmentInstance filteredAttachment : filteredAttachments) {
+            if (latestAttachment == null || latestAttachment.getTime().before(filteredAttachment.getTime())) {
+                latestAttachment = filteredAttachment;
             }
         }
 
