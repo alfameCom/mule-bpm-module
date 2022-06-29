@@ -41,6 +41,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
 
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -163,14 +164,15 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
         if (this.asyncExecutorFactory instanceof BPMDefaultAsyncExecutorFactory) {
             BPMDefaultAsyncExecutorFactory defaultAsyncExecutorFactory = (BPMDefaultAsyncExecutorFactory) this.asyncExecutorFactory;
-            this.processEngineConfiguration.setAsyncExecutorTenantId(this.tenantId);
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setTenantId(this.tenantId);
             this.processEngineConfiguration.setAsyncExecutorNumberOfRetries(1);
             this.processEngineConfiguration.setAsyncExecutorCorePoolSize(defaultAsyncExecutorFactory.getMinThreads());
             this.processEngineConfiguration.setAsyncExecutorMaxPoolSize(defaultAsyncExecutorFactory.getMaxThreads());
-            this.processEngineConfiguration.setAsyncExecutorDefaultAsyncJobAcquireWaitTime(defaultAsyncExecutorFactory.getDefaultAsyncJobAcquireWaitTimeInMillis());
-            this.processEngineConfiguration.setAsyncExecutorDefaultTimerJobAcquireWaitTime(defaultAsyncExecutorFactory.getDefaultTimerJobAcquireWaitTimeInMillis());
-            this.processEngineConfiguration.setAsyncExecutorMaxAsyncJobsDuePerAcquisition(defaultAsyncExecutorFactory.getMaxAsyncJobsDuePerAcquisition());
-            this.processEngineConfiguration.setAsyncExecutorMaxTimerJobsPerAcquisition(defaultAsyncExecutorFactory.getMaxTimerJobsPerAcquisition());
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setDefaultAsyncJobAcquireWaitTime(Duration.ofMillis(defaultAsyncExecutorFactory.getDefaultAsyncJobAcquireWaitTimeInMillis()));
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setDefaultAsyncJobAcquireWaitTime(Duration.ofMillis(defaultAsyncExecutorFactory.getDefaultAsyncJobAcquireWaitTimeInMillis()));
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setDefaultTimerJobAcquireWaitTime(Duration.ofMillis(defaultAsyncExecutorFactory.getDefaultTimerJobAcquireWaitTimeInMillis()));
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setMaxAsyncJobsDuePerAcquisition(defaultAsyncExecutorFactory.getMaxAsyncJobsDuePerAcquisition());
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setMaxTimerJobsPerAcquisition(defaultAsyncExecutorFactory.getMaxTimerJobsPerAcquisition());
             this.processEngineConfiguration.setAsyncFailedJobWaitTime(defaultAsyncExecutorFactory.getAsyncFailedJobWaitTimeInSeconds());
             this.processEngineConfiguration.setAsyncExecutor(this.asyncExecutorFactory.createAsyncExecutor());
         } else if (this.asyncExecutorFactory != null) {

@@ -21,7 +21,7 @@ public class BPMStandaloneProcessEngineSchemaConfiguration extends StandalonePro
 
     @Override
     protected JobServiceConfiguration instantiateJobServiceConfiguration() {
-        return new BPMTenantAwareJobServiceConfiguration(ScopeTypes.BPMN, this.getAsyncExecutorTenantId());
+        return new BPMTenantAwareJobServiceConfiguration(ScopeTypes.BPMN, this.getAsyncExecutorConfiguration().getTenantId());
     }
 
 }
