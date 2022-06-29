@@ -41,6 +41,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
 
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -71,9 +72,9 @@ import static org.slf4j.LoggerFactory.getLogger;
         subTypes = {BPMProcessInstanceIdFilter.class, BPMProcessInstanceProcessDefinitionFilter.class, BPMProcessInstanceBusinessKeyLikeFilter.class, BPMProcessInstanceProcessNameLikeFilter.class, BPMProcessInstanceTenantFilter.class, BPMProcessInstanceVariableLikeFilter.class, BPMProcessInstanceStartedAfterFilter.class, BPMProcessInstanceStartedBeforeFilter.class, BPMProcessInstanceFinishedAfterFilter.class, BPMProcessInstanceFinishedBeforeFilter.class, BPMProcessInstanceUnfinishedFilter.class, BPMProcessInstanceFinishedFilter.class, BPMProcessInstanceIncludeProcessVariables.class})
 @SubTypeMapping(baseType = BPMAttachmentFilter.class,
         subTypes = {BPMAttachmentNameFilter.class})
-@ExternalLib(name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.6.0", requiredClassName = "org.flowable.engine.RuntimeService")
-@ExternalLib(name = "Flowable Form Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-form-engine:6.6.0", requiredClassName = "org.flowable.form.engine.FormEngine")
-@ExternalLib(name = "Flowable Form Engine Configurator", type = DEPENDENCY, coordinates = "org.flowable:flowable-form-engine-configurator:6.6.0", requiredClassName = "org.flowable.form.engine.configurator.FormEngineConfigurator")
+@ExternalLib(name = "Flowable Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-engine:6.7.2", requiredClassName = "org.flowable.engine.RuntimeService")
+@ExternalLib(name = "Flowable Form Engine", type = DEPENDENCY, coordinates = "org.flowable:flowable-form-engine:6.7.2", requiredClassName = "org.flowable.form.engine.FormEngine")
+@ExternalLib(name = "Flowable Form Engine Configurator", type = DEPENDENCY, coordinates = "org.flowable:flowable-form-engine-configurator:6.7.2", requiredClassName = "org.flowable.form.engine.configurator.FormEngineConfigurator")
 @ExternalLib(name = "BPM Flowable Activity", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-flowable-activity:${project.version}", requiredClassName = "org.flowable.mule.MuleSendActivityBehavior")
 @ExternalLib(name = "BPM Task Queue", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-task-queue:${project.version}", requiredClassName = "com.alfame.esb.bpm.taskqueue.BPMTaskQueueFactory")
 @ExternalLib(name = "BPM API", type = DEPENDENCY, coordinates = "com.alfame.esb.bpm:mule-bpm-api:${project.version}", requiredClassName = "com.alfame.esb.bpm.api.BPMEnginePool")
@@ -163,14 +164,15 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
         this.processEngineConfiguration.setAsyncExecutorActivate(false);
         if (this.asyncExecutorFactory instanceof BPMDefaultAsyncExecutorFactory) {
             BPMDefaultAsyncExecutorFactory defaultAsyncExecutorFactory = (BPMDefaultAsyncExecutorFactory) this.asyncExecutorFactory;
-            this.processEngineConfiguration.setAsyncExecutorTenantId(this.tenantId);
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setTenantId(this.tenantId);
             this.processEngineConfiguration.setAsyncExecutorNumberOfRetries(1);
             this.processEngineConfiguration.setAsyncExecutorCorePoolSize(defaultAsyncExecutorFactory.getMinThreads());
             this.processEngineConfiguration.setAsyncExecutorMaxPoolSize(defaultAsyncExecutorFactory.getMaxThreads());
-            this.processEngineConfiguration.setAsyncExecutorDefaultAsyncJobAcquireWaitTime(defaultAsyncExecutorFactory.getDefaultAsyncJobAcquireWaitTimeInMillis());
-            this.processEngineConfiguration.setAsyncExecutorDefaultTimerJobAcquireWaitTime(defaultAsyncExecutorFactory.getDefaultTimerJobAcquireWaitTimeInMillis());
-            this.processEngineConfiguration.setAsyncExecutorMaxAsyncJobsDuePerAcquisition(defaultAsyncExecutorFactory.getMaxAsyncJobsDuePerAcquisition());
-            this.processEngineConfiguration.setAsyncExecutorMaxTimerJobsPerAcquisition(defaultAsyncExecutorFactory.getMaxTimerJobsPerAcquisition());
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setDefaultAsyncJobAcquireWaitTime(Duration.ofMillis(defaultAsyncExecutorFactory.getDefaultAsyncJobAcquireWaitTimeInMillis()));
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setDefaultAsyncJobAcquireWaitTime(Duration.ofMillis(defaultAsyncExecutorFactory.getDefaultAsyncJobAcquireWaitTimeInMillis()));
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setDefaultTimerJobAcquireWaitTime(Duration.ofMillis(defaultAsyncExecutorFactory.getDefaultTimerJobAcquireWaitTimeInMillis()));
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setMaxAsyncJobsDuePerAcquisition(defaultAsyncExecutorFactory.getMaxAsyncJobsDuePerAcquisition());
+            this.processEngineConfiguration.getAsyncExecutorConfiguration().setMaxTimerJobsPerAcquisition(defaultAsyncExecutorFactory.getMaxTimerJobsPerAcquisition());
             this.processEngineConfiguration.setAsyncFailedJobWaitTime(defaultAsyncExecutorFactory.getAsyncFailedJobWaitTimeInSeconds());
             this.processEngineConfiguration.setAsyncExecutor(this.asyncExecutorFactory.createAsyncExecutor());
         } else if (this.asyncExecutorFactory != null) {
@@ -181,13 +183,18 @@ public class BPMExtension implements Initialisable, Startable, Stoppable, BPMEng
 
     @Override
     public void start() throws MuleException {
-        this.processEngine = this.processEngineConfiguration.buildProcessEngine();
+        if (this.processEngine == null) {
+            this.processEngine = this.processEngineConfiguration.buildProcessEngine();
+        }
 
-        this.formEngine = this.formEngineConfigurator.getFormEngine();
+        if (this.formEngine == null) {
+            this.formEngine = this.formEngineConfigurator.getFormEngine();
+        }
 
         this.deployDefinitions(this.definitions, this.tenantId);
 
-        if (this.processEngineConfiguration.getAsyncExecutor() != null) {
+        if (this.processEngineConfiguration.getAsyncExecutor() != null
+                && !this.processEngineConfiguration.getAsyncExecutor().isActive()) {
             this.processEngineConfiguration.getAsyncExecutor().start();
         }
 
