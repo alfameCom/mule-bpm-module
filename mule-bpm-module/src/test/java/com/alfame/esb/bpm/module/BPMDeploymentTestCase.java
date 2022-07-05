@@ -6,7 +6,6 @@ import com.alfame.esb.bpm.api.BPMProcessInstance;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 
 public class BPMDeploymentTestCase extends BPMAbstractTestCase {
 
@@ -23,14 +22,10 @@ public class BPMDeploymentTestCase extends BPMAbstractTestCase {
         Startable startable = (Startable) engine;
         Assert.assertNotNull("Startable should not be NULL", startable);
 
-        Stoppable stobable = (Stoppable) engine;
-        Assert.assertNotNull("Stoppable should not be NULL", stobable);
-
         BPMProcessInstance firstProcessInstance = engine.processInstanceBuilder()
                 .processDefinitionKey("testProcess").startProcessInstance();
         Assert.assertNotNull("First process instance should not be NULL", firstProcessInstance);
 
-        stobable.stop();
         startable.start();
 
         engine = BPMEnginePool.getInstance("engineConfig");
